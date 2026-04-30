@@ -1,0 +1,117 @@
+.authContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(30, 30, 35, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.authCard h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.authCard p {
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #ff4b2b;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #ff4b2b;
+  box-shadow: 0 0 0 2px rgba(255, 75, 43, 0.2);
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary-gradient);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.switchAuth {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.switchAuth a {
+  color: #ff4b2b;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.switchAuth a:hover {
+  text-decoration: underline;
+}
+
+.errorMsg {
+  background: rgba(255, 59, 48, 0.1);
+  border-left: 3px solid #ff3b30;
+  padding: 0.8rem;
+  border-radius: 4px;
+  color: #ff3b30;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}

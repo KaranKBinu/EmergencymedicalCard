@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  role          String         @default("USER") // USER or ADMIN
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  medicalRecord MedicalRecord?
+}
+
+model MedicalRecord {
+  id                String           @id @default(uuid())
+  userId            String           @unique
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name              String
+  dob               String
+  bloodGroup        String
+  height            String?
+  weight            String?
+  medicalConditions String?
+  medicineAllergies String?
+  commonAllergies   String?
+  emergencyContact  String?
+  address           String?
+  medicalNotes      String?
+  optionalFields    String?          // JSON or stringified info
+  history           MedicalHistory[]
+  updatedAt         DateTime         @updatedAt
+}
+
+model MedicalHistory {
+  id          String        @id @default(uuid())
+  recordId    String
+  record      MedicalRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  date        String
+  description String
+  notes       String?
+}
