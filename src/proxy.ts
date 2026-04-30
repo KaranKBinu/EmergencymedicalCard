@@ -5,7 +5,7 @@ import { decrypt } from '@/lib/auth';
 const protectedRoutes = ['/dashboard', '/admin'];
 const publicRoutes = ['/login', '/register', '/'];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
@@ -48,7 +48,7 @@ export async function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-export default middleware;
+export default proxy;
 
 // Routes Middleware should not run on
 export const config = {
