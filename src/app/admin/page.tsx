@@ -163,8 +163,10 @@ export default function AdminPage() {
         onClose={() => setSelectedUser(null)}
         maxWidth="md"
         fullWidth
-        PaperProps={{
-          sx: { bgcolor: 'background.default', backgroundImage: 'none', borderRadius: 4 }
+        slotProps={{
+          paper: {
+            sx: { bgcolor: 'background.default', backgroundImage: 'none', borderRadius: 4 }
+          }
         }}
       >
         <DialogTitle sx={{ m: 0, p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

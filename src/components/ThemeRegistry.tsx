@@ -37,6 +37,15 @@ const themeOptions: ThemeOptions = {
   },
   components: {
     MuiButton: {
+      variants: [
+        {
+          props: { variant: 'contained', color: 'primary' },
+          style: {
+            background: 'linear-gradient(45deg, #ff416c 0%, #ff4b2b 100%)',
+            border: 'none',
+          },
+        },
+      ],
       styleOverrides: {
         root: {
           padding: '10px 24px',
@@ -45,9 +54,6 @@ const themeOptions: ThemeOptions = {
             transform: 'translateY(-2px)',
             boxShadow: '0 8px 20px rgba(255, 75, 43, 0.3)',
           },
-        },
-        containedPrimary: {
-          background: 'linear-gradient(45deg, #ff416c 0%, #ff4b2b 100%)',
         },
       },
     },

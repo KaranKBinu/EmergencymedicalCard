@@ -87,12 +87,14 @@ export default function Navbar() {
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
                   onClose={handleClose}
-                  PaperProps={{
-                    sx: {
-                      mt: 1.5,
-                      bgcolor: '#121216',
-                      border: '1px solid rgba(255,255,255,0.05)',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                  slotProps={{
+                    paper: {
+                      sx: {
+                        mt: 1.5,
+                        bgcolor: '#121216',
+                        border: '1px solid rgba(255,255,255,0.05)',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                      }
                     }
                   }}
                 >

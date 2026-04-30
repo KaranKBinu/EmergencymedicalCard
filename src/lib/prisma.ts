@@ -1,13 +1,29 @@
-// Updated: 2026-04-30T08:35:00Z
 import { PrismaClient } from '@prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
+import { createClient } from '@libsql/client';
 import path from 'path';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 function createPrismaClient() {
-  // PrismaBetterSqlite3 expects { url: 'file:path' } — it creates the Database internally
-  // It strips the 'file:' prefix itself, so we just need a plain file path
+  const tursoUrl = process.env.TURSO_DATABASE_URL;
+  const tursoToken = process.env.TURSO_AUTH_TOKEN;
+
+  if (process.env.NODE_ENV === 'production' && tursoUrl && tursoToken) {
+    console.log('[Prisma] Connecting to Turso (LibSQL)');
+    const libsql = createClient({
+      url: tursoUrl,
+      authToken: tursoToken,
+    });
+    // In this version, PrismaLibSql might expect the client or the config. 
+    // Given the error, we'll try passing the client with an explicit cast if needed, 
+    // or check if it expects the client as a property.
+    const adapter = new PrismaLibSql(libsql as any);
+    return new PrismaClient({ adapter, log: ['query'] });
+  }
+
+  // Local development fallback
   const dbPath = path.resolve(process.cwd(), 'dev.db');
   const dbUrl = `file:${dbPath}`;
   console.log('[Prisma] Connecting via better-sqlite3 to:', dbUrl);
@@ -17,8 +33,5 @@ function createPrismaClient() {
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-// Deep Cache Refresh Salt: 992288
-// Timestamp: 2026-04-30T09:35:00Z
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
