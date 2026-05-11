@@ -56,6 +56,7 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
           <div className="text-left">
             <span className="text-[10px] uppercase font-black text-white/60 tracking-widest">Emergency Contact</span>
             <p className="text-lg font-black text-white leading-none mt-1">{data.emergencyName}</p>
+            <p className="text-xs text-white/70 font-bold mt-1 tracking-wider">{data.emergencyPhone}</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
             <Phone className="w-6 h-6 text-white fill-white" />

@@ -80,13 +80,13 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
               <div className="grid grid-cols-2 gap-4 w-full max-w-md mt-10">
                 <button 
                   onClick={handleDownload}
-                  className="flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all hover:opacity-90"
+                  className="flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all hover:opacity-90 cursor-pointer"
                 >
                   <Download className="w-5 h-5" /> Download PNG
                 </button>
                 <button 
                   onClick={handleShare}
-                  className="flex items-center justify-center gap-2 py-4 bg-white/5 text-white rounded-2xl text-sm font-bold transition-all hover:bg-white/10 border border-white/5"
+                  className="flex items-center justify-center gap-2 py-4 bg-white/5 text-white rounded-2xl text-sm font-bold transition-all hover:bg-white/10 border border-white/5 cursor-pointer"
                 >
                   <Share2 className="w-5 h-5" /> Copy Link
                 </button>
@@ -109,7 +109,7 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
 
               <button 
                 onClick={() => setIsEditModalOpen(true)}
-                className="w-full mt-8 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-sm font-bold transition-all border border-white/5"
+                className="w-full mt-8 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-sm font-bold transition-all border border-white/5 cursor-pointer"
               >
                 Edit Record
               </button>
@@ -127,7 +127,7 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
               </p>
               <button 
                 onClick={handleShare}
-                className="w-full py-3 bg-primary/10 text-primary text-xs font-bold rounded-xl border border-primary/20 hover:bg-primary/20 transition-all"
+                className="w-full py-3 bg-primary/10 text-primary text-xs font-bold rounded-xl border border-primary/20 hover:bg-primary/20 transition-all cursor-pointer"
               >
                 Copy Public Safety Link
               </button>

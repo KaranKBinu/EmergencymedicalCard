@@ -80,7 +80,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-black">Blood Group</span>
                     <div className="flex items-center gap-2.5">
@@ -97,7 +97,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                       <div className="p-1.5 rounded-lg bg-accent/10">
                         <Phone className="w-5 h-5 text-accent" />
                       </div>
-                      <span className="text-xl font-black text-white tracking-tight">{data.emergencyPhone}</span>
+                      <span className="text-lg font-black text-white tracking-tight whitespace-nowrap">{data.emergencyPhone}</span>
                     </div>
                   </div>
                 </div>
