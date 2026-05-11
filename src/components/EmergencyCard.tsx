@@ -146,36 +146,43 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
           <div className="absolute inset-0 rotate-y-180 backface-hidden">
             <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 bg-[#0d0d10]">
               <div className="relative h-full p-8 flex flex-col bg-white/[0.02] backdrop-blur-md">
-                <div className="grid grid-cols-2 gap-6 mb-6">
+                <div className="grid grid-cols-2 gap-6 mb-4">
                   {/* Medical Details */}
-                  <div className="space-y-2">
-                    <span className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground font-black">Allergies</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {data.allergies && data.allergies.length > 0 ? data.allergies.slice(0, 3).map(a => (
-                        <span key={a} className="px-2 py-1 rounded-md bg-destructive/20 text-destructive text-[9px] font-bold border border-destructive/10">{a}</span>
-                      )) : <span className="text-[10px] text-white/40 italic">None</span>}
+                  <div className="space-y-1.5">
+                    <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground font-black">Critical Allergies</span>
+                    <div className="flex flex-wrap gap-1">
+                      {data.allergies && data.allergies.length > 0 ? data.allergies.slice(0, 4).map(a => (
+                        <span key={a} className="px-1.5 py-0.5 rounded-md bg-destructive/20 text-destructive text-[8px] font-bold border border-destructive/10">{a}</span>
+                      )) : <span className="text-[9px] text-white/30 italic">None</span>}
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <span className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground font-black">Conditions</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {data.medicalConditions && data.medicalConditions.length > 0 ? data.medicalConditions.slice(0, 3).map(c => (
-                        <span key={c} className="px-2 py-1 rounded-md bg-accent/20 text-accent text-[9px] font-bold border border-accent/10">{c}</span>
-                      )) : <span className="text-[10px] text-white/40 italic">None</span>}
+                  <div className="space-y-1.5 border-l border-white/5 pl-6">
+                    <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground font-black">Medical Conditions</span>
+                    <div className="flex flex-wrap gap-1">
+                      {data.medicalConditions && data.medicalConditions.length > 0 ? data.medicalConditions.slice(0, 4).map(c => (
+                        <span key={c} className="px-1.5 py-0.5 rounded-md bg-accent/20 text-accent text-[8px] font-bold border border-accent/10">{c}</span>
+                      )) : <span className="text-[9px] text-white/30 italic">None</span>}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1 min-h-0 flex flex-col">
-                  <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex-1 flex flex-col">
-                    <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-3">
-                      <Info className="w-4 h-4 text-primary" /> Important Medical Notes
+                <div className="flex-1 min-h-0">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 h-full flex flex-col">
+                    <div className="flex items-center gap-2 text-[8px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2">
+                      <Info className="w-3.5 h-3.5 text-primary" /> Important Medical Notes
                     </div>
-                    <div className="overflow-y-auto custom-scrollbar flex-1">
-                      <p className="text-[12px] text-white/80 leading-relaxed italic">
+                    <div className="flex-1 overflow-hidden">
+                      <p className={`leading-relaxed italic text-white/80 ${(data.medications?.length || 0) > 250 ? 'text-[9.5px]' : 'text-[11px]'}`}>
                         {data.medications || "No additional medications or special instructions provided by the user."}
                       </p>
                     </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-4 text-[9px] font-bold text-muted-foreground mt-auto border-t border-white/5">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-3.5 h-3.5 text-accent" />
+                    <span className="tracking-widest uppercase">Emergency Response Profile</span>
                   </div>
                 </div>
               </div>
