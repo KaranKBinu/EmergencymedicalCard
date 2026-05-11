@@ -6,6 +6,7 @@ import { QrCode, Download, Share2, Edit3, Shield, Settings, LogOut } from "lucid
 import toast from "react-hot-toast";
 
 export default function Dashboard() {
+  const [mounted, setMounted] = useState(false);
   const [userData] = useState({
     fullName: "Karan K Binu",
     bloodGroup: "O+",
@@ -15,6 +16,10 @@ export default function Dashboard() {
     allergies: ["Peanuts", "Penicillin"],
     medicalConditions: ["Asthma"],
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleDownload = () => {
     toast.success("Downloading your Emergency Identity Card...");
@@ -104,9 +109,9 @@ export default function Dashboard() {
               <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                 This URL can be scanned by medical staff. It only shows critical info, hiding your address and sensitive history.
               </p>
-              <code className="block p-3 bg-black/40 rounded-xl text-[10px] text-primary/80 break-all border border-primary/5">
-                {typeof window !== "undefined" ? window.location.origin : ""}/v/sample-id
-              </code>
+                <code className="block p-3 bg-black/40 rounded-xl text-[10px] text-primary/80 break-all border border-primary/5">
+                  {mounted ? window.location.origin : ""}/v/sample-id
+                </code>
             </div>
           </div>
         </div>

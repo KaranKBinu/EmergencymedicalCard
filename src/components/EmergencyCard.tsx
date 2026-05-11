@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { QrCode, Phone, Droplets, User, Calendar, MapPin, Activity, AlertCircle } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -15,7 +16,11 @@ interface EmergencyData {
 }
 
 export default function EmergencyCard({ data }: { data: EmergencyData }) {
-  const publicUrl = typeof window !== "undefined" ? `${window.location.origin}/v/sample-id` : "";
+  const [publicUrl, setPublicUrl] = useState("");
+
+  useEffect(() => {
+    setPublicUrl(`${window.location.origin}/v/sample-id`);
+  }, []);
 
   return (
     <div className="flex flex-col items-center gap-8 py-10">
