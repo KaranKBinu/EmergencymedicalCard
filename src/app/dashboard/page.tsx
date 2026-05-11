@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EmergencyCard from "@/components/EmergencyCard";
 import { QrCode, Download, Share2, Edit3, Shield, Settings, LogOut } from "lucide-react";
 import toast from "react-hot-toast";
