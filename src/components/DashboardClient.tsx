@@ -6,9 +6,11 @@ import { QrCode, Download, Share2, Edit3, Shield, Settings, LogOut } from "lucid
 import toast from "react-hot-toast";
 import { toPng } from "html-to-image";
 import { signOut } from "next-auth/react";
+import EditRecordModal from "@/components/EditRecordModal";
 
 export default function DashboardClient({ initialData, userId }: { initialData: any, userId: string }) {
   const [mounted, setMounted] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,12 +72,12 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
               <p className="text-muted-foreground">Welcome back, {initialData.fullName.split(' ')[0]}. Your card is ready.</p>
             </div>
 
-            <div className="glass rounded-[3rem] p-4 sm:p-12 flex flex-col items-center border-white/5">
-              <div ref={cardRef} className="bg-background rounded-[1.5rem] overflow-hidden">
+            <div className="glass rounded-[3rem] p-6 sm:p-16 flex flex-col items-center border-white/5 w-full">
+              <div ref={cardRef} className="w-full flex justify-center perspective-1000">
                 <EmergencyCard data={initialData} />
               </div>
               
-              <div className="grid grid-cols-2 gap-4 w-full max-w-sm mt-8">
+              <div className="grid grid-cols-2 gap-4 w-full max-w-md mt-10">
                 <button 
                   onClick={handleDownload}
                   className="flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all hover:opacity-90"
@@ -105,7 +107,10 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
                 <VitalsItem label="Conditions" value={initialData.medicalConditions[0] || "None"} color="text-accent" />
               </div>
 
-              <button className="w-full mt-8 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-sm font-bold transition-all border border-white/5">
+              <button 
+                onClick={() => setIsEditModalOpen(true)}
+                className="w-full mt-8 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-sm font-bold transition-all border border-white/5"
+              >
                 Edit Record
               </button>
             </div>
@@ -130,6 +135,11 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
           </div>
         </div>
       </div>
+      <EditRecordModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        initialData={initialData} 
+      />
     </div>
   );
 }

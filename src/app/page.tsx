@@ -87,19 +87,22 @@ export default function Home() {
           </div>
           
           <div className="flex-1 relative">
-            <div className="glass rounded-[2rem] p-8 aspect-[1.6/1] w-full max-w-md mx-auto shadow-2xl relative overflow-hidden group">
+            <div className="glass rounded-[2.5rem] p-8 aspect-[1.58/1] w-full max-w-md mx-auto shadow-[0_0_50px_-12px_rgba(255,77,77,0.2)] relative overflow-hidden group border-white/10">
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 blur-[60px] rounded-full" />
               <div className="absolute top-0 right-0 p-8">
-                <QrCode className="w-20 h-20 text-white opacity-20" />
+                <QrCode className="w-20 h-20 text-white opacity-20 group-hover:opacity-40 transition-opacity" />
               </div>
-              <div className="h-full flex flex-col justify-between">
+              <div className="h-full flex flex-col justify-between relative z-10">
                 <div>
-                  <div className="w-16 h-16 rounded-2xl bg-white/10 mb-4" />
-                  <h3 className="text-xl font-bold">John Doe</h3>
-                  <p className="text-xs text-muted-foreground">ID: #9902-X</p>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 border border-white/10 mb-4 flex items-center justify-center">
+                    <Heart className="w-8 h-8 text-white/20" />
+                  </div>
+                  <h3 className="text-2xl font-bold tracking-tight">Alex Rivera</h3>
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-black mt-1">Life ID: #EMER-24</p>
                 </div>
-                <div className="flex gap-4">
-                  <div className="px-3 py-1 rounded-lg bg-primary/20 text-primary text-[10px] font-bold">O Positive</div>
-                  <div className="px-3 py-1 rounded-lg bg-white/5 text-white/60 text-[10px] font-bold">Emergency Contact: Active</div>
+                <div className="flex gap-3">
+                  <div className="px-4 py-2 rounded-xl bg-primary/20 border border-primary/20 text-primary text-xs font-black">AB POSITIVE</div>
+                  <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 text-xs font-black">ALLERGIC: PENICILLIN</div>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone, Droplets, AlertCircle, Info, Activity, User, Heart, ShieldAlert } from "lucide-react";
+import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert } from "lucide-react";
 
 interface PublicMedicalRecord {
   fullName: string;
@@ -11,7 +11,6 @@ interface PublicMedicalRecord {
   medicalConditions: string[];
   allergies: string[];
   medications?: string;
-  organDonor: boolean;
 }
 
 export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRecord }) {
@@ -82,20 +81,7 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
           </div>
         </div>
 
-        {/* Vitals Summary */}
-        <div className="glass rounded-[2rem] p-6 space-y-6">
-          <div className="flex justify-between items-center border-b border-white/5 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                <Heart className="w-5 h-5 text-primary" />
-              </div>
-              <span className="font-bold">Organ Donor</span>
-            </div>
-            <div className={`px-4 py-1.5 rounded-full text-xs font-black uppercase ${data.organDonor ? 'bg-primary/20 text-primary' : 'bg-white/5 text-muted-foreground'}`}>
-              {data.organDonor ? 'Verified Yes' : 'Not Listed'}
-            </div>
-          </div>
-
+        <div className="glass rounded-[2rem] p-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold tracking-widest px-1">
               <Info className="w-3.5 h-3.5" />
