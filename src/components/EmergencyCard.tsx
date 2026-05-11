@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { QrCode, Phone, Droplets, User, ShieldAlert, Activity, Scale, Ruler, Info, Calendar } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -24,6 +24,7 @@ interface EmergencyData {
 
 export default function EmergencyCard({ data, forcedSide }: { data: EmergencyData, forcedSide?: 'front' | 'back' }) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   
   // Use forcedSide if provided, otherwise use internal state
   const currentFlipped = forcedSide ? (forcedSide === 'back') : isFlipped;
@@ -48,7 +49,22 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
       <div
         className="relative w-full max-w-[480px] aspect-[1.58/1] cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem]"
         onClick={() => setIsFlipped(!isFlipped)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
+              exit={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
+              className="absolute -top-14 left-1/2 px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Click to flip card
+            </motion.div>
+          )}
+        </AnimatePresence>
         <motion.div
           className="relative w-full h-full transition-all duration-500 preserve-3d"
           animate={{ rotateY: currentFlipped ? 180 : 0 }}

@@ -359,14 +359,14 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
           <button 
             type="button"
             onClick={onClose}
-            className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/5"
+            className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/5 cursor-pointer"
           >
             Cancel
           </button>
           <button 
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 py-4 bg-primary text-white rounded-2xl font-bold transition-all hover:opacity-90 flex items-center justify-center gap-2 disabled:opacity-50"
+            className="flex-1 py-4 bg-primary text-white rounded-2xl font-bold transition-all hover:opacity-90 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
             Save Changes
