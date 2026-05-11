@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale } from "lucide-react";
+import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useRef } from "react";
 
 interface EditRecordModalProps {
   isOpen: boolean;
@@ -13,9 +14,11 @@ interface EditRecordModalProps {
 
 export default function EditRecordModal({ isOpen, onClose, initialData }: EditRecordModalProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     ...initialData,
+    photoUrl: initialData.photoUrl || "",
     allergies: initialData.allergies || [],
     medicalConditions: initialData.medicalConditions || []
   });
@@ -63,6 +66,21 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     setFormData({ ...formData, [field]: newList });
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Image size should be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, photoUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
@@ -82,6 +100,50 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
         <form onSubmit={handleSubmit} className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
           <div className="space-y-8">
+            {/* Photo Section */}
+            <section className="flex flex-col items-center gap-4 mb-8">
+              <div className="relative group">
+                <div className="w-32 h-32 rounded-[2.5rem] bg-white/5 border-2 border-dashed border-white/10 overflow-hidden flex items-center justify-center transition-all group-hover:border-primary/50">
+                  {formData.photoUrl ? (
+                    <img src={formData.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center">
+                      <Camera className="w-8 h-8 text-white/20 mx-auto mb-1" />
+                      <span className="text-[10px] text-white/20 font-bold uppercase tracking-tighter">Optional</span>
+                    </div>
+                  )}
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                  >
+                    <span className="text-xs font-bold text-white flex items-center gap-1">
+                      <ImageIcon className="w-4 h-4" /> Change
+                    </span>
+                  </div>
+                </div>
+                {formData.photoUrl && (
+                  <button 
+                    type="button"
+                    onClick={() => setFormData({ ...formData, photoUrl: "" })}
+                    className="absolute -top-2 -right-2 p-1.5 bg-destructive text-white rounded-xl shadow-lg hover:scale-110 transition-all"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleImageChange} 
+                accept="image/*" 
+                className="hidden" 
+              />
+              <div className="text-center">
+                <p className="text-sm font-bold">Profile Photo</p>
+                <p className="text-xs text-muted-foreground">Upload a clear photo for first responders</p>
+              </div>
+            </section>
+
             {/* Basic Info */}
             <section className="space-y-4">
               <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary/60 px-1">Basic Identity</h3>
