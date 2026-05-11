@@ -22,8 +22,11 @@ interface EmergencyData {
   createdAt?: Date;
 }
 
-export default function EmergencyCard({ data }: { data: EmergencyData }) {
+export default function EmergencyCard({ data, forcedSide }: { data: EmergencyData, forcedSide?: 'front' | 'back' }) {
   const [isFlipped, setIsFlipped] = useState(false);
+  
+  // Use forcedSide if provided, otherwise use internal state
+  const currentFlipped = forcedSide ? (forcedSide === 'back') : isFlipped;
   const [publicUrl, setPublicUrl] = useState("");
 
   useEffect(() => {
@@ -48,7 +51,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
       >
         <motion.div
           className="relative w-full h-full transition-all duration-500 preserve-3d"
-          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          animate={{ rotateY: currentFlipped ? 180 : 0 }}
           transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
         >
           {/* FRONT SIDE */}

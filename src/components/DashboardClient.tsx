@@ -7,30 +7,121 @@ import toast from "react-hot-toast";
 import { toPng } from "html-to-image";
 import { signOut } from "next-auth/react";
 import EditRecordModal from "@/components/EditRecordModal";
+import { jsPDF } from "jspdf";
 
 export default function DashboardClient({ initialData, userId }: { initialData: any, userId: string }) {
   const [mounted, setMounted] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const frontRef = useRef<HTMLDivElement>(null);
+  const backRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleDownload = async () => {
-    if (cardRef.current === null) return;
-    
-    const toastId = toast.loading("Generating your high-res card...");
-    
+  const handleDownloadPNG = async () => {
+    const toastId = toast.loading("Generating high-resolution PNGs...");
     try {
-      const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 2 });
-      const link = document.createElement('a');
-      link.download = `Emergency-Card-${initialData.fullName.replace(/\s+/g, '-')}.png`;
-      link.href = dataUrl;
-      link.click();
-      toast.success("Card downloaded successfully!", { id: toastId });
+      if (!frontRef.current || !backRef.current) return;
+      
+      const frontDataUrl = await toPng(frontRef.current, { pixelRatio: 3 });
+      const backDataUrl = await toPng(backRef.current, { pixelRatio: 3 });
+      
+      const download = (url: string, side: string) => {
+        const link = document.createElement('a');
+        link.download = `Emergency-Card-${side}-${initialData.fullName.replace(/\s+/g, '-')}.png`;
+        link.href = url;
+        link.click();
+      };
+      
+      download(frontDataUrl, 'Front');
+      setTimeout(() => download(backDataUrl, 'Back'), 500);
+      
+      toast.success("PNGs downloaded!", { id: toastId });
     } catch (err) {
-      toast.error("Failed to generate image. Please try again.", { id: toastId });
+      toast.error("Failed to generate PNGs.", { id: toastId });
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    const toastId = toast.loading("Preparing your PDF document...");
+    try {
+      if (!frontRef.current || !backRef.current) return;
+      
+      // Capture both sides
+      const frontImg = await toPng(frontRef.current, { pixelRatio: 2 });
+      const backImg = await toPng(backRef.current, { pixelRatio: 2 });
+      
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const cardWidth = 120; // 12cm
+      const cardHeight = (cardWidth / 1.582);
+      const margin = (pageWidth - cardWidth) / 2;
+      
+      // Add Title (Centered)
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(24);
+      pdf.setTextColor(30, 30, 30);
+      const title = "Emergency Medical Identity";
+      const titleWidth = pdf.getTextWidth(title);
+      pdf.text(title, (pageWidth - titleWidth) / 2, 35);
+      
+      // Add Subtitle
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      const subtitle = `Digital Safety Profile for ${initialData.fullName}`;
+      const subtitleWidth = pdf.getTextWidth(subtitle);
+      pdf.text(subtitle, (pageWidth - subtitleWidth) / 2, 42);
+
+      // Add a subtle line
+      pdf.setDrawColor(230, 230, 230);
+      pdf.line(margin, 48, pageWidth - margin, 48);
+      
+      // Add Front Card
+      pdf.addImage(frontImg, 'PNG', margin, 60, cardWidth, cardHeight);
+      
+      // Add Back Card
+      pdf.addImage(backImg, 'PNG', margin, 70 + cardHeight, cardWidth, cardHeight);
+      
+      // Add Instructions Box
+      const footerY = 85 + (cardHeight * 2);
+      pdf.setFillColor(245, 245, 245);
+      pdf.roundedRect(margin, footerY, cardWidth, 25, 3, 3, 'F');
+      
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(9);
+      pdf.setTextColor(50, 50, 50);
+      pdf.text("PRINTING INSTRUCTIONS", margin + 5, footerY + 8);
+      
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 100, 100);
+      const instructions = [
+        "1. Print this document on high-quality A4 paper or cardstock.",
+        "2. Carefully cut along the edges of both card sides.",
+        "3. Fold or glue the sides together to create your double-sided emergency card.",
+        "4. Place in your wallet or behind your phone case for easy access."
+      ];
+      instructions.forEach((line, i) => {
+        pdf.text(line, margin + 5, footerY + 14 + (i * 3.5));
+      });
+      
+      // Add Metadata
+      pdf.setFontSize(7);
+      pdf.text(`Issued: ${new Date().toLocaleDateString()}  |  ID: ${initialData.publicId.slice(0, 8)}`, margin, 280);
+      
+      pdf.save(`Medical-ID-${initialData.fullName.replace(/\s+/g, '-')}.pdf`);
+      toast.success("PDF document ready!", { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to generate PDF.", { id: toastId });
     }
   };
 
@@ -77,19 +168,36 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
                 <EmergencyCard data={initialData} />
               </div>
               
-              <div className="grid grid-cols-2 gap-4 w-full max-w-md mt-10">
-                <button 
-                  onClick={handleDownload}
-                  className="flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all hover:opacity-90 cursor-pointer"
-                >
-                  <Download className="w-5 h-5" /> Download PNG
-                </button>
+              <div className="flex flex-col gap-4 w-full max-w-md mt-10">
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <button 
+                    onClick={handleDownloadPDF}
+                    className="flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all hover:opacity-90 cursor-pointer shadow-[0_10px_20px_-10px_rgba(239,68,68,0.5)]"
+                  >
+                    <Download className="w-5 h-5" /> Download PDF
+                  </button>
+                  <button 
+                    onClick={handleDownloadPNG}
+                    className="flex items-center justify-center gap-2 py-4 bg-white/5 text-white rounded-2xl text-sm font-bold transition-all hover:bg-white/10 border border-white/5 cursor-pointer"
+                  >
+                    <QrCode className="w-5 h-5" /> Export PNGs
+                  </button>
+                </div>
                 <button 
                   onClick={handleShare}
-                  className="flex items-center justify-center gap-2 py-4 bg-white/5 text-white rounded-2xl text-sm font-bold transition-all hover:bg-white/10 border border-white/5 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-3 text-muted-foreground hover:text-white transition-colors text-xs font-medium"
                 >
-                  <Share2 className="w-5 h-5" /> Copy Link
+                  <Share2 className="w-4 h-4" /> Share Scannable Profile URL
                 </button>
+              </div>
+
+              <div className="fixed -left-[4000px] top-0 pointer-events-none opacity-0">
+                <div ref={frontRef} style={{ width: '480px' }}>
+                  <EmergencyCard data={initialData} forcedSide="front" />
+                </div>
+                <div ref={backRef} style={{ width: '480px' }} className="mt-4">
+                  <EmergencyCard data={initialData} forcedSide="back" />
+                </div>
               </div>
             </div>
           </div>
