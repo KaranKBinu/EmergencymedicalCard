@@ -24,6 +24,7 @@ export default async function PublicViewPage({ params }: { params: { id: string 
     medications: record.medications || undefined,
     address: record.address || undefined,
     dob: record.dob,
+    createdAt: record.createdAt,
     organDonor: record.organDonor,
   };
 

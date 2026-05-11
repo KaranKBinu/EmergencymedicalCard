@@ -19,6 +19,7 @@ interface EmergencyData {
   photoUrl?: string;
   publicId?: string;
   dob?: string;
+  createdAt?: Date;
 }
 
 export default function EmergencyCard({ data }: { data: EmergencyData }) {
@@ -32,7 +33,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
     // Auto-flip animation on load
     const timer1 = setTimeout(() => setIsFlipped(true), 1200);
     const timer2 = setTimeout(() => setIsFlipped(false), 2800);
-    
+
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
@@ -41,7 +42,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
 
   return (
     <div className="flex flex-col items-center gap-6 py-4 w-full">
-      <div 
+      <div
         className="relative w-full max-w-[480px] aspect-[1.58/1] cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem]"
         onClick={() => setIsFlipped(!isFlipped)}
       >
@@ -56,7 +57,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
               {/* Background Accents */}
               <div className="absolute -top-24 -right-24 w-80 h-80 bg-primary/20 blur-[100px] rounded-full" />
               <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-accent/10 blur-[100px] rounded-full" />
-              
+
               <div className="relative h-full p-8 flex flex-col justify-between bg-white/[0.02] backdrop-blur-md">
                 <div className="flex justify-between items-start">
                   <div className="flex gap-5">
@@ -79,7 +80,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="p-2.5 bg-white rounded-2xl shadow-xl border border-white/20">
                     <QRCodeSVG value={publicUrl} size={80} level="H" />
                   </div>
@@ -95,7 +96,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                       <span className="text-xl font-black text-white">{data.bloodGroup}</span>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-1.5">
                     <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-black">Emergency Call</span>
                     <div className="flex items-center gap-2.5">
@@ -106,7 +107,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 pb-2">
                     <span className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-black">Height</span>
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
@@ -116,7 +117,7 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5 pb-2">
                     <span className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-black">Weight</span>
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
@@ -131,6 +132,10 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                   <div className="flex items-center gap-2">
                     <ShieldAlert className="w-4 h-4 text-primary" />
                     <span className="tracking-widest uppercase">Scannable Medical Identity</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 opacity-60">
+                    <span className="text-[8px] uppercase tracking-tighter">Issued:</span>
+                    <span>{data.createdAt ? new Date(data.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : "2024"}</span>
                   </div>
                 </div>
               </div>
@@ -171,13 +176,6 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                         {data.medications || "No additional medications or special instructions provided by the user."}
                       </p>
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-6 text-[10px] font-bold text-muted-foreground mt-auto">
-                  <div className="flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-accent" />
-                    <span className="tracking-widest uppercase">Detailed Medical Record</span>
                   </div>
                 </div>
               </div>

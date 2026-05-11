@@ -35,6 +35,7 @@ export default async function DashboardPage() {
     weight: record.weight || undefined,
     dob: record.dob,
     address: record.address || undefined,
+    createdAt: record.createdAt,
     publicId: record.id
   };
 
