@@ -27,6 +27,15 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
   useEffect(() => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
     setPublicUrl(`${baseUrl}/v/${data.publicId || 'sample-id'}`);
+
+    // Auto-flip animation on load
+    const timer1 = setTimeout(() => setIsFlipped(true), 1200);
+    const timer2 = setTimeout(() => setIsFlipped(false), 2800);
+    
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
   }, [data.publicId]);
 
   return (
@@ -98,7 +107,6 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                     <ShieldAlert className="w-4 h-4 text-primary" />
                     <span className="tracking-widest uppercase">Scannable Medical Identity</span>
                   </div>
-                  <span className="bg-white/5 px-3 py-1 rounded-full text-[9px] tracking-tighter">CLICK TO FLIP</span>
                 </div>
               </div>
             </div>
@@ -162,15 +170,12 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                     <Activity className="w-4 h-4 text-accent" />
                     <span className="tracking-widest uppercase">Detailed Medical Record</span>
                   </div>
-                  <span className="bg-white/5 px-3 py-1 rounded-full text-[9px] tracking-tighter">CLICK TO FLIP</span>
                 </div>
               </div>
             </div>
           </div>
         </motion.div>
       </div>
-      
-      <p className="text-xs text-muted-foreground/60 font-medium tracking-wide">Click card to flip and view safety details</p>
     </div>
   );
 }
