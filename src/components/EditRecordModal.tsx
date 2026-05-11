@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin } from "lucide-react";
+import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
@@ -20,6 +20,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     ...initialData,
     photoUrl: initialData.photoUrl || "",
     address: initialData.address || "",
+    dob: initialData.dob || "",
     allergies: initialData.allergies || [],
     medicalConditions: initialData.medicalConditions || []
   });
@@ -159,6 +160,19 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
                       required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground ml-1">Date of Birth</label>
+                  <div className="relative group">
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none group-focus-within:text-primary transition-colors" />
+                    <input 
+                      type="date" 
+                      value={formData.dob}
+                      onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+                      onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm [color-scheme:dark] cursor-pointer"
                     />
                   </div>
                 </div>

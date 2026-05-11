@@ -33,6 +33,8 @@ export default async function DashboardPage() {
     organDonor: record.organDonor,
     height: record.height || undefined,
     weight: record.weight || undefined,
+    dob: record.dob,
+    address: record.address || undefined,
     publicId: record.id
   };
 

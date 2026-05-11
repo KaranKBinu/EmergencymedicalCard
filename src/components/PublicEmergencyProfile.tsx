@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert, MapPin } from "lucide-react";
+import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert, MapPin, Calendar } from "lucide-react";
 
 interface PublicMedicalRecord {
   fullName: string;
@@ -12,6 +12,7 @@ interface PublicMedicalRecord {
   allergies: string[];
   medications?: string;
   address?: string;
+  dob?: string;
 }
 
 export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRecord }) {
@@ -45,7 +46,14 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
           </div>
           <div>
             <h1 className="text-3xl font-black tracking-tight">{data.fullName}</h1>
-            <p className="text-destructive font-bold text-xl">{data.bloodGroup} Positive</p>
+            <div className="flex items-center justify-center gap-4 mt-1">
+              <p className="text-destructive font-bold text-xl">{data.bloodGroup} Positive</p>
+              <div className="w-1 h-1 rounded-full bg-white/20" />
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                <span className="text-sm font-bold">{data.dob || "Unknown DOB"}</span>
+              </div>
+            </div>
           </div>
         </div>
 

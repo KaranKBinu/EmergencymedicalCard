@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { QrCode, Phone, Droplets, User, ShieldAlert, Activity, Scale, Ruler, Info } from "lucide-react";
+import { QrCode, Phone, Droplets, User, ShieldAlert, Activity, Scale, Ruler, Info, Calendar } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 interface EmergencyData {
@@ -18,6 +18,7 @@ interface EmergencyData {
   weight?: string;
   photoUrl?: string;
   publicId?: string;
+  dob?: string;
 }
 
 export default function EmergencyCard({ data }: { data: EmergencyData }) {
@@ -71,6 +72,10 @@ export default function EmergencyCard({ data }: { data: EmergencyData }) {
                       <div className="flex items-center gap-2 mt-1.5">
                         <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                         <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">Emergency ID</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <Calendar className="w-3 h-3 text-white/20" />
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{data.dob || "--"}</span>
                       </div>
                     </div>
                   </div>
