@@ -13,14 +13,16 @@ interface EmergencyData {
   allergies?: string[];
   medicalConditions?: string[];
   photoUrl?: string;
+  publicId?: string;
 }
 
 export default function EmergencyCard({ data }: { data: EmergencyData }) {
   const [publicUrl, setPublicUrl] = useState("");
 
   useEffect(() => {
-    setPublicUrl(`${window.location.origin}/v/sample-id`);
-  }, []);
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+    setPublicUrl(`${baseUrl}/v/${data.publicId || 'sample-id'}`);
+  }, [data.publicId]);
 
   return (
     <div className="flex flex-col items-center gap-8 py-10">

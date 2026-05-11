@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, Heart, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
 
 export default function Login() {
   const router = useRouter();
@@ -23,12 +24,21 @@ export default function Login() {
     setLoading(true);
     
     try {
-      // Mock login
-      await new Promise(r => setTimeout(r, 1200));
-      toast.success("Welcome back!");
-      router.push("/dashboard");
+      const res = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (res?.error) {
+        toast.error("Invalid email or password");
+      } else {
+        toast.success("Welcome back!");
+        router.push("/dashboard");
+        router.refresh();
+      }
     } catch (error) {
-      toast.error("Invalid credentials.");
+      toast.error("Login failed.");
     } finally {
       setLoading(false);
     }

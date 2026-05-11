@@ -1,17 +1,29 @@
+import { prisma } from "@/lib/prisma";
 import PublicEmergencyProfile from "@/components/PublicEmergencyProfile";
+import { notFound } from "next/navigation";
 
-export default function PublicViewPage() {
-  // Mock data for the public view
-  const mockEmergencyData = {
-    fullName: "Karan K Binu",
-    bloodGroup: "O+",
-    emergencyName: "Binu K",
-    emergencyPhone: "+91 98765 43210",
-    medicalConditions: ["Asthma", "Type 1 Diabetes"],
-    allergies: ["Peanuts", "Penicillin", "Latex"],
-    medications: "Takes Insulin daily. Carrying inhaler in right pocket.",
-    organDonor: true,
+export default async function PublicViewPage({ params }: { params: { id: string } }) {
+  const { id } = await params;
+
+  const record = await prisma.medicalRecord.findUnique({
+    where: { id }
+  });
+
+  if (!record) {
+    notFound();
+  }
+
+  const medicalData = {
+    fullName: record.fullName,
+    photoUrl: record.photoUrl || undefined,
+    bloodGroup: record.bloodGroup,
+    emergencyName: record.emergencyName,
+    emergencyPhone: record.emergencyPhone,
+    medicalConditions: record.medicalConditions?.split(",").filter(Boolean) || [],
+    allergies: record.allergies?.split(",").filter(Boolean) || [],
+    medications: record.medications || undefined,
+    organDonor: record.organDonor,
   };
 
-  return <PublicEmergencyProfile data={mockEmergencyData} />;
+  return <PublicEmergencyProfile data={medicalData} />;
 }

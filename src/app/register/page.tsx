@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Mail, Lock, Phone, Droplets, Heart } from "lucide-react";
 import toast from "react-hot-toast";
+import { registerUser } from "@/lib/actions";
 
 export default function Register() {
   const router = useRouter();
@@ -33,10 +34,13 @@ export default function Register() {
     setLoading(true);
     
     try {
-      // Mock API call
-      await new Promise(r => setTimeout(r, 1500));
-      toast.success("Account created successfully!");
-      router.push("/dashboard");
+      const res = await registerUser(formData);
+      if (res?.error) {
+        toast.error(res.error);
+      } else {
+        toast.success("Account created successfully!");
+        router.push("/login");
+      }
     } catch (error) {
       toast.error("Registration failed.");
     } finally {
