@@ -135,7 +135,7 @@ export default function Register() {
 function InputGroup({ icon, label, children }: { icon: React.ReactNode, label: string, children: React.ReactNode }) {
   return (
     <div className="space-y-1.5 text-left">
-      <label className="text-[10px] uppercase font-black text-muted-foreground tracking-widest ml-1">{label}</label>
+      <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest ml-1">{label}</label>
       <div className="flex items-center gap-3 p-4 bg-white/[0.03] border border-white/5 rounded-2xl focus-within:border-primary/50 transition-all">
         <div className="text-muted-foreground w-5 h-5 flex-shrink-0">
           {icon}

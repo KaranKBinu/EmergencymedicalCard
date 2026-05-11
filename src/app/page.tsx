@@ -8,7 +8,7 @@ export default function Home() {
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/20 blur-[120px] rounded-full -z-10 opacity-50" />
         
-        <div className="container px-6 mx-auto text-center">
+        <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-primary mb-6">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -46,7 +46,7 @@ export default function Home() {
 
       {/* Features Grid */}
       <section className="py-20 bg-black/20">
-        <div className="container px-6 mx-auto">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard 
               icon={<Zap className="w-6 h-6 text-primary" />}
@@ -69,7 +69,7 @@ export default function Home() {
       
       {/* Card Preview Section */}
       <section className="py-20 border-t border-white/5">
-        <div className="container px-6 mx-auto flex flex-col md:flex-row items-center gap-12">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
           <div className="flex-1 text-left">
             <h2 className="text-3xl font-bold mb-4">The Card That <br/> Speaks For You.</h2>
             <p className="text-muted-foreground mb-6">
