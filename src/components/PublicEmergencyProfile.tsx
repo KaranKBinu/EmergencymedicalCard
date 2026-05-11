@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert } from "lucide-react";
+import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert, MapPin } from "lucide-react";
 
 interface PublicMedicalRecord {
   fullName: string;
@@ -11,6 +11,7 @@ interface PublicMedicalRecord {
   medicalConditions: string[];
   allergies: string[];
   medications?: string;
+  address?: string;
 }
 
 export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRecord }) {
@@ -82,8 +83,18 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
           </div>
         </div>
 
-        <div className="glass rounded-[2rem] p-6">
+        <div className="glass rounded-[2rem] p-6 space-y-6">
           <div className="space-y-2">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold tracking-widest px-1">
+              <MapPin className="w-3.5 h-3.5 text-accent" />
+              Residential Address
+            </div>
+            <div className="p-4 rounded-2xl bg-white/[0.03] text-sm text-white/80 leading-relaxed border border-white/5">
+              {data.address || "No address information provided."}
+            </div>
+          </div>
+
+          <div className="space-y-2 border-t border-white/5 pt-6">
             <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold tracking-widest px-1">
               <Info className="w-3.5 h-3.5" />
               Additional Medical Notes

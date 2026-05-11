@@ -22,7 +22,8 @@ export async function PATCH(req: Request) {
       height,
       weight,
       organDonor,
-      photoUrl
+      photoUrl,
+      address
     } = body;
 
     const record = await prisma.medicalRecord.update({
@@ -39,7 +40,8 @@ export async function PATCH(req: Request) {
         height,
         weight,
         organDonor,
-        photoUrl
+        photoUrl,
+        address
       }
     });
 

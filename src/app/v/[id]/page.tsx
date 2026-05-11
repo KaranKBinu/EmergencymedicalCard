@@ -22,6 +22,7 @@ export default async function PublicViewPage({ params }: { params: { id: string 
     medicalConditions: record.medicalConditions?.split(",").filter(Boolean) || [],
     allergies: record.allergies?.split(",").filter(Boolean) || [],
     medications: record.medications || undefined,
+    address: record.address || undefined,
     organDonor: record.organDonor,
   };
 
