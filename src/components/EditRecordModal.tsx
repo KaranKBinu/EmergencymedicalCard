@@ -305,10 +305,16 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground ml-1">Important Medications / Notes</label>
+                <div className="flex justify-between items-center px-1">
+                  <label className="text-xs font-bold text-muted-foreground">Important Medications / Notes</label>
+                  <span className={`text-[10px] font-bold ${(formData.medications?.length || 0) >= 365 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                    {formData.medications?.length || 0}/375
+                  </span>
+                </div>
                 <textarea 
                   value={formData.medications}
                   onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
+                  maxLength={375}
                   rows={3}
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all text-sm resize-none"
                   placeholder="List medications first responders should know about..."
