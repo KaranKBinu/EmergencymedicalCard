@@ -31,6 +31,8 @@ export default async function DashboardPage() {
     photoUrl: record.photoUrl || undefined,
     medications: record.medications || undefined,
     organDonor: record.organDonor,
+    height: record.height || undefined,
+    weight: record.weight || undefined,
     publicId: record.id
   };
 
