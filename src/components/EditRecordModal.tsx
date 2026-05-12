@@ -61,6 +61,16 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     return { name: file.name, url: blob.url };
   };
 
+  const deleteFile = async (url: string) => {
+    try {
+      await fetch(`/api/upload?url=${encodeURIComponent(url)}`, {
+        method: "DELETE",
+      });
+    } catch (error) {
+      console.error("Delete Error:", error);
+    }
+  };
+
   const saveChanges = async (currentData = formData) => {
     setLoading(true);
     try {
@@ -148,11 +158,24 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     }
   };
 
-  const removeHistoryItem = (index: number) => {
-    setFormData({
-      ...formData,
-      history: formData.history.filter((_: any, i: number) => i !== index)
-    });
+  const removeHistoryItem = async (index: number) => {
+    const item = formData.history[index];
+    
+    // Delete associated files from blob storage
+    if (item.files && item.files.length > 0) {
+      toast.loading("Cleaning up files...", { id: "delete-progress" });
+      await Promise.all(item.files.map((file: any) => deleteFile(file.url)));
+      toast.dismiss("delete-progress");
+    }
+
+    const updatedHistory = formData.history.filter((_: any, i: number) => i !== index);
+    const updatedData = { ...formData, history: updatedHistory };
+    setFormData(updatedData);
+    
+    // Auto-save the record update
+    toast.loading("Updating record...", { id: "save-progress" });
+    await saveChanges(updatedData);
+    toast.dismiss("save-progress");
   };
 
   const handleHistoryFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,10 +211,12 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const oldUrl = formData.photoUrl;
       const toastId = toast.loading("Uploading photo...");
       try {
         const { url } = await uploadFile(file);
         setFormData({ ...formData, photoUrl: url });
+        if (oldUrl) await deleteFile(oldUrl);
         toast.success("Photo uploaded!", { id: toastId });
       } catch (err) {
         toast.error("Photo upload failed", { id: toastId });
@@ -242,7 +267,12 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                 {formData.photoUrl && (
                   <button 
                     type="button"
-                    onClick={() => setFormData({ ...formData, photoUrl: "" })}
+                    onClick={async () => {
+                      const urlToDelete = formData.photoUrl;
+                      setFormData({ ...formData, photoUrl: "" });
+                      await deleteFile(urlToDelete);
+                      toast.success("Photo removed");
+                    }}
                     className="absolute -top-2 -right-2 p-1.5 bg-destructive text-white rounded-xl shadow-lg hover:scale-110 transition-all"
                   >
                     <Trash2 className="w-3 h-3" />
@@ -624,10 +654,22 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                           </div>
                           <button 
                             type="button"
-                            onClick={() => setNewHistory({
-                              ...newHistory,
-                              files: newHistory.files.filter((_, idx) => idx !== i)
-                            })}
+                            onClick={async () => {
+                              const fileToDelete = newHistory.files[i];
+                              const updatedFiles = newHistory.files.filter((_, idx) => idx !== i);
+                              const updatedHistoryItem = { ...newHistory, files: updatedFiles };
+                              
+                              setNewHistory(updatedHistoryItem);
+                              
+                              if (editingHistoryIndex !== null) {
+                                const updatedHistory = [...formData.history];
+                                updatedHistory[editingHistoryIndex] = updatedHistoryItem;
+                                setFormData({ ...formData, history: updatedHistory });
+                              }
+
+                              await deleteFile(fileToDelete.url);
+                              toast.success("File removed");
+                            }}
                             className="p-1 text-destructive opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                           >
                             <X className="w-3.5 h-3.5" />
