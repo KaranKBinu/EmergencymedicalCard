@@ -22,33 +22,33 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
     <div className="min-h-screen bg-background text-foreground pb-20">
 
 
-      <div className="max-w-lg mx-auto px-4 sm:px-6 pt-10 space-y-8">
+      <div className="max-w-lg mx-auto px-6 pt-10 space-y-8">
         {/* Profile Identity */}
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="relative">
-            <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-[2.5rem] bg-card border-2 border-white/5 overflow-hidden shadow-2xl">
+            <div className="w-32 h-32 rounded-[2.5rem] bg-card border-2 border-white/5 overflow-hidden shadow-2xl">
               {data.photoUrl ? (
                 <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" />
               ) : (
-                <User className="w-14 h-14 sm:w-16 sm:h-16 text-white/10 m-7 sm:m-8" />
+                <User className="w-16 h-16 text-white/10 m-8" />
               )}
             </div>
-            <div className="absolute -bottom-1 -right-1 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-destructive flex items-center justify-center border-4 border-background shadow-xl">
-              <Droplets className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
+            <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-2xl bg-destructive flex items-center justify-center border-4 border-background shadow-xl">
+              <Droplets className="w-6 h-6 text-white fill-white" />
             </div>
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">{data.fullName}</h1>
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mt-1">
-              <p className="text-destructive font-bold text-lg sm:text-xl">{data.bloodGroup}</p>
-              <div className="hidden xs:block w-1 h-1 rounded-full bg-white/20" />
+            <h1 className="text-3xl font-black tracking-tight">{data.fullName}</h1>
+            <div className="flex items-center justify-center gap-4 mt-1">
+              <p className="text-destructive font-bold text-xl">{data.bloodGroup}</p>
+              <div className="w-1 h-1 rounded-full bg-white/20" />
               <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span className="text-xs sm:text-sm font-bold uppercase">{data.gender || "N/A"}</span>
+                <span className="text-sm font-bold uppercase">{data.gender || "N/A"}</span>
               </div>
-              <div className="hidden xs:block w-1 h-1 rounded-full bg-white/20" />
+              <div className="w-1 h-1 rounded-full bg-white/20" />
               <div className="flex items-center gap-1.5 text-muted-foreground">
-                <Calendar className="w-3.5 h-3.5 sm:w-4 h-4" />
-                <span className="text-xs sm:text-sm font-bold">{data.dob || "Unknown DOB"}</span>
+                <Calendar className="w-4 h-4" />
+                <span className="text-sm font-bold">{data.dob || "Unknown DOB"}</span>
               </div>
             </div>
           </div>
@@ -57,22 +57,22 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
         {/* Vital Action: Call Emergency Contact */}
         <a 
           href={`tel:${data.emergencyPhone}`}
-          className="flex items-center justify-between p-5 sm:p-6 bg-destructive rounded-[2rem] shadow-[0_0_40px_rgba(239,68,68,0.3)] emergency-pulse hover:brightness-110 active:scale-95 transition-all"
+          className="flex items-center justify-between p-6 bg-destructive rounded-[2rem] shadow-[0_0_40px_rgba(239,68,68,0.3)] emergency-pulse hover:brightness-110 active:scale-95 transition-all"
         >
           <div className="text-left">
-            <span className="text-[11px] sm:text-[12px] uppercase font-black text-white/60 tracking-[0.1em]">Emergency Contact</span>
-            <p className="text-base sm:text-lg font-black text-white leading-none mt-1">{data.emergencyName}</p>
-            <p className="text-[11px] sm:text-xs text-white/70 font-bold mt-1 tracking-wider">{data.emergencyPhone}</p>
+            <span className="text-[10px] uppercase font-black text-white/60 tracking-widest">Emergency Contact</span>
+            <p className="text-lg font-black text-white leading-none mt-1">{data.emergencyName}</p>
+            <p className="text-xs text-white/70 font-bold mt-1 tracking-wider">{data.emergencyPhone}</p>
           </div>
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/20 flex items-center justify-center">
-            <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
+          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
+            <Phone className="w-6 h-6 text-white fill-white" />
           </div>
         </a>
 
         {/* Medical Alerts Section */}
         <div className="space-y-4">
           <SectionTitle icon={<AlertCircle className="w-5 h-5 text-destructive" />} title="Critical Allergies" />
-          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {data.allergies.length > 0 ? data.allergies.map((a) => {
               const isMed = a.startsWith('💊 ');
               const displayName = isMed ? a.replace('💊 ', '') : a;
@@ -88,7 +88,7 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
                     </div>
                   )}
                   <div 
-                    className={`px-4 py-3 rounded-2xl border font-bold text-xs sm:text-sm text-center flex items-center justify-center gap-2 ${
+                    className={`px-4 py-3 rounded-2xl border font-bold text-sm text-center flex items-center justify-center gap-2 ${
                       isMed 
                         ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
                         : 'bg-destructive/10 border-destructive/20 text-destructive'
@@ -104,7 +104,7 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
 
         <div className="space-y-4">
           <SectionTitle icon={<Activity className="w-5 h-5 text-accent" />} title="Medical Conditions" />
-          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {data.medicalConditions.length > 0 ? data.medicalConditions.map((condition) => (
               <AlertCard key={condition} label={condition} variant="accent" />
             )) : <p className="text-muted-foreground text-sm italic col-span-2">No chronic conditions</p>}
@@ -113,7 +113,7 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
 
         <div className="glass rounded-[2rem] p-6 space-y-6">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-muted-foreground text-[11px] uppercase font-bold tracking-[0.15em] px-1">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold tracking-widest px-1">
               <MapPin className="w-3.5 h-3.5 text-accent" />
               Residential Address
             </div>
@@ -123,7 +123,7 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
           </div>
 
           <div className="space-y-2 border-t border-white/5 pt-6">
-            <div className="flex items-center gap-2 text-muted-foreground text-[11px] uppercase font-bold tracking-[0.15em] px-1">
+            <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase font-bold tracking-widest px-1">
               <Info className="w-3.5 h-3.5" />
               Additional Medical Notes
             </div>
@@ -207,7 +207,7 @@ function SectionTitle({ icon, title }: { icon: React.ReactNode, title: string })
   return (
     <div className="flex items-center gap-2 px-2">
       {icon}
-      <h2 className="text-[11px] sm:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">{title}</h2>
+      <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground">{title}</h2>
     </div>
   );
 }

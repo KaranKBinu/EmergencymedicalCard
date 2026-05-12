@@ -180,35 +180,26 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
             <span className="font-black font-outfit tracking-tight text-xl">Life ID</span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <button 
-                onClick={() => setIsEditModalOpen(true)}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold transition-all"
-              >
-                <Edit3 className="w-4 h-4 text-primary" />
-                <span className="hidden sm:inline">Edit Card</span>
-              </button>
-              <button 
-                onClick={() => signOut()}
-                className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-xl text-sm font-bold transition-all"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden xs:inline">Sign Out</span>
-              </button>
-            </div>
+
+            <button 
+              onClick={() => signOut()}
+              className="p-2 hover:bg-destructive/10 rounded-xl transition-all group"
+            >
+              <LogOut className="w-5 h-5 text-muted-foreground group-hover:text-destructive" />
+            </button>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="max-w-5xl mx-auto px-6 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12">
           <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             <div className="space-y-1 sm:space-y-2">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-outfit tracking-tight leading-tight">Your Digital Identity</h1>
+              <h1 className="text-3xl sm:text-4xl font-black font-outfit tracking-tight leading-tight">Your Digital Identity</h1>
               <p className="text-muted-foreground text-sm">Welcome back, {initialData.fullName.split(' ')[0]}. Your card is ready.</p>
             </div>
 
-            <div className="glass rounded-[2rem] sm:rounded-[3rem] p-4 sm:p-16 flex flex-col items-center border-white/5 w-full overflow-hidden">
+            <div className="glass rounded-[2.5rem] sm:rounded-[3rem] p-4 sm:p-16 flex flex-col items-center border-white/5 w-full">
               <div 
                 className="w-full flex justify-center perspective-1000"
                 onMouseMove={handleMouseMove}
@@ -231,7 +222,7 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
                 </motion.div>
               </div>
               
-              <div className="flex flex-col gap-3 w-full max-w-sm mt-4 sm:mt-10">
+              <div className="flex flex-col gap-4 w-full max-w-md mt-10">
                 <div className="relative w-full" ref={dropdownRef}>
                   <button 
                     onClick={() => setIsDownloadOpen(!isDownloadOpen)}
@@ -346,9 +337,9 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
                   accent="border-green-500/20 bg-green-500/5"
                 />
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="flex items-center gap-2 text-[11px] font-black text-muted-foreground uppercase tracking-widest">
+                  <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     <Activity className="w-3.5 h-3.5" />
-                    Medical Baseline
+                    Key Medical Data
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {initialData.allergies.length > 0 ? (
@@ -440,7 +431,7 @@ function StatusCard({ icon, label, value, accent }: { icon: React.ReactNode, lab
           {icon}
         </div>
         <div className="flex flex-col">
-          <span className="text-[11px] text-muted-foreground font-bold uppercase tracking-widest leading-none mb-1">{label}</span>
+          <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest leading-none mb-1">{label}</span>
           <span className="text-sm font-black tracking-tight">{value}</span>
         </div>
       </div>
