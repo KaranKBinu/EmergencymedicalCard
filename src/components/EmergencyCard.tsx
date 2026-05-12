@@ -39,6 +39,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
   const [publicUrl, setPublicUrl] = useState("");
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastWidth = useRef<number>(0);
 
   const [showHint, setShowHint] = useState(false);
 
@@ -49,6 +50,9 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
     const handleResize = () => {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
+        if (width === 0 || width === lastWidth.current) return;
+        lastWidth.current = width;
+
         const shouldRotate = width < 440;
         setIsRotated(shouldRotate);
 
