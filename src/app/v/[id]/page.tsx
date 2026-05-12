@@ -13,7 +13,7 @@ const REVERSE_BLOOD_GROUP_MAP: Record<string, string> = {
   "O_NEGATIVE": "O-",
 };
 
-export default async function PublicViewPage({ params }: { params: { id: string } }) {
+export default async function PublicViewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   // Decode the ID if it was URL encoded (since it's an email)
   const email = decodeURIComponent(id);
