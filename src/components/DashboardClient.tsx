@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import EmergencyCard from "@/components/EmergencyCard";
 import { QrCode, Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Activity, Pill, ChevronDown, FileText, Image as ImageIcon, ExternalLink } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
 import { toPng } from "html-to-image";
 import { signOut } from "next-auth/react";
@@ -18,6 +18,32 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
+
+  // 3D Tilt Hook Setup
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+  const shineOpacity = useTransform(mouseYSpring, [-0.5, 0.5], [0.2, 0]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = (mouseX / width) - 0.5;
+    const yPct = (mouseY / height) - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -174,8 +200,26 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
             </div>
 
             <div className="glass rounded-[2.5rem] sm:rounded-[3rem] p-4 sm:p-16 flex flex-col items-center border-white/5 w-full">
-              <div ref={cardRef} className="w-full flex justify-center perspective-1000">
-                <EmergencyCard data={initialData} />
+              <div 
+                className="w-full flex justify-center perspective-1000"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+              >
+                <motion.div 
+                  style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+                  className="relative group cursor-pointer transition-shadow"
+                >
+                  <EmergencyCard data={initialData} />
+                  
+                  {/* Premium Shine Effect */}
+                  <motion.div 
+                    style={{ opacity: shineOpacity }}
+                    className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" 
+                  />
+                  
+                  {/* Subtle Floating Shadow */}
+                  <div className="absolute -inset-4 bg-primary/20 blur-3xl opacity-0 group-hover:opacity-30 transition-opacity -z-10 rounded-full" />
+                </motion.div>
               </div>
               
               <div className="flex flex-col gap-4 w-full max-w-md mt-10">
