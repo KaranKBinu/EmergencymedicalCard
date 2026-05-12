@@ -22,6 +22,9 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     address: initialData.address || "",
     dob: initialData.dob || "",
     gender: initialData.gender || "",
+    height: initialData.height || "",
+    weight: initialData.weight || "",
+    medications: initialData.medicalNotes || "",
     allergies: initialData.allergies || [],
     medicalConditions: initialData.medicalConditions || [],
     history: initialData.history || []
@@ -33,6 +36,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
   const [editingHistoryIndex, setEditingHistoryIndex] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [unitSystem, setUnitSystem] = useState("metric");
   const historyFileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -443,30 +447,58 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
             {/* Vitals */}
             <section className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/40 px-1">Vitals & Other</h3>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/40 px-1">Vitals & Measurements</h3>
+              
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground ml-1">Height (e.g. 180 cm)</label>
+                {/* Height Input */}
+                <div className="space-y-2 group">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">Height</label>
                   <div className="relative">
-                    <Ruler className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-primary text-muted-foreground">
+                      <Ruler className="w-4 h-4" />
+                    </div>
                     <input 
                       type="text" 
                       value={formData.height}
                       onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none text-sm"
+                      placeholder={unitSystem === "metric" ? "180 cm" : "5'11\""}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3.5 pl-11 pr-20 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all text-sm font-medium"
                     />
+                    <button 
+                      type="button"
+                      onClick={() => setUnitSystem(unitSystem === "metric" ? "imperial" : "metric")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5"
+                    >
+                      <span className={`text-[9px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-primary" : "text-muted-foreground"}`}>cm</span>
+                      <div className="w-[1px] h-3 bg-white/10" />
+                      <span className={`text-[9px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-primary" : "text-muted-foreground"}`}>ft</span>
+                    </button>
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground ml-1">Weight (e.g. 75 kg)</label>
+
+                {/* Weight Input */}
+                <div className="space-y-2 group">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">Weight</label>
                   <div className="relative">
-                    <Scale className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-accent text-muted-foreground">
+                      <Scale className="w-4 h-4" />
+                    </div>
                     <input 
                       type="text" 
                       value={formData.weight}
                       onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none text-sm"
+                      placeholder={unitSystem === "metric" ? "75 kg" : "165 lbs"}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3.5 pl-11 pr-20 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 transition-all text-sm font-medium"
                     />
+                    <button 
+                      type="button"
+                      onClick={() => setUnitSystem(unitSystem === "metric" ? "imperial" : "metric")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5"
+                    >
+                      <span className={`text-[9px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-accent" : "text-muted-foreground"}`}>kg</span>
+                      <div className="w-[1px] h-3 bg-white/10" />
+                      <span className={`text-[9px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-accent" : "text-muted-foreground"}`}>lbs</span>
+                    </button>
                   </div>
                 </div>
               </div>
