@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import EmergencyCard from "@/components/EmergencyCard";
-import { QrCode, Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Activity, Pill } from "lucide-react";
+import { QrCode, Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Activity, Pill, ChevronDown, FileText, Image as ImageIcon, ExternalLink } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { toPng } from "html-to-image";
 import { signOut } from "next-auth/react";
@@ -12,12 +13,23 @@ import { jsPDF } from "jspdf";
 export default function DashboardClient({ initialData, userId }: { initialData: any, userId: string }) {
   const [mounted, setMounted] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDownloadOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleDownloadPNG = async () => {
@@ -167,25 +179,77 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
               </div>
               
               <div className="flex flex-col gap-4 w-full max-w-md mt-10">
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="relative w-full" ref={dropdownRef}>
                   <button 
-                    onClick={handleDownloadPDF}
-                    className="flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all hover:opacity-90 cursor-pointer shadow-[0_10px_20px_-10px_rgba(239,68,68,0.5)]"
+                    onClick={() => setIsDownloadOpen(!isDownloadOpen)}
+                    className={`w-full flex items-center justify-center gap-3 px-6 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all cursor-pointer shadow-[0_10px_20px_-10px_rgba(239,68,68,0.5)] ${isDownloadOpen ? 'ring-2 ring-primary/50' : ''}`}
                   >
-                    <Download className="w-5 h-5" /> Download PDF
+                    <Download className="w-5 h-5" />
+                    <span>Download Your Card</span>
+                    <ChevronDown className={`w-5 h-5 ml-1 transition-transform duration-300 ${isDownloadOpen ? 'rotate-180' : ''}`} />
                   </button>
-                  <button 
-                    onClick={handleDownloadPNG}
-                    className="flex items-center justify-center gap-2 py-4 bg-white/5 text-white rounded-2xl text-sm font-bold transition-all hover:bg-white/10 border border-white/5 cursor-pointer"
-                  >
-                    <QrCode className="w-5 h-5" /> Export PNGs
-                  </button>
+
+                  <AnimatePresence>
+                    {isDownloadOpen && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute bottom-full left-0 w-full mb-3 p-2 bg-[#121214] border border-white/10 rounded-[1.5rem] shadow-2xl backdrop-blur-xl z-[60] overflow-hidden"
+                      >
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => {
+                              handleDownloadPDF();
+                              setIsDownloadOpen(false);
+                            }}
+                            className="flex items-center gap-3 p-4 hover:bg-white/5 rounded-xl transition-all group text-left w-full"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 group-hover:bg-red-500/20 transition-colors">
+                              <FileText className="w-5 h-5" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-bold text-white">Download PDF Document</span>
+                              <span className="text-[10px] text-muted-foreground font-medium">Ready for high-quality printing</span>
+                            </div>
+                          </button>
+
+                          <div className="h-px bg-white/5 mx-2" />
+
+                          <button
+                            onClick={() => {
+                              handleDownloadPNG();
+                              setIsDownloadOpen(false);
+                            }}
+                            className="flex items-center gap-3 p-4 hover:bg-white/5 rounded-xl transition-all group text-left w-full"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:bg-blue-500/20 transition-colors">
+                              <ImageIcon className="w-5 h-5" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-bold text-white">Export PNG Images</span>
+                              <span className="text-[10px] text-muted-foreground font-medium">Front & Back high-res files</span>
+                            </div>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
                 <button 
                   onClick={handleShare}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-muted-foreground hover:text-white transition-colors text-xs font-medium"
+                  className="w-full relative overflow-hidden group p-4 bg-white/[0.03] border border-white/5 hover:border-white/10 rounded-[1.5rem] transition-all hover:bg-white/5 cursor-pointer"
                 >
-                  <Share2 className="w-4 h-4" /> Share Scannable Profile URL
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+                      <Share2 className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col text-left">
+                      <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">Share Your Public Profile</span>
+                      <span className="text-[10px] text-muted-foreground font-medium">Copy a scannable link for first responders</span>
+                    </div>
+                  </div>
+                  <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </button>
               </div>
 
@@ -273,22 +337,35 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
               </button>
             </div>
 
-            <div className="bg-primary/5 border border-primary/10 rounded-[2.5rem] p-8">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="bg-primary/5 border border-primary/10 rounded-[2.5rem] p-8 relative overflow-hidden group">
+              <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 blur-3xl rounded-full" />
+              
+              <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-2xl bg-primary/20 flex items-center justify-center">
-                  <QrCode className="w-5 h-5 text-primary" />
+                  <Shield className="w-5 h-5 text-primary" />
                 </div>
-                <h4 className="font-bold">Public URL</h4>
+                <h4 className="font-bold text-sm tracking-tight">Safety Profile</h4>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed mb-4 italic">
-                {mounted ? `${window.location.origin}/v/${initialData.publicId}` : "Loading URL..."}
+
+              <p className="text-[11px] text-muted-foreground leading-relaxed mb-6 italic opacity-80">
+                This is the live profile that first responders will see when scanning your digital identity card.
               </p>
-              <button 
-                onClick={handleShare}
-                className="w-full py-3 bg-primary/10 text-primary text-xs font-bold rounded-xl border border-primary/20 hover:bg-primary/20 transition-all cursor-pointer"
-              >
-                Copy Public Safety Link
-              </button>
+
+              <div className="space-y-3">
+                <button 
+                  onClick={() => window.open(`${window.location.origin}/v/${initialData.publicId}`, '_blank')}
+                  className="w-full py-4 bg-primary text-white text-xs font-bold rounded-2xl shadow-[0_10px_20px_-10px_rgba(239,68,68,0.5)] hover:opacity-90 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  See Your Public Data <ExternalLink className="w-4 h-4" />
+                </button>
+                
+                <button 
+                  onClick={handleShare}
+                  className="w-full py-3 bg-white/5 text-muted-foreground hover:text-white text-[10px] font-bold rounded-xl border border-white/5 hover:border-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Share2 className="w-3.5 h-3.5" /> Copy Profile URL
+                </button>
+              </div>
             </div>
           </div>
         </div>

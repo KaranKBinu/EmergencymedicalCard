@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar, FileText, FilePlus, Edit3, Pill } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+
 
 interface EditRecordModalProps {
   isOpen: boolean;
@@ -40,7 +41,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
   const [unitSystem, setUnitSystem] = useState("metric");
   const historyFileInputRef = useRef<HTMLInputElement>(null);
 
-  if (!isOpen) return null;
+
 
   const uploadFile = async (file: File, overwrite = false) => {
     const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}&overwrite=${overwrite}`, {
@@ -225,24 +226,49 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={onClose} />
-      
-      <div className="relative w-full max-w-2xl h-[92vh] sm:h-auto bg-[#0a0a0c] border-t sm:border border-white/10 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:zoom-in duration-300 flex flex-col">
-        <div className="flex items-center justify-between p-6 sm:p-8 border-b border-white/5 shrink-0">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-black font-outfit flex items-center gap-2">
-              <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-primary" /> Edit Medical Record
-            </h2>
-            <p className="text-muted-foreground text-xs sm:text-sm">Keep your emergency information up to date.</p>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-all">
-            <X className="w-6 h-6 text-muted-foreground" />
-          </button>
-        </div>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto custom-scrollbar">
+          <div className="min-h-full flex items-end sm:items-start justify-center p-0 sm:p-6 md:p-12 lg:p-20">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-black/80 backdrop-blur-md" 
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="relative w-full max-w-4xl bg-[#0a0a0c] border border-white/10 rounded-t-[3rem] sm:rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col mb-0 sm:mb-8"
+            >
+              {/* Premium Header */}
+              <div className="sticky top-0 z-20 bg-[#0a0a0c]/80 backdrop-blur-xl border-b border-white/5 p-6 sm:p-10 flex items-center justify-between">
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
+                    <Activity className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl font-black font-outfit tracking-tight text-white leading-tight">
+                      Edit Medical Record
+                    </h2>
+                    <p className="text-muted-foreground text-xs sm:text-sm font-medium opacity-70">Securing your identity for emergency responders.</p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={onClose} 
+                  className="p-3 hover:bg-white/5 rounded-2xl transition-all cursor-pointer group"
+                >
+                  <X className="w-6 h-6 text-muted-foreground group-hover:text-white group-hover:scale-110 transition-transform" />
+                </button>
+              </div>
 
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 overflow-y-auto flex-1 custom-scrollbar">
-          <div className="space-y-8">
+              <div className="p-6 sm:p-12 space-y-16">
+                <form onSubmit={handleSubmit} className="space-y-16 pb-20">
             {/* Photo Section */}
             <section className="flex flex-col items-center gap-4 mb-8">
               <div className="relative group">
@@ -293,43 +319,45 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
             </section>
 
             {/* Basic Info */}
-            <section className="space-y-4">
-              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-primary/60 px-1">Basic Identity</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground ml-1">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <section className="space-y-8">
+              <div className="flex items-center gap-3 px-1 border-l-2 border-primary/40 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Identity & Vitals</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Full Name</label>
+                  <div className="relative group">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <input 
                       type="text" 
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-sm font-medium"
                       required
                     />
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground ml-1">Date of Birth</label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Date of Birth</label>
                   <div className="relative group">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none group-focus-within:text-primary transition-colors" />
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none" />
                     <input 
                       type="date" 
                       value={formData.dob}
                       onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
                       onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm [color-scheme:dark] cursor-pointer"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-sm font-medium [color-scheme:dark] cursor-pointer"
                     />
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground ml-1">Blood Group</label>
-                  <div className="relative">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Blood Group</label>
+                  <div className="relative group">
                     <Droplets className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                     <select 
                       value={formData.bloodGroup}
                       onChange={(e) => setFormData({ ...formData, bloodGroup: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm appearance-none"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-sm font-medium appearance-none"
                     >
                       {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(bg => (
                         <option key={bg} value={bg} className="bg-[#0a0a0c]">{bg}</option>
@@ -337,60 +365,52 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                     </select>
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground ml-1">Gender</label>
-                  <select 
-                    value={formData.gender}
-                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm appearance-none"
-                  >
-                    <option value="" className="bg-[#0a0a0c]">Select Gender</option>
-                    <option value="MALE" className="bg-[#0a0a0c]">Male</option>
-                    <option value="FEMALE" className="bg-[#0a0a0c]">Female</option>
-                    <option value="OTHER" className="bg-[#0a0a0c]">Other</option>
-                  </select>
-                </div>
               </div>
             </section>
 
             {/* Emergency Contact */}
-            <section className="space-y-4">
-              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-accent/60 px-1">Emergency Contact</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground ml-1">Contact Name</label>
-                  <input 
-                    type="text" 
-                    value={formData.emergencyName}
-                    onChange={(e) => setFormData({ ...formData, emergencyName: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-sm"
-                    required
-                  />
+            <section className="space-y-8">
+              <div className="flex items-center gap-3 px-1 border-l-2 border-accent/40 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Emergency Contact</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Contact Name</label>
+                  <div className="relative group">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
+                    <input 
+                      type="text" 
+                      value={formData.emergencyName}
+                      onChange={(e) => setFormData({ ...formData, emergencyName: e.target.value })}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all text-sm font-medium"
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-muted-foreground ml-1">Phone Number</label>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-accent" />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Phone Number</label>
+                  <div className="relative group">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-accent transition-colors" />
                     <input 
                       type="tel" 
                       value={formData.emergencyPhone}
                       onChange={(e) => setFormData({ ...formData, emergencyPhone: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-sm"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all text-sm font-medium"
                       required
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-muted-foreground ml-1">Residential Address</label>
-                <div className="relative">
-                  <MapPin className="absolute left-4 top-3 w-4 h-4 text-accent" />
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Residential Address</label>
+                <div className="relative group">
+                  <MapPin className="absolute left-4 top-4 w-4 h-4 text-accent group-focus-within:text-accent transition-colors" />
                   <textarea 
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    rows={2}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all text-sm resize-none"
+                    rows={3}
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all text-sm font-medium resize-none"
                     placeholder="Enter permanent or home address..."
                   />
                 </div>
@@ -398,13 +418,15 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
             </section>
 
             {/* Medical Data */}
-            <section className="space-y-6">
-              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-white/40 px-1">Medical Details</h3>
+            <section className="space-y-8">
+              <div className="flex items-center gap-3 px-1 border-l-2 border-blue-500/40 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Critical Medical Data</h3>
+              </div>
               
               <div className="space-y-4">
-                <label className="text-xs font-bold text-muted-foreground ml-1">Allergies</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {formData.allergies.map((a: string, i: number) => {
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Allergies & Reactions</label>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {formData.allergies.length > 0 ? formData.allergies.map((a: string, i: number) => {
                     const isMed = a.startsWith('💊 ');
                     const displayName = isMed ? a.replace('💊 ', '') : a;
                     return (
@@ -414,85 +436,84 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                             <div className="w-4 h-2 bg-blue-500 rounded-full shadow-md border border-blue-100 flex items-center overflow-hidden rotate-[-35deg] relative">
                               <div className="w-1/2 h-full bg-blue-500" />
                               <div className="w-1/2 h-full bg-white" />
-                              <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-black/10 pointer-events-none" />
                             </div>
                           </div>
                         )}
-                        <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${isMed ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 pl-4' : 'bg-destructive/10 text-destructive border-destructive/10'}`}>
+                        <span className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all ${isMed ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 pl-5' : 'bg-destructive/10 text-destructive border-destructive/10'}`}>
                           {displayName}
-                          <button type="button" onClick={() => removeArrayItem('allergies', i)} className="ml-1 hover:opacity-50">
-                            <X className="w-3 h-3" />
+                          <button type="button" onClick={() => removeArrayItem('allergies', i)} className="ml-1 hover:scale-125 transition-transform">
+                            <X className="w-3.5 h-3.5" />
                           </button>
                         </span>
                       </div>
                     );
-                  })}
+                  }) : <p className="text-xs text-muted-foreground italic ml-1">No allergies added yet.</p>}
                 </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex gap-2">
+                <div className="flex flex-col gap-4">
+                  <div className="flex gap-3">
                     <input 
                       type="text" 
                       value={newAllergy}
                       onChange={(e) => setNewAllergy(e.target.value)}
-                      placeholder="Add allergy..."
-                      className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2 px-4 focus:outline-none text-sm"
+                      placeholder="e.g. Peanuts, Penicillin..."
+                      className="flex-1 bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm font-medium"
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('allergies', newAllergy, setNewAllergy))}
                     />
                     <button 
                       type="button"
                       onClick={() => addArrayItem('allergies', newAllergy, setNewAllergy)}
-                      className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all"
+                      className="px-6 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all cursor-pointer flex items-center justify-center group"
                     >
-                      <Plus className="w-5 h-5" />
+                      <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     </button>
                   </div>
                   <button
                     type="button"
                     onClick={() => setIsMedication(!isMedication)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all self-start ${isMedication ? 'bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'}`}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-2xl border transition-all self-start ${isMedication ? 'bg-blue-500/20 border-blue-500 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : 'bg-white/[0.03] border-white/10 text-muted-foreground hover:bg-white/[0.05]'}`}
                   >
-                    <Pill className={`w-3.5 h-3.5 ${isMedication ? 'animate-bounce' : ''}`} />
-                    <span className="text-[10px] font-black uppercase tracking-widest">
-                      {isMedication ? 'Tagged as Medicine' : 'Tag as Medicine'}
+                    <Pill className={`w-4 h-4 ${isMedication ? 'animate-bounce' : ''}`} />
+                    <span className="text-[10px] font-black uppercase tracking-[0.1em]">
+                      {isMedication ? 'Tagged as Medication' : 'Tag as Medication'}
                     </span>
                   </button>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <label className="text-xs font-bold text-muted-foreground ml-1">Chronic Conditions</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {formData.medicalConditions.map((c: string, i: number) => (
-                    <span key={i} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-accent/10 text-accent text-xs font-bold border border-accent/10">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Chronic Conditions</label>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {formData.medicalConditions.length > 0 ? formData.medicalConditions.map((c: string, i: number) => (
+                    <span key={i} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 text-accent text-xs font-bold border border-accent/20">
                       {c}
-                      <button type="button" onClick={() => removeArrayItem('medicalConditions', i)} className="hover:text-accent/50">
-                        <X className="w-3 h-3" />
+                      <button type="button" onClick={() => removeArrayItem('medicalConditions', i)} className="hover:scale-125 transition-transform">
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </span>
-                  ))}
+                  )) : <p className="text-xs text-muted-foreground italic ml-1">No chronic conditions listed.</p>}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <input 
                     type="text" 
                     value={newCondition}
                     onChange={(e) => setNewCondition(e.target.value)}
-                    placeholder="Add condition..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2 px-4 focus:outline-none text-sm"
+                    placeholder="e.g. Asthma, Type 2 Diabetes..."
+                    className="flex-1 bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all text-sm font-medium"
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('medicalConditions', newCondition, setNewCondition))}
                   />
                   <button 
                     type="button"
                     onClick={() => addArrayItem('medicalConditions', newCondition, setNewCondition)}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all"
+                    className="px-6 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all cursor-pointer flex items-center justify-center group"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   </button>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-xs font-bold text-muted-foreground">Medical Notes / Medications</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Medications & Notes</label>
                   <span className={`text-[10px] font-bold ${(formData.medications?.length || 0) >= 365 ? 'text-destructive' : 'text-muted-foreground'}`}>
                     {formData.medications?.length || 0}/375
                   </span>
@@ -501,23 +522,23 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   value={formData.medications}
                   onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
                   maxLength={375}
-                  rows={3}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all text-sm resize-none"
-                  placeholder="List medications or any critical medical notes first responders should know about..."
+                  rows={4}
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-[1.5rem] py-5 px-6 focus:outline-none focus:ring-2 focus:ring-white/10 transition-all text-sm font-medium resize-none leading-relaxed"
+                  placeholder="List active medications or critical notes for responders..."
                 />
               </div>
             </section>
-
-            {/* Vitals */}
-            <section className="space-y-4">
-              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-white/40 px-1">Vitals & Measurements</h3>
+            <section className="space-y-8">
+              <div className="flex items-center gap-3 px-1 border-l-2 border-white/20 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Measurements</h3>
+              </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {/* Height Input */}
-                <div className="space-y-2 group">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">Height</label>
+                <div className="space-y-3 group">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Height</label>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-primary text-muted-foreground">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-primary text-muted-foreground">
                       <Ruler className="w-4 h-4" />
                     </div>
                     <input 
@@ -525,25 +546,25 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       value={formData.height}
                       onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                       placeholder={unitSystem === "metric" ? "180 cm" : "5'11\""}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3.5 pl-11 pr-20 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all text-sm font-medium"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-[1.25rem] py-4.5 pl-14 pr-24 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-sm font-bold"
                     />
                     <button 
                       type="button"
                       onClick={() => setUnitSystem(unitSystem === "metric" ? "imperial" : "metric")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-2 cursor-pointer shadow-inner"
                     >
-                      <span className={`text-[9px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-primary" : "text-muted-foreground"}`}>cm</span>
+                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-primary" : "text-muted-foreground opacity-40"}`}>cm</span>
                       <div className="w-[1px] h-3 bg-white/10" />
-                      <span className={`text-[9px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-primary" : "text-muted-foreground"}`}>ft</span>
+                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-primary" : "text-muted-foreground opacity-40"}`}>ft</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Weight Input */}
-                <div className="space-y-2 group">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">Weight</label>
+                <div className="space-y-3 group">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Weight</label>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-accent text-muted-foreground">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-accent text-muted-foreground">
                       <Scale className="w-4 h-4" />
                     </div>
                     <input 
@@ -551,16 +572,16 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       value={formData.weight}
                       onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                       placeholder={unitSystem === "metric" ? "75 kg" : "165 lbs"}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3.5 pl-11 pr-20 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50 transition-all text-sm font-medium"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-[1.25rem] py-4.5 pl-14 pr-24 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all text-sm font-bold"
                     />
                     <button 
                       type="button"
                       onClick={() => setUnitSystem(unitSystem === "metric" ? "imperial" : "metric")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-2 cursor-pointer shadow-inner"
                     >
-                      <span className={`text-[9px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-accent" : "text-muted-foreground"}`}>kg</span>
+                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-accent" : "text-muted-foreground opacity-40"}`}>kg</span>
                       <div className="w-[1px] h-3 bg-white/10" />
-                      <span className={`text-[9px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-accent" : "text-muted-foreground"}`}>lbs</span>
+                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-accent" : "text-muted-foreground opacity-40"}`}>lbs</span>
                     </button>
                   </div>
                 </div>
@@ -568,53 +589,59 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
             </section>
 
             {/* Medical History Section */}
-            <section className="space-y-6 pt-4 border-t border-white/5">
-              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-white/40 px-1">Medical History Records</h3>
+            <section className="space-y-8 pt-10 border-t border-white/5">
+              <div className="flex items-center gap-3 px-1 border-l-2 border-white/20 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Medical History Archive</h3>
+              </div>
               
               {/* Add new history form */}
-              <div id="medical-history-form" className="space-y-4 p-6 rounded-2xl bg-white/[0.03] border border-white/5">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Title</label>
+              <div id="medical-history-form" className="space-y-6 p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Entry Title</label>
                     <input 
                       type="text" 
                       value={newHistory.title}
                       onChange={(e) => setNewHistory({...newHistory, title: e.target.value})}
-                      placeholder="e.g. Heart Surgery"
-                      className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:border-primary/50"
+                      placeholder="e.g. Major Heart Surgery"
+                      className="w-full p-4 bg-[#0a0a0c] border border-white/10 rounded-2xl text-sm font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
                     />
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Date</label>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Completion Date</label>
                     <input 
                       type="text" 
                       value={newHistory.date}
                       onChange={(e) => setNewHistory({...newHistory, date: e.target.value})}
-                      placeholder="e.g. May 2023"
-                      className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:border-primary/50"
+                      placeholder="e.g. June 2023"
+                      className="w-full p-4 bg-[#0a0a0c] border border-white/10 rounded-2xl text-sm font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
                     />
                   </div>
                 </div>
                 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Description (Optional)</label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Detailed Description</label>
                   <textarea 
                     value={newHistory.description}
                     onChange={(e) => setNewHistory({...newHistory, description: e.target.value})}
-                    placeholder="Brief details about the procedure or diagnosis..."
-                    className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:border-primary/50 min-h-[80px]"
+                    placeholder="Brief details about the procedure, diagnosis, or outcome..."
+                    className="w-full p-4 bg-[#0a0a0c] border border-white/10 rounded-2xl text-sm font-medium outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 min-h-[100px] resize-none"
                   />
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Attached Files</label>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-1">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Document Attachments</label>
                     <button 
                       type="button"
                       onClick={() => historyFileInputRef.current?.click()}
-                      className="flex items-center gap-1.5 text-[10px] font-black text-primary uppercase hover:opacity-80 transition-all cursor-pointer"
+                      className="flex items-center gap-2 text-[11px] font-black text-primary uppercase hover:opacity-80 transition-all cursor-pointer group/btn"
                     >
-                      <FilePlus className="w-3.5 h-3.5" />
+                      <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center group-hover/btn:bg-primary/20 transition-colors">
+                        <FilePlus className="w-4 h-4" />
+                      </div>
                       Add Files
                     </button>
                   </div>
@@ -628,27 +655,30 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   />
                   
                   {isUploading && (
-                    <div className="col-span-2 p-4 rounded-2xl bg-primary/5 border border-primary/20 animate-pulse">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">Uploading Files...</span>
-                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">{uploadProgress}%</span>
+                    <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20 animate-pulse">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[11px] font-black text-primary uppercase tracking-widest">Uploading High-Res Documents...</span>
+                        <span className="text-[11px] font-black text-primary">{uploadProgress}%</span>
                       </div>
-                      <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary transition-all duration-300" 
-                          style={{ width: `${uploadProgress}%` }}
+                      <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                        <motion.div 
+                          className="h-full bg-primary" 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${uploadProgress}%` }}
                         />
                       </div>
                     </div>
                   )}
 
                   {newHistory.files.length > 0 && !isUploading && (
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {newHistory.files.map((file, i) => (
-                        <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10 group">
-                          <div className="flex items-center gap-2 overflow-hidden">
-                            <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
-                            <span className="text-[10px] font-medium text-white/60 truncate">
+                        <div key={i} className="flex items-center justify-between p-3.5 rounded-xl bg-[#0a0a0c] border border-white/10 group/file">
+                          <div className="flex items-center gap-3 overflow-hidden">
+                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                              <FileText className="w-4 h-4 text-primary" />
+                            </div>
+                            <span className="text-xs font-bold text-white/80 truncate">
                               {file.name}
                             </span>
                           </div>
@@ -658,21 +688,18 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                               const fileToDelete = newHistory.files[i];
                               const updatedFiles = newHistory.files.filter((_, idx) => idx !== i);
                               const updatedHistoryItem = { ...newHistory, files: updatedFiles };
-                              
                               setNewHistory(updatedHistoryItem);
-                              
                               if (editingHistoryIndex !== null) {
                                 const updatedHistory = [...formData.history];
                                 updatedHistory[editingHistoryIndex] = updatedHistoryItem;
                                 setFormData({ ...formData, history: updatedHistory });
                               }
-
                               await deleteFile(fileToDelete.url);
                               toast.success("File removed");
                             }}
-                            className="p-1 text-destructive opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                            className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-all cursor-pointer"
                           >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
                       ))}
@@ -680,14 +707,14 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-3 pt-4">
                   <button 
                     type="button" 
                     onClick={addHistoryItem}
-                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="flex-1 py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 cursor-pointer shadow-[0_10px_30px_-10px_rgba(239,68,68,0.3)] hover:opacity-90"
                   >
-                    {editingHistoryIndex !== null ? <Save className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                    {editingHistoryIndex !== null ? "Update Item" : "Add to History"}
+                    {editingHistoryIndex !== null ? <Save className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                    {editingHistoryIndex !== null ? "Update History Item" : "Add to Medical Archive"}
                   </button>
                   {editingHistoryIndex !== null && (
                     <button 
@@ -696,7 +723,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                         setEditingHistoryIndex(null);
                         setNewHistory({ title: '', date: '', description: '', files: [] as { name: string, url: string }[] });
                       }}
-                      className="px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all cursor-pointer"
+                      className="px-6 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -705,66 +732,74 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               </div>
 
               {/* List of existing history */}
-              <div className="space-y-4">
-                {formData.history.map((item: any, index: number) => (
-                  <div key={index} className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-between group">
-                    <div className="flex items-center gap-4 overflow-hidden">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <Activity className="w-5 h-5 text-primary" />
+              <div className="grid grid-cols-1 gap-4">
+                {formData.history.length > 0 ? formData.history.map((item: any, index: number) => (
+                  <div key={index} className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] hover:border-white/10 transition-all">
+                    <div className="flex items-center gap-5 overflow-hidden">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+                        <Activity className="w-6 h-6 text-primary opacity-60 group-hover:opacity-100 transition-opacity" />
                       </div>
                       <div className="overflow-hidden">
-                        <h4 className="text-sm font-bold truncate">{item.title}</h4>
-                        <div className="flex flex-wrap gap-1 mt-1">
+                        <h4 className="text-base font-black tracking-tight">{item.title}</h4>
+                        <div className="flex flex-wrap gap-2 mt-2">
                           {item.files?.map((file: any, fIdx: number) => (
-                            <span key={fIdx} className="text-[8px] px-1.5 py-0.5 bg-primary/5 text-primary/60 border border-primary/10 rounded-md truncate max-w-[100px]">
+                            <span key={fIdx} className="text-[10px] px-2 py-1 bg-white/5 text-white/40 border border-white/5 rounded-lg truncate max-w-[120px]">
                               {file.name}
                             </span>
                           ))}
                         </div>
-                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1">{item.date}</p>
+                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-2 opacity-60">{item.date}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3 pl-4">
                       <button 
                         type="button"
                         onClick={() => startEditingHistory(index)}
-                        className="p-2 text-muted-foreground hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer"
+                        className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-white hover:bg-white/10 rounded-xl transition-all cursor-pointer"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button 
                         type="button" 
                         onClick={() => removeHistoryItem(index)}
-                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all cursor-pointer"
+                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-[2.5rem]">
+                    <p className="text-sm text-muted-foreground italic">No medical history records found.</p>
+                  </div>
+                )}
               </div>
             </section>
-          </div>
-        </form>
-
-        <div className="p-6 sm:p-8 border-t border-white/5 bg-white/[0.01] flex gap-4 shrink-0">
-          <button 
-            type="button"
-            onClick={onClose}
-            className="flex-1 py-3.5 sm:py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/5 cursor-pointer text-sm sm:text-base"
-          >
-            Cancel
-          </button>
-          <button 
-            onClick={handleSubmit}
-            disabled={loading}
-            className="flex-1 py-3.5 sm:py-4 bg-primary text-white rounded-2xl font-bold transition-all hover:opacity-90 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-sm sm:text-base"
-          >
-            {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
-            Save Changes
-          </button>
+          </form>
         </div>
-      </div>
-    </div>
+
+              {/* Floating Action Bar */}
+              <div className="sticky bottom-0 z-20 bg-[#0a0a0c]/80 backdrop-blur-xl border-t border-white/5 p-6 sm:p-8 flex items-center gap-4">
+                <button 
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 py-4 sm:py-5 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/5 cursor-pointer text-sm"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="flex-[2] py-4 sm:py-5 bg-primary text-white rounded-2xl font-bold transition-all hover:opacity-90 flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer text-sm shadow-[0_10px_30px_-10px_rgba(239,68,68,0.4)]"
+                >
+                  {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
+                  Save Changes
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }
