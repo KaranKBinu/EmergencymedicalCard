@@ -20,16 +20,7 @@ interface PublicMedicalRecord {
 export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRecord }) {
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      {/* Critical Header */}
-      <div className="bg-destructive/10 border-b border-destructive/20 py-4 px-6 sticky top-0 backdrop-blur-md z-50">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-destructive animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-tighter text-destructive">Emergency Medical Profile</span>
-          </div>
-          <div className="px-3 py-1 rounded-full bg-destructive text-white text-[10px] font-black uppercase">Critical</div>
-        </div>
-      </div>
+
 
       <div className="max-w-lg mx-auto px-6 pt-10 space-y-8">
         {/* Profile Identity */}

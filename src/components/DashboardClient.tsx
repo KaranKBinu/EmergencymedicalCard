@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import EmergencyCard from "@/components/EmergencyCard";
-import { QrCode, Download, Share2, Edit3, Shield, Settings, LogOut, Droplets, Calendar, Phone, Activity, Pill } from "lucide-react";
+import { QrCode, Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Activity, Pill } from "lucide-react";
 import toast from "react-hot-toast";
 import { toPng } from "html-to-image";
 import { signOut } from "next-auth/react";
@@ -142,9 +142,7 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
             <span className="font-black font-outfit tracking-tight text-xl">Life ID</span>
           </div>
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-white/5 rounded-xl transition-all">
-              <Settings className="w-5 h-5 text-muted-foreground" />
-            </button>
+
             <button 
               onClick={() => signOut()}
               className="p-2 hover:bg-destructive/10 rounded-xl transition-all group"
