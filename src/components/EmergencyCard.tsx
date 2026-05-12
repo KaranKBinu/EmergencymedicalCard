@@ -18,8 +18,15 @@ interface EmergencyData {
   photoUrl?: string;
   publicId?: string;
   dob?: string;
+  gender?: string;
   createdAt?: Date;
 }
+
+const GENDER_ICONS: Record<string, { icon: string, color: string }> = {
+  "MALE": { icon: "https://api.iconify.design/ph:gender-male-bold.svg?color=%233b82f6", color: "text-blue-500" },
+  "FEMALE": { icon: "https://api.iconify.design/ph:gender-female-bold.svg?color=%23ec4899", color: "text-pink-500" },
+  "OTHER": { icon: "https://api.iconify.design/ph:gender-intersex-bold.svg?color=%23a855f7", color: "text-purple-500" },
+};
 
 export default function EmergencyCard({ data, forcedSide }: { data: EmergencyData, forcedSide?: 'front' | 'back' }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -79,11 +86,22 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
               <div className="relative h-full p-8 flex flex-col justify-between bg-white/[0.02] backdrop-blur-md">
                 <div className="flex justify-between items-start">
                   <div className="flex gap-5">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/20 overflow-hidden flex items-center justify-center shadow-inner">
-                      {data.photoUrl ? (
-                        <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" />
-                      ) : (
-                        <User className="w-10 h-10 text-white/20" />
+                    <div className="relative">
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/20 overflow-hidden flex items-center justify-center shadow-inner">
+                        {data.photoUrl ? (
+                          <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-10 h-10 text-white/20" />
+                        )}
+                      </div>
+                      {data.gender && GENDER_ICONS[data.gender.toUpperCase()] && (
+                        <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-lg bg-[#0a0a0c]/80 backdrop-blur-md border border-white/10 flex items-center justify-center shadow-2xl p-1 transition-transform hover:scale-110">
+                          <img 
+                            src={GENDER_ICONS[data.gender.toUpperCase()].icon} 
+                            alt={data.gender} 
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
                       )}
                     </div>
                     <div>
