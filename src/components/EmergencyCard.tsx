@@ -112,7 +112,11 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
               initial={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
               animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
               exit={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
-              className={`absolute left-1/2 px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2 whitespace-nowrap ${isRotated ? '-rotate-90 -left-20 top-1/2' : '-top-14'}`}
+              className={`absolute px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2 whitespace-nowrap transition-all ${
+                isRotated 
+                  ? '-rotate-90 -left-24 top-[152px] -translate-y-1/2' 
+                  : '-top-14 left-1/2 -translate-x-1/2'
+              }`}
             >
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               {isRotated ? 'Tap to flip card' : 'Click to flip card'}

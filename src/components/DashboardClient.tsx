@@ -180,13 +180,22 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
             <span className="font-black font-outfit tracking-tight text-xl">Life ID</span>
           </div>
           <div className="flex items-center gap-4">
-
-            <button 
-              onClick={() => signOut()}
-              className="p-2 hover:bg-destructive/10 rounded-xl transition-all group"
-            >
-              <LogOut className="w-5 h-5 text-muted-foreground group-hover:text-destructive" />
-            </button>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <button 
+                onClick={() => setIsEditModalOpen(true)}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold transition-all"
+              >
+                <Edit3 className="w-4 h-4 text-primary" />
+                <span className="hidden sm:inline">Edit Card</span>
+              </button>
+              <button 
+                onClick={() => signOut()}
+                className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-xl text-sm font-bold transition-all"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden xs:inline">Sign Out</span>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
