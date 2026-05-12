@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -39,8 +38,8 @@ model MedicalRecord {
   emergencyRelation String
   
   // Medical Details
-  medicalConditions String? // Stored as comma-separated or JSON
-  allergies         String? // Stored as comma-separated or JSON
+  medicalConditions String[] @default([])
+  allergies         String[] @default([])
   medications       String?
   pastSurgeries     String?
   
@@ -48,6 +47,21 @@ model MedicalRecord {
   address           String?
   organDonor        Boolean  @default(false)
   
+  history           MedicalHistory[]
+  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model MedicalHistory {
+  id              String         @id @default(uuid())
+  medicalRecordId String
+  medicalRecord   MedicalRecord  @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+  
+  title           String         // e.g. "Surgery Name" or "Diagnosis"
+  date            String         // e.g. "2023-05" or "Year/Month"
+  description     String?
+  fileUrls        String[]       @default([])
+  
+  createdAt       DateTime       @default(now())
 }

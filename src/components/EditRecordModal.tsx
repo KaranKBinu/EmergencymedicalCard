@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar } from "lucide-react";
+import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar, FileText, FilePlus, Edit3 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
@@ -22,11 +22,17 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     address: initialData.address || "",
     dob: initialData.dob || "",
     allergies: initialData.allergies || [],
-    medicalConditions: initialData.medicalConditions || []
+    medicalConditions: initialData.medicalConditions || [],
+    history: initialData.history || []
   });
 
   const [newAllergy, setNewAllergy] = useState("");
   const [newCondition, setNewCondition] = useState("");
+  const [newHistory, setNewHistory] = useState({ title: '', date: '', description: '', fileUrls: [] as string[] });
+  const [editingHistoryIndex, setEditingHistoryIndex] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const historyFileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
@@ -35,18 +41,26 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     setLoading(true);
 
     try {
+      const body = JSON.stringify(formData);
+      console.log("Payload size:", (body.length / 1024 / 1024).toFixed(2) + "MB");
+
       const response = await fetch("/api/record", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body
       });
 
-      if (!response.ok) throw new Error("Failed to update record");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server Error Response:", errorText);
+        throw new Error(`Failed to update record: ${response.status} ${errorText}`);
+      }
 
       toast.success("Medical record updated successfully!");
       router.refresh();
       onClose();
     } catch (error) {
+      console.error("Save Error:", error);
       toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -68,11 +82,90 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     setFormData({ ...formData, [field]: newList });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const startEditingHistory = (index: number) => {
+    setNewHistory(formData.history[index]);
+    setEditingHistoryIndex(index);
+    const historyForm = document.getElementById('medical-history-form');
+    if (historyForm) historyForm.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const addHistoryItem = () => {
+    if (!newHistory.title || !newHistory.date) {
+      toast.error("Please provide at least a title and date");
+      return;
+    }
+    
+    if (editingHistoryIndex !== null) {
+      const updatedHistory = [...formData.history];
+      updatedHistory[editingHistoryIndex] = newHistory;
+      setFormData({ ...formData, history: updatedHistory });
+      setEditingHistoryIndex(null);
+      toast.success("History item updated");
+    } else {
+      setFormData({
+        ...formData,
+        history: [...formData.history, newHistory]
+      });
+      toast.success("History item added");
+    }
+    
+    setNewHistory({ title: '', date: '', description: '', fileUrls: [] as string[] });
+  };
+
+  const removeHistoryItem = (index: number) => {
+    setFormData({
+      ...formData,
+      history: formData.history.filter((_: any, i: number) => i !== index)
+    });
+  };
+
+  const handleHistoryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const fileList = Array.from(files);
+      const oversizedFiles = fileList.filter(f => f.size > 10 * 1024 * 1024);
+      
+      if (oversizedFiles.length > 0) {
+        toast.error(`Some files exceed the 10MB limit: ${oversizedFiles.map(f => f.name).join(", ")}`);
+        if (e.target) e.target.value = "";
+        return;
+      }
+
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      const readers = fileList.map((file, index) => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setUploadProgress(Math.round(((index + 1) / fileList.length) * 100));
+            resolve(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(readers).then(base64s => {
+        // Simulate a small delay for the animation effect
+        setTimeout(() => {
+          setNewHistory(prev => ({ 
+            ...prev, 
+            fileUrls: [...new Set([...prev.fileUrls, ...base64s])] 
+          }));
+          setIsUploading(false);
+          setUploadProgress(0);
+          if (e.target) e.target.value = "";
+          toast.success("Files attached successfully");
+        }, 800);
+      });
+    }
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Image size should be less than 2MB");
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Image size should be less than 10MB");
         return;
       }
       const reader = new FileReader();
@@ -136,7 +229,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               <input 
                 type="file" 
                 ref={fileInputRef} 
-                onChange={handleImageChange} 
+                onChange={handlePhotoChange} 
                 accept="image/*" 
                 className="hidden" 
               />
@@ -350,6 +443,165 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                     />
                   </div>
                 </div>
+              </div>
+            </section>
+
+            {/* Medical History Section */}
+            <section className="space-y-6 pt-4 border-t border-white/5">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/40 px-1">Medical History Records</h3>
+              
+              {/* Add new history form */}
+              <div id="medical-history-form" className="space-y-4 p-6 rounded-2xl bg-white/[0.03] border border-white/5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Title</label>
+                    <input 
+                      type="text" 
+                      value={newHistory.title}
+                      onChange={(e) => setNewHistory({...newHistory, title: e.target.value})}
+                      placeholder="e.g. Heart Surgery"
+                      className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:border-primary/50"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Date</label>
+                    <input 
+                      type="text" 
+                      value={newHistory.date}
+                      onChange={(e) => setNewHistory({...newHistory, date: e.target.value})}
+                      placeholder="e.g. May 2023"
+                      className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:border-primary/50"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Description (Optional)</label>
+                  <textarea 
+                    value={newHistory.description}
+                    onChange={(e) => setNewHistory({...newHistory, description: e.target.value})}
+                    placeholder="Brief details about the procedure or diagnosis..."
+                    className="w-full p-3 bg-white/5 border border-white/10 rounded-xl text-sm outline-none focus:border-primary/50 min-h-[80px]"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Attached Files</label>
+                    <button 
+                      type="button"
+                      onClick={() => historyFileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 text-[10px] font-black text-primary uppercase hover:opacity-80 transition-all"
+                    >
+                      <FilePlus className="w-3.5 h-3.5" />
+                      Add Files
+                    </button>
+                  </div>
+                  
+                  <input 
+                    type="file"
+                    ref={historyFileInputRef}
+                    onChange={handleHistoryFileChange}
+                    multiple
+                    className="hidden"
+                  />
+                  
+                  {isUploading && (
+                    <div className="col-span-2 p-4 rounded-2xl bg-primary/5 border border-primary/20 animate-pulse">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">Processing Files...</span>
+                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">{uploadProgress}%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary transition-all duration-300" 
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {newHistory.fileUrls.length > 0 && !isUploading && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {newHistory.fileUrls.map((url, i) => (
+                        <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10 group">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+                            <span className="text-[10px] font-medium text-white/60 truncate">
+                              {url.startsWith('data:') ? 'Newly Uploaded' : 'Existing File'}
+                            </span>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={() => setNewHistory({
+                              ...newHistory,
+                              fileUrls: newHistory.fileUrls.filter((_, idx) => idx !== i)
+                            })}
+                            className="p-1 text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <button 
+                    type="button" 
+                    onClick={addHistoryItem}
+                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all flex items-center justify-center gap-2"
+                  >
+                    {editingHistoryIndex !== null ? <Save className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                    {editingHistoryIndex !== null ? "Update Item" : "Add to History"}
+                  </button>
+                  {editingHistoryIndex !== null && (
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setEditingHistoryIndex(null);
+                        setNewHistory({ title: '', date: '', description: '', fileUrls: [] as string[] });
+                      }}
+                      className="px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* List of existing history */}
+              <div className="space-y-4">
+                {formData.history.map((item: any, index: number) => (
+                  <div key={index} className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-between group">
+                    <div className="flex items-center gap-4 overflow-hidden">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                        <Activity className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="overflow-hidden">
+                        <h4 className="text-sm font-bold truncate">{item.title}</h4>
+                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{item.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        type="button"
+                        onClick={() => startEditingHistory(index)}
+                        className="p-2 text-muted-foreground hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => removeHistoryItem(index)}
+                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert, MapPin, Calendar } from "lucide-react";
+import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert, MapPin, Calendar, FileText, Download, Image as ImageIcon } from "lucide-react";
 
 interface PublicMedicalRecord {
   fullName: string;
@@ -13,6 +13,7 @@ interface PublicMedicalRecord {
   medications?: string;
   address?: string;
   dob?: string;
+  history: any[];
 }
 
 export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRecord }) {
@@ -112,6 +113,71 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
             </div>
           </div>
         </div>
+
+        {/* Medical History Timeline */}
+        {data.history && data.history.length > 0 && (
+          <div className="space-y-4">
+            <SectionTitle icon={<FileText className="w-5 h-5 text-primary" />} title="Medical History" />
+            <div className="space-y-4">
+              {data.history.map((item: any, idx: number) => (
+                <div key={idx} className="glass rounded-[2rem] p-6 border-white/5 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-2xl -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
+                  
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Activity className="w-4 h-4 text-primary" />
+                      </div>
+                      <h4 className="font-bold text-lg tracking-tight">{item.title}</h4>
+                    </div>
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-1 rounded-lg border border-white/5">
+                      {item.date}
+                    </span>
+                  </div>
+
+                  {item.description && (
+                    <p className="text-sm text-white/60 leading-relaxed italic mb-4 pl-10 border-l border-white/5 ml-4">
+                      {item.description}
+                    </p>
+                  )}
+                  {item.fileUrls && item.fileUrls.length > 0 && (
+                    <div className="grid grid-cols-1 gap-2 mt-4">
+                      {item.fileUrls.filter(Boolean).map((url: string, fIdx: number) => {
+                        const isImage = url.startsWith('data:image/') || url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                        const extension = url.startsWith('data:') 
+                          ? (url.match(/data:image\/(\w+)/)?.[1] || url.match(/data:application\/(\w+)/)?.[1] || 'bin')
+                          : url.split('.').pop()?.split('?')[0] || 'file';
+
+                        return (
+                          <div key={fIdx} className="flex flex-col gap-2">
+                            <a 
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              download={`Medical-Doc-${fIdx + 1}.${extension}`}
+                              className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group/file cursor-pointer"
+                            >
+                              <div className="flex items-center gap-3">
+                                {isImage ? <ImageIcon className="w-4 h-4 text-primary" /> : <FileText className="w-4 h-4 text-primary" />}
+                                <span className="text-xs font-bold text-white/80">Document #{fIdx + 1} ({extension.toUpperCase()})</span>
+                              </div>
+                              <Download className="w-4 h-4 text-muted-foreground group-hover/file:text-white transition-colors" />
+                            </a>
+                            {isImage && (
+                              <div className="mt-1 rounded-xl overflow-hidden border border-white/5 bg-white/5 p-1">
+                                <img src={url} alt="Medical Attachment" className="w-full h-auto max-h-40 object-cover rounded-lg" />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

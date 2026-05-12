@@ -10,6 +10,11 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
+    console.log("[RECORD_PATCH] Body received:", { 
+      ...body, 
+      photoUrl: body.photoUrl ? "data:..." : null,
+      history: body.history?.map((h: any) => ({ ...h, fileUrls: h.fileUrls?.map(() => "data:...") }))
+    });
     const { 
       fullName, 
       bloodGroup, 
@@ -24,7 +29,10 @@ export async function PATCH(req: Request) {
       organDonor,
       photoUrl,
       address,
-      dob
+      dob,
+      gender,
+      pastSurgeries,
+      history
     } = body;
 
     const record = await prisma.medicalRecord.update({
@@ -35,15 +43,29 @@ export async function PATCH(req: Request) {
         emergencyName,
         emergencyPhone,
         emergencyRelation,
-        allergies: Array.isArray(allergies) ? allergies.join(",") : allergies,
-        medicalConditions: Array.isArray(medicalConditions) ? medicalConditions.join(",") : medicalConditions,
+        allergies: Array.isArray(allergies) ? allergies : [],
+        medicalConditions: Array.isArray(medicalConditions) ? medicalConditions : [],
         medications,
         height,
         weight,
         organDonor,
         photoUrl,
         address,
-        dob
+        dob,
+        gender,
+        pastSurgeries,
+        history: {
+          deleteMany: {},
+          create: (Array.isArray(history) ? history : []).map((h: any) => ({
+            title: h.title || "",
+            date: h.date || "",
+            description: h.description || "",
+            fileUrls: Array.isArray(h.fileUrls) ? h.fileUrls : []
+          }))
+        }
+      },
+      select: {
+        id: true
       }
     });
 
