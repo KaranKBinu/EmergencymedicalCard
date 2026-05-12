@@ -48,7 +48,7 @@ export default function LoginForm() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-background relative overflow-hidden">
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full -z-10" />
       
-      <div className="w-full max-w-md glass p-8 rounded-[2.5rem] shadow-2xl">
+      <div className="w-full max-w-md glass p-6 sm:p-8 rounded-[2.5rem] shadow-2xl">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
             <Heart className="w-6 h-6 text-primary" />
@@ -96,7 +96,7 @@ export default function LoginForm() {
 function InputGroup({ icon, label, children }: { icon: React.ReactNode, label: string, children: React.ReactNode }) {
   return (
     <div className="space-y-1.5 text-left">
-      <label className="text-[10px] uppercase font-black text-muted-foreground tracking-widest ml-1">{label}</label>
+      <label className="text-[11px] uppercase font-black text-muted-foreground tracking-[0.1em] ml-1">{label}</label>
       <div className="flex items-center gap-3 p-4 bg-white/[0.03] border border-white/5 rounded-2xl focus-within:border-primary/50 transition-all">
         <div className="text-muted-foreground w-5 h-5 flex-shrink-0">
           {icon}

@@ -246,9 +246,9 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               className="relative w-full max-w-4xl bg-[#0a0a0c] border border-white/10 rounded-t-[3rem] sm:rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col mb-0 sm:mb-8"
             >
               {/* Premium Header */}
-              <div className="sticky top-0 z-20 bg-[#0a0a0c]/80 backdrop-blur-xl border-b border-white/5 p-6 sm:p-10 flex items-center justify-between">
-                <div className="flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
+              <div className="sticky top-0 z-20 bg-[#0a0a0c]/80 backdrop-blur-xl border-b border-white/5 p-4 sm:p-10 flex items-center justify-between">
+                <div className="flex items-center gap-3 sm:gap-5">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
                     <Activity className="w-6 h-6 text-primary" />
                   </div>
                   <div>
@@ -267,7 +267,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                 </button>
               </div>
 
-              <div className="p-6 sm:p-12 space-y-16">
+              <div className="p-4 sm:p-12 space-y-12 sm:space-y-16">
                 <form onSubmit={handleSubmit} className="space-y-16 pb-20">
             {/* Photo Section */}
             <section className="flex flex-col items-center gap-4 mb-8">
@@ -325,7 +325,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Full Name</label>
+                  <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1 opacity-60">Full Name</label>
                   <div className="relative group">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <input 
@@ -338,7 +338,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Date of Birth</label>
+                  <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1 opacity-60">Date of Birth</label>
                   <div className="relative group">
                     <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none" />
                     <input 
@@ -351,7 +351,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Blood Group</label>
+                  <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1 opacity-60">Blood Group</label>
                   <div className="relative group">
                     <Droplets className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                     <select 
@@ -595,7 +595,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               </div>
               
               {/* Add new history form */}
-              <div id="medical-history-form" className="space-y-6 p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 relative overflow-hidden group">
+              <div id="medical-history-form" className="space-y-6 p-5 sm:p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -734,7 +734,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               {/* List of existing history */}
               <div className="grid grid-cols-1 gap-4">
                 {formData.history.length > 0 ? formData.history.map((item: any, index: number) => (
-                  <div key={index} className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] hover:border-white/10 transition-all">
+                  <div key={index} className="p-4 sm:p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] hover:border-white/10 transition-all">
                     <div className="flex items-center gap-5 overflow-hidden">
                       <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
                         <Activity className="w-6 h-6 text-primary opacity-60 group-hover:opacity-100 transition-opacity" />
@@ -779,7 +779,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
         </div>
 
               {/* Floating Action Bar */}
-              <div className="sticky bottom-0 z-20 bg-[#0a0a0c]/80 backdrop-blur-xl border-t border-white/5 p-6 sm:p-8 flex items-center gap-4">
+              <div className="sticky bottom-0 z-20 bg-[#0a0a0c]/80 backdrop-blur-xl border-t border-white/5 p-4 sm:p-8 flex items-center gap-4">
                 <button 
                   type="button"
                   onClick={onClose}

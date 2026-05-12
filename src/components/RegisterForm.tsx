@@ -53,7 +53,7 @@ export default function RegisterForm() {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full -z-10" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -z-10" />
 
-      <div className="w-full max-w-md glass p-8 rounded-[2.5rem] shadow-2xl">
+      <div className="w-full max-w-md glass p-6 sm:p-8 rounded-[2.5rem] shadow-2xl">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
             <Heart className="w-6 h-6 text-primary fill-primary" />
@@ -92,7 +92,7 @@ export default function RegisterForm() {
                   className="w-full bg-transparent border-none outline-none text-sm" placeholder="John Doe" required 
                 />
               </InputGroup>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InputGroup icon={<Droplets />} label="Blood Group">
                   <select 
                     name="bloodGroup" value={formData.bloodGroup} onChange={handleChange}
@@ -151,7 +151,7 @@ export default function RegisterForm() {
 function InputGroup({ icon, label, children }: { icon: React.ReactNode, label: string, children: React.ReactNode }) {
   return (
     <div className="space-y-1.5 text-left">
-      <label className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest ml-1">{label}</label>
+      <label className="text-[11px] uppercase font-black text-muted-foreground tracking-[0.1em] ml-1">{label}</label>
       <div className="flex items-center gap-3 p-4 bg-white/[0.03] border border-white/5 rounded-2xl focus-within:border-primary/50 transition-all">
         <div className="text-muted-foreground w-5 h-5 flex-shrink-0">
           {icon}

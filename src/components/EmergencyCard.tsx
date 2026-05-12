@@ -35,9 +35,12 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
   
   // Use forcedSide if provided, otherwise use internal state
   const currentFlipped = forcedSide ? (forcedSide === 'back') : isFlipped;
+  const [isRotated, setIsRotated] = useState(false);
   const [publicUrl, setPublicUrl] = useState("");
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
@@ -46,49 +49,78 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
     const handleResize = () => {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
-        const newScale = Math.min(1, width / 480);
-        setScale(newScale);
+        const shouldRotate = width < 440;
+        setIsRotated(shouldRotate);
+
+        if (shouldRotate) {
+          const newScale = Math.min(1, (width - 48) / 304);
+          setScale(newScale);
+        } else {
+          const newScale = Math.min(1, (width - 64) / 480);
+          setScale(newScale);
+        }
       }
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
 
-    // Auto-flip animation on load
     const timer1 = setTimeout(() => setIsFlipped(true), 1200);
     const timer2 = setTimeout(() => setIsFlipped(false), 2800);
+    const hintTimer = setTimeout(() => setShowHint(true), 1500);
+    const hideTimer = setTimeout(() => setShowHint(false), 4500);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timer1);
       clearTimeout(timer2);
+      clearTimeout(hintTimer);
+      clearTimeout(hideTimer);
     };
   }, [data.publicId]);
 
+  const currentShowHint = showHint || isHovered;
+
   return (
-    <div ref={containerRef} className="flex flex-col items-center gap-6 py-4 w-full overflow-visible">
+    <div ref={containerRef} className="flex flex-col items-center w-full overflow-visible">
       <div
-        className="relative w-[480px] h-[304px] cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem] origin-top"
-        style={{ transform: `scale(${scale})`, marginBottom: `-${304 * (1 - scale)}px` }}
-        onClick={() => setIsFlipped(!isFlipped)}
+        className="relative cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem] transition-all duration-500"
+        style={{ 
+          width: isRotated ? `${304 * scale}px` : `${480 * scale}px`,
+          height: isRotated ? `${480 * scale}px` : `${304 * scale}px`,
+          marginBottom: isRotated ? '2rem' : `0px`,
+        }}
+        onClick={() => {
+          setIsFlipped(!isFlipped);
+          setShowHint(false);
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onTouchStart={() => setShowHint(true)}
       >
+        <div 
+          className="absolute top-0 left-0 origin-top-left"
+          style={{ 
+            transform: `scale(${scale}) ${isRotated ? 'rotate(90deg) translateX(0) translateY(-100%)' : ''}`,
+            width: '480px',
+            height: '304px',
+          }}
+        >
         <AnimatePresence>
-          {isHovered && (
+          {currentShowHint && (
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
               animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
               exit={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
-              className="absolute -top-14 left-1/2 px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2"
+              className={`absolute left-1/2 px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2 whitespace-nowrap ${isRotated ? '-rotate-90 -left-20 top-1/2' : '-top-14'}`}
             >
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              Click to flip card
+              {isRotated ? 'Tap to flip card' : 'Click to flip card'}
             </motion.div>
           )}
         </AnimatePresence>
         <motion.div
-          className="relative w-full h-full transition-all duration-500 preserve-3d"
+          className="relative w-[480px] h-[304px] transition-all duration-500 preserve-3d"
           animate={{ rotateY: currentFlipped ? 180 : 0 }}
           transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
         >
@@ -122,13 +154,13 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
                     </div>
                     <div>
                       <h3 className="text-2xl font-black font-outfit tracking-tight text-white leading-tight">{data.fullName}</h3>
-                      <div className="flex items-center gap-2 mt-1.5">
+                      <div className="flex items-center gap-2 mt-2">
                         <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">Emergency ID</span>
+                        <span className="text-[11px] uppercase tracking-[0.15em] text-muted-foreground font-black">Emergency ID</span>
                       </div>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Calendar className="w-3 h-3 text-white/20" />
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{data.dob || "--"}</span>
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-white/20" />
+                        <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">{data.dob || "--"}</span>
                       </div>
                     </div>
                   </div>
@@ -140,7 +172,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
 
                 <div className="grid grid-cols-2 gap-y-6 gap-x-4">
                   <div className="space-y-1.5">
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-black">Blood Group</span>
+                    <span className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-black">Blood Group</span>
                     <div className="flex items-center gap-2.5">
                       <div className="p-1.5 rounded-lg bg-primary/10">
                         <Droplets className="w-5 h-5 text-primary" />
@@ -150,7 +182,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
                   </div>
 
                   <div className="space-y-1.5">
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-black">Emergency Call</span>
+                    <span className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-black">Emergency Call</span>
                     <div className="flex items-center gap-2.5">
                       <div className="p-1.5 rounded-lg bg-accent/10">
                         <Phone className="w-5 h-5 text-accent" />
@@ -160,7 +192,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
                   </div>
 
                   <div className="space-y-1.5 pb-2">
-                    <span className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-black">Height</span>
+                    <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-black">Height</span>
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
                         <Ruler className="w-4 h-4 text-muted-foreground" />
@@ -170,7 +202,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
                   </div>
 
                   <div className="space-y-1.5 pb-2">
-                    <span className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-black">Weight</span>
+                    <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-black">Weight</span>
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
                         <Scale className="w-4 h-4 text-muted-foreground" />
@@ -183,7 +215,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
                 <div className="flex justify-between items-center pt-2 text-[10px] font-bold text-muted-foreground border-t border-white/5">
                   <div className="flex items-center gap-2">
                     <ShieldAlert className="w-4 h-4 text-primary" />
-                    <span className="tracking-widest uppercase">Scannable Medical Identity</span>
+                    <span className="tracking-widest uppercase text-[11px]">Scannable Medical Identity</span>
                   </div>
                   <div className="flex items-center gap-1.5 opacity-60">
                     <span className="text-[8px] uppercase tracking-tighter">Issued:</span>
@@ -263,6 +295,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
             </div>
           </div>
         </motion.div>
+        </div>
       </div>
     </div>
   );
