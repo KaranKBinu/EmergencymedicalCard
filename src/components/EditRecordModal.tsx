@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar, FileText, FilePlus, Edit3 } from "lucide-react";
+import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar, FileText, FilePlus, Edit3, Pill } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
@@ -31,6 +31,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
   });
 
   const [newAllergy, setNewAllergy] = useState("");
+  const [isMedication, setIsMedication] = useState(false);
   const [newCondition, setNewCondition] = useState("");
   const [newHistory, setNewHistory] = useState({ title: '', date: '', description: '', files: [] as { name: string, url: string }[] });
   const [editingHistoryIndex, setEditingHistoryIndex] = useState<number | null>(null);
@@ -91,11 +92,16 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
   const addArrayItem = (field: 'allergies' | 'medicalConditions', value: string, setter: (v: string) => void) => {
     if (!value.trim()) return;
+    let finalValue = value.trim();
+    if (field === 'allergies' && isMedication) {
+      finalValue = `💊 ${finalValue}`;
+    }
     setFormData({
       ...formData,
-      [field]: [...formData[field], value.trim()]
+      [field]: [...formData[field], finalValue]
     });
     setter("");
+    if (field === 'allergies') setIsMedication(false);
   };
 
   const removeArrayItem = (field: 'allergies' | 'medicalConditions', index: number) => {
@@ -368,30 +374,57 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               <div className="space-y-4">
                 <label className="text-xs font-bold text-muted-foreground ml-1">Allergies</label>
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {formData.allergies.map((a: string, i: number) => (
-                    <span key={i} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-destructive/10 text-destructive text-xs font-bold border border-destructive/10 group">
-                      {a}
-                      <button type="button" onClick={() => removeArrayItem('allergies', i)} className="hover:text-destructive/50">
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
+                  {formData.allergies.map((a: string, i: number) => {
+                    const isMed = a.startsWith('💊 ');
+                    const displayName = isMed ? a.replace('💊 ', '') : a;
+                    return (
+                      <div key={i} className="relative group">
+                        {isMed && (
+                          <div className="absolute -top-1 -left-1 z-10">
+                            <div className="w-4 h-2 bg-blue-500 rounded-full shadow-md border border-blue-100 flex items-center overflow-hidden rotate-[-35deg] relative">
+                              <div className="w-1/2 h-full bg-blue-500" />
+                              <div className="w-1/2 h-full bg-white" />
+                              <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-black/10 pointer-events-none" />
+                            </div>
+                          </div>
+                        )}
+                        <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${isMed ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 pl-4' : 'bg-destructive/10 text-destructive border-destructive/10'}`}>
+                          {displayName}
+                          <button type="button" onClick={() => removeArrayItem('allergies', i)} className="ml-1 hover:opacity-50">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    value={newAllergy}
-                    onChange={(e) => setNewAllergy(e.target.value)}
-                    placeholder="Add allergy..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2 px-4 focus:outline-none text-sm"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('allergies', newAllergy, setNewAllergy))}
-                  />
-                  <button 
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={newAllergy}
+                      onChange={(e) => setNewAllergy(e.target.value)}
+                      placeholder="Add allergy..."
+                      className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2 px-4 focus:outline-none text-sm"
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('allergies', newAllergy, setNewAllergy))}
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => addArrayItem('allergies', newAllergy, setNewAllergy)}
+                      className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <button
                     type="button"
-                    onClick={() => addArrayItem('allergies', newAllergy, setNewAllergy)}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all"
+                    onClick={() => setIsMedication(!isMedication)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all self-start ${isMedication ? 'bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10'}`}
                   >
-                    <Plus className="w-5 h-5" />
+                    <Pill className={`w-3.5 h-3.5 ${isMedication ? 'animate-bounce' : ''}`} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      {isMedication ? 'Tagged as Medicine' : 'Tag as Medicine'}
+                    </span>
                   </button>
                 </div>
               </div>

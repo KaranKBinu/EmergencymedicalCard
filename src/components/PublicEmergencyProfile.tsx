@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert, MapPin, Calendar, FileText, Download, Image as ImageIcon } from "lucide-react";
+import { Phone, Droplets, AlertCircle, Info, Activity, User, ShieldAlert, MapPin, Calendar, FileText, Download, Image as ImageIcon, Pill } from "lucide-react";
 
 interface PublicMedicalRecord {
   fullName: string;
@@ -82,9 +82,32 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
         <div className="space-y-4">
           <SectionTitle icon={<AlertCircle className="w-5 h-5 text-destructive" />} title="Critical Allergies" />
           <div className="grid grid-cols-2 gap-3">
-            {data.allergies.length > 0 ? data.allergies.map((allergy) => (
-              <AlertCard key={allergy} label={allergy} variant="destructive" />
-            )) : <p className="text-muted-foreground text-sm italic col-span-2">No known allergies</p>}
+            {data.allergies.length > 0 ? data.allergies.map((a) => {
+              const isMed = a.startsWith('💊 ');
+              const displayName = isMed ? a.replace('💊 ', '') : a;
+              return (
+                <div key={a} className="relative">
+                  {isMed && (
+                    <div className="absolute -top-1 -left-1 z-10">
+                      <div className="w-5 h-2.5 bg-blue-500 rounded-full shadow-md border border-blue-100 flex items-center overflow-hidden rotate-[-35deg] relative">
+                        <div className="w-1/2 h-full bg-blue-500" />
+                        <div className="w-1/2 h-full bg-white" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-black/10 pointer-events-none" />
+                      </div>
+                    </div>
+                  )}
+                  <div 
+                    className={`px-4 py-3 rounded-2xl border font-bold text-sm text-center flex items-center justify-center gap-2 ${
+                      isMed 
+                        ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
+                        : 'bg-destructive/10 border-destructive/20 text-destructive'
+                    }`}
+                  >
+                    {displayName}
+                  </div>
+                </div>
+              );
+            }) : <p className="text-muted-foreground text-sm italic col-span-2">No known allergies</p>}
           </div>
         </div>
 

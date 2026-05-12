@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import EmergencyCard from "@/components/EmergencyCard";
-import { QrCode, Download, Share2, Edit3, Shield, Settings, LogOut, Droplets, Calendar, Phone, Activity } from "lucide-react";
+import { QrCode, Download, Share2, Edit3, Shield, Settings, LogOut, Droplets, Calendar, Phone, Activity, Pill } from "lucide-react";
 import toast from "react-hot-toast";
 import { toPng } from "html-to-image";
 import { signOut } from "next-auth/react";
@@ -237,9 +237,31 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {initialData.allergies.length > 0 ? (
-                      initialData.allergies.map((a: string) => (
-                        <span key={a} className="px-2 py-1 rounded-md bg-destructive/10 text-destructive text-[10px] font-bold border border-destructive/20">{a}</span>
-                      ))
+                      initialData.allergies.map((a: string) => {
+                        const isMed = a.startsWith('💊 ');
+                        const displayName = isMed ? a.replace('💊 ', '') : a;
+                        return (
+                          <div key={a} className="relative">
+                            {isMed && (
+                              <div className="absolute -top-0.5 -left-0.5 z-10">
+                                <div className="w-3.5 h-1.5 bg-blue-500 rounded-full shadow-sm border border-blue-100 flex items-center overflow-hidden rotate-[-35deg] relative">
+                                  <div className="w-1/2 h-full bg-blue-500" />
+                                  <div className="w-1/2 h-full bg-white" />
+                                </div>
+                              </div>
+                            )}
+                            <span 
+                              className={`px-2 py-1 rounded-md text-[10px] font-bold border flex items-center gap-1 ${
+                                isMed 
+                                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.1)] pl-3' 
+                                  : 'bg-destructive/10 text-destructive border-destructive/20'
+                              }`}
+                            >
+                              {displayName}
+                            </span>
+                          </div>
+                        );
+                      })
                     ) : <span className="text-[10px] text-muted-foreground italic">No Allergies</span>}
                   </div>
                 </div>

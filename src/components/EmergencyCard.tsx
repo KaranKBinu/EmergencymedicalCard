@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { QrCode, Phone, Droplets, User, ShieldAlert, Activity, Scale, Ruler, Info, Calendar } from "lucide-react";
+import { QrCode, Phone, Droplets, User, ShieldAlert, Activity, Scale, Ruler, Info, Calendar, Pill } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
 interface EmergencyData {
@@ -187,9 +187,31 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
                   <div className="space-y-1.5">
                     <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground font-black">Critical Allergies</span>
                     <div className="flex flex-wrap gap-1">
-                      {data.allergies && data.allergies.length > 0 ? data.allergies.slice(0, 4).map(a => (
-                        <span key={a} className="px-1.5 py-0.5 rounded-md bg-destructive/20 text-destructive text-[8px] font-bold border border-destructive/10">{a}</span>
-                      )) : <span className="text-[9px] text-white/30 italic">None</span>}
+                      {data.allergies && data.allergies.length > 0 ? data.allergies.slice(0, 4).map(a => {
+                        const isMed = a.startsWith('💊 ');
+                        const displayName = isMed ? a.replace('💊 ', '') : a;
+                        return (
+                          <div key={a} className="relative">
+                            {isMed && (
+                              <div className="absolute -top-0.5 -left-0.5 z-10">
+                                <div className="w-3 h-1.5 bg-blue-500 rounded-full shadow-sm border border-blue-500/10 flex items-center overflow-hidden rotate-[-35deg] relative">
+                                  <div className="w-1/2 h-full bg-blue-500" />
+                                  <div className="w-1/2 h-full bg-white" />
+                                </div>
+                              </div>
+                            )}
+                            <span 
+                              className={`px-1.5 py-0.5 rounded-md text-[8px] font-bold border flex items-center gap-0.5 ${
+                                isMed 
+                                  ? 'bg-blue-500/20 text-blue-400 border-blue-500/20 shadow-[0_0_8px_rgba(59,130,246,0.1)] pl-2' 
+                                  : 'bg-destructive/20 text-destructive border-destructive/10'
+                              }`}
+                            >
+                              {displayName}
+                            </span>
+                          </div>
+                        );
+                      }) : <span className="text-[9px] text-white/30 italic">None</span>}
                     </div>
                   </div>
                   <div className="space-y-1.5 border-l border-white/5 pl-6">
