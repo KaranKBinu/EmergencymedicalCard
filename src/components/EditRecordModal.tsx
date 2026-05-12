@@ -225,23 +225,23 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative w-full max-w-2xl bg-[#0a0a0c] border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex items-center justify-between p-8 border-b border-white/5">
+      <div className="relative w-full max-w-2xl h-[92vh] sm:h-auto bg-[#0a0a0c] border-t sm:border border-white/10 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom sm:zoom-in duration-300 flex flex-col">
+        <div className="flex items-center justify-between p-6 sm:p-8 border-b border-white/5 shrink-0">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Activity className="w-6 h-6 text-primary" /> Edit Medical Record
+            <h2 className="text-xl sm:text-2xl font-black font-outfit flex items-center gap-2">
+              <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-primary" /> Edit Medical Record
             </h2>
-            <p className="text-muted-foreground text-sm">Keep your emergency information up to date.</p>
+            <p className="text-muted-foreground text-xs sm:text-sm">Keep your emergency information up to date.</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-all">
             <X className="w-6 h-6 text-muted-foreground" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 overflow-y-auto flex-1 custom-scrollbar">
           <div className="space-y-8">
             {/* Photo Section */}
             <section className="flex flex-col items-center gap-4 mb-8">
@@ -294,7 +294,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
             {/* Basic Info */}
             <section className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary/60 px-1">Basic Identity</h3>
+              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-primary/60 px-1">Basic Identity</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-muted-foreground ml-1">Full Name</label>
@@ -355,7 +355,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
             {/* Emergency Contact */}
             <section className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-accent/60 px-1">Emergency Contact</h3>
+              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-accent/60 px-1">Emergency Contact</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-muted-foreground ml-1">Contact Name</label>
@@ -399,7 +399,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
             {/* Medical Data */}
             <section className="space-y-6">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/40 px-1">Medical Details</h3>
+              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-white/40 px-1">Medical Details</h3>
               
               <div className="space-y-4">
                 <label className="text-xs font-bold text-muted-foreground ml-1">Allergies</label>
@@ -510,7 +510,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
             {/* Vitals */}
             <section className="space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/40 px-1">Vitals & Measurements</h3>
+              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-white/40 px-1">Vitals & Measurements</h3>
               
               <div className="grid grid-cols-2 gap-4">
                 {/* Height Input */}
@@ -569,7 +569,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
             {/* Medical History Section */}
             <section className="space-y-6 pt-4 border-t border-white/5">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/40 px-1">Medical History Records</h3>
+              <h3 className="text-[10px] font-black font-outfit uppercase tracking-[0.2em] text-white/40 px-1">Medical History Records</h3>
               
               {/* Add new history form */}
               <div id="medical-history-form" className="space-y-4 p-6 rounded-2xl bg-white/[0.03] border border-white/5">
@@ -747,18 +747,18 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
           </div>
         </form>
 
-        <div className="p-8 border-t border-white/5 bg-white/[0.01] flex gap-4">
+        <div className="p-6 sm:p-8 border-t border-white/5 bg-white/[0.01] flex gap-4 shrink-0">
           <button 
             type="button"
             onClick={onClose}
-            className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/5 cursor-pointer"
+            className="flex-1 py-3.5 sm:py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/5 cursor-pointer text-sm sm:text-base"
           >
             Cancel
           </button>
           <button 
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 py-4 bg-primary text-white rounded-2xl font-bold transition-all hover:opacity-90 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="flex-1 py-3.5 sm:py-4 bg-primary text-white rounded-2xl font-bold transition-all hover:opacity-90 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-sm sm:text-base"
           >
             {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
             Save Changes

@@ -139,7 +139,7 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Shield className="w-5 h-5 text-white fill-white" />
             </div>
-            <span className="font-bold tracking-tight text-xl">Life ID</span>
+            <span className="font-black font-outfit tracking-tight text-xl">Life ID</span>
           </div>
           <div className="flex items-center gap-4">
             <button className="p-2 hover:bg-white/5 rounded-xl transition-all">
@@ -155,15 +155,15 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2 space-y-8">
-            <div className="space-y-2">
-              <h1 className="text-4xl font-black tracking-tight">Your Digital Identity</h1>
-              <p className="text-muted-foreground">Welcome back, {initialData.fullName.split(' ')[0]}. Your card is ready.</p>
+      <div className="max-w-5xl mx-auto px-6 py-8 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+            <div className="space-y-1 sm:space-y-2">
+              <h1 className="text-3xl sm:text-4xl font-black font-outfit tracking-tight leading-tight">Your Digital Identity</h1>
+              <p className="text-muted-foreground text-sm">Welcome back, {initialData.fullName.split(' ')[0]}. Your card is ready.</p>
             </div>
 
-            <div className="glass rounded-[3rem] p-6 sm:p-16 flex flex-col items-center border-white/5 w-full">
+            <div className="glass rounded-[2.5rem] sm:rounded-[3rem] p-4 sm:p-16 flex flex-col items-center border-white/5 w-full">
               <div ref={cardRef} className="w-full flex justify-center perspective-1000">
                 <EmergencyCard data={initialData} />
               </div>
@@ -206,9 +206,9 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
             <div className="glass rounded-[2.5rem] p-8 border-white/5 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
               
-              <h3 className="text-lg font-bold mb-8 flex items-center gap-2">
+              <h3 className="text-lg font-black font-outfit mb-8 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-primary" /> 
-                <span className="tracking-tight">Current Status</span>
+                <span className="tracking-tight uppercase text-xs">Current Status</span>
               </h3>
               
               <div className="grid grid-cols-1 gap-4">

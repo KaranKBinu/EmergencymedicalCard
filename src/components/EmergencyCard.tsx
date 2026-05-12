@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { QrCode, Phone, Droplets, User, ShieldAlert, Activity, Scale, Ruler, Info, Calendar, Pill } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import { useRef } from "react";
 
 interface EmergencyData {
   fullName: string;
@@ -35,25 +36,40 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
   // Use forcedSide if provided, otherwise use internal state
   const currentFlipped = forcedSide ? (forcedSide === 'back') : isFlipped;
   const [publicUrl, setPublicUrl] = useState("");
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
     setPublicUrl(`${baseUrl}/v/${data.publicId || 'sample-id'}`);
+
+    const handleResize = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth;
+        const newScale = Math.min(1, width / 480);
+        setScale(newScale);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
 
     // Auto-flip animation on load
     const timer1 = setTimeout(() => setIsFlipped(true), 1200);
     const timer2 = setTimeout(() => setIsFlipped(false), 2800);
 
     return () => {
+      window.removeEventListener('resize', handleResize);
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
   }, [data.publicId]);
 
   return (
-    <div className="flex flex-col items-center gap-6 py-4 w-full">
+    <div ref={containerRef} className="flex flex-col items-center gap-6 py-4 w-full overflow-visible">
       <div
-        className="relative w-full max-w-[480px] aspect-[1.58/1] cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem]"
+        className="relative w-[480px] h-[304px] cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem] origin-top"
+        style={{ transform: `scale(${scale})`, marginBottom: `-${304 * (1 - scale)}px` }}
         onClick={() => setIsFlipped(!isFlipped)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -105,7 +121,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
                       )}
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold tracking-tight text-white leading-tight">{data.fullName}</h3>
+                      <h3 className="text-2xl font-black font-outfit tracking-tight text-white leading-tight">{data.fullName}</h3>
                       <div className="flex items-center gap-2 mt-1.5">
                         <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                         <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">Emergency ID</span>
