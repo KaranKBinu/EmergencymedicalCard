@@ -37,6 +37,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
   const currentFlipped = forcedSide ? (forcedSide === 'back') : isFlipped;
   const [publicUrl, setPublicUrl] = useState("");
   const [scale, setScale] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,8 +47,18 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
     const handleResize = () => {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
-        const newScale = Math.min(1, width / 480);
-        setScale(newScale);
+        const mobile = window.innerWidth < 640;
+        setIsMobile(mobile);
+        
+        if (mobile) {
+          // On mobile, we rotate 90deg. The card's 304px height becomes its width.
+          // We want this to fit within the container width.
+          const newScale = Math.min(1.1, (width - 32) / 304);
+          setScale(newScale);
+        } else {
+          const newScale = Math.min(1, width / 480);
+          setScale(newScale);
+        }
       }
     };
 
@@ -58,35 +69,51 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
     const timer1 = setTimeout(() => setIsFlipped(true), 1200);
     const timer2 = setTimeout(() => setIsFlipped(false), 2800);
 
+    // Auto-show tooltip hint on mobile
+    let hintTimer: NodeJS.Timeout;
+    let hideTimer: NodeJS.Timeout;
+
+    if (window.innerWidth < 640) {
+      hintTimer = setTimeout(() => setIsHovered(true), 3500);
+      hideTimer = setTimeout(() => setIsHovered(false), 8500);
+    }
+
     return () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timer1);
       clearTimeout(timer2);
+      if (hintTimer) clearTimeout(hintTimer);
+      if (hideTimer) clearTimeout(hideTimer);
     };
   }, [data.publicId]);
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center gap-6 py-4 w-full overflow-visible">
+    <div ref={containerRef} className="flex flex-col items-center py-4 w-full overflow-x-hidden relative">
+      <AnimatePresence>
+        {isHovered && !isMobile && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
+            exit={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
+            className="absolute -top-14 left-1/2 px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2 whitespace-nowrap"
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Click to flip card
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div
-        className="relative w-[480px] h-[304px] cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem] origin-top"
-        style={{ transform: `scale(${scale})`, marginBottom: `-${304 * (1 - scale)}px` }}
+        className={`relative w-[480px] h-[304px] cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem] transition-transform duration-500 ${isMobile ? 'origin-center' : 'origin-top'}`}
+        style={{ 
+          transform: `scale(${scale}) ${isMobile ? 'rotate(90deg)' : ''}`, 
+          marginBottom: isMobile ? `${(480 * scale - 304 * scale) / 2 + 10}px` : `-${304 * (1 - scale)}px`,
+          marginTop: isMobile ? `${(480 * scale - 304 * scale) / 2 + 10}px` : '0px'
+        }}
         onClick={() => setIsFlipped(!isFlipped)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <AnimatePresence>
-          {isHovered && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
-              animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
-              exit={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
-              className="absolute -top-14 left-1/2 px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              Click to flip card
-            </motion.div>
-          )}
-        </AnimatePresence>
         <motion.div
           className="relative w-full h-full transition-all duration-500 preserve-3d"
           animate={{ rotateY: currentFlipped ? 180 : 0 }}
@@ -264,6 +291,19 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
           </div>
         </motion.div>
       </div>
+      <AnimatePresence>
+        {isHovered && isMobile && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.9 }}
+            className="px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2 whitespace-nowrap mt-4"
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Tap to flip card
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

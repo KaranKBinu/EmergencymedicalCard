@@ -170,7 +170,7 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
   };
 
   return (
-    <div className="min-h-screen bg-[#070708] text-white">
+    <div className="min-h-screen bg-[#070708] text-white overflow-x-hidden">
       <nav className="border-b border-white/5 bg-black/40 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -199,7 +199,7 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
               <p className="text-muted-foreground text-sm">Welcome back, {initialData.fullName.split(' ')[0]}. Your card is ready.</p>
             </div>
 
-            <div className="glass rounded-[2.5rem] sm:rounded-[3rem] p-4 sm:p-16 flex flex-col items-center border-white/5 w-full">
+            <div className="glass rounded-[2.5rem] sm:rounded-[3rem] p-4 sm:p-16 flex flex-col items-center border-white/5 w-full overflow-hidden">
               <div 
                 className="w-full flex justify-center perspective-1000"
                 onMouseMove={handleMouseMove}
