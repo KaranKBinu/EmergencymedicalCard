@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { Heart, Shield, Zap, QrCode } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  
+  if (session?.user) {
+    redirect("/dashboard");
+  }
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
