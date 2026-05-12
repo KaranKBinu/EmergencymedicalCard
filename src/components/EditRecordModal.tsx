@@ -21,6 +21,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     photoUrl: initialData.photoUrl || "",
     address: initialData.address || "",
     dob: initialData.dob || "",
+    gender: initialData.gender || "",
     allergies: initialData.allergies || [],
     medicalConditions: initialData.medicalConditions || [],
     history: initialData.history || []
@@ -28,7 +29,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
   const [newAllergy, setNewAllergy] = useState("");
   const [newCondition, setNewCondition] = useState("");
-  const [newHistory, setNewHistory] = useState({ title: '', date: '', description: '', fileUrls: [] as string[] });
+  const [newHistory, setNewHistory] = useState({ title: '', date: '', description: '', files: [] as { name: string, url: string }[] });
   const [editingHistoryIndex, setEditingHistoryIndex] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -36,24 +37,36 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const uploadFile = async (file: File, overwrite = false) => {
+    const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}&overwrite=${overwrite}`, {
+      method: "POST",
+      body: file,
+    });
+
+    if (response.status === 409) {
+      toast.error(`File "${file.name}" already exists. Overwriting...`, { duration: 3000 });
+      return uploadFile(file, true);
+    }
+
+    if (!response.ok) {
+      throw new Error("Upload failed");
+    }
+
+    const blob = await response.json();
+    return { name: file.name, url: blob.url };
+  };
+
+  const saveChanges = async (currentData = formData) => {
     setLoading(true);
-
     try {
-      const body = JSON.stringify(formData);
-      console.log("Payload size:", (body.length / 1024 / 1024).toFixed(2) + "MB");
-
       const response = await fetch("/api/record", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body
+        body: JSON.stringify(currentData)
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Server Error Response:", errorText);
-        throw new Error(`Failed to update record: ${response.status} ${errorText}`);
+        throw new Error("Failed to update record");
       }
 
       toast.success("Medical record updated successfully!");
@@ -65,6 +78,11 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await saveChanges();
   };
 
   const addArrayItem = (field: 'allergies' | 'medicalConditions', value: string, setter: (v: string) => void) => {
@@ -89,27 +107,35 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     if (historyForm) historyForm.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const addHistoryItem = () => {
+  const addHistoryItem = async () => {
     if (!newHistory.title || !newHistory.date) {
       toast.error("Please provide at least a title and date");
       return;
     }
     
+    let updatedHistory = [...formData.history];
     if (editingHistoryIndex !== null) {
-      const updatedHistory = [...formData.history];
       updatedHistory[editingHistoryIndex] = newHistory;
-      setFormData({ ...formData, history: updatedHistory });
+      const updatedData = { ...formData, history: updatedHistory };
+      setFormData(updatedData);
       setEditingHistoryIndex(null);
-      toast.success("History item updated");
+      setNewHistory({ title: '', date: '', description: '', files: [] as { name: string, url: string }[] });
+      
+      toast.loading("Updating record...", { id: "save-progress" });
+      await saveChanges(updatedData);
+      toast.dismiss("save-progress");
     } else {
-      setFormData({
+      const updatedData = {
         ...formData,
         history: [...formData.history, newHistory]
-      });
-      toast.success("History item added");
+      };
+      setFormData(updatedData);
+      setNewHistory({ title: '', date: '', description: '', files: [] as { name: string, url: string }[] });
+      
+      toast.loading("Adding to history...", { id: "save-progress" });
+      await saveChanges(updatedData);
+      toast.dismiss("save-progress");
     }
-    
-    setNewHistory({ title: '', date: '', description: '', fileUrls: [] as string[] });
   };
 
   const removeHistoryItem = (index: number) => {
@@ -119,60 +145,47 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     });
   };
 
-  const handleHistoryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHistoryFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
       const fileList = Array.from(files);
-      const oversizedFiles = fileList.filter(f => f.size > 10 * 1024 * 1024);
-      
-      if (oversizedFiles.length > 0) {
-        toast.error(`Some files exceed the 10MB limit: ${oversizedFiles.map(f => f.name).join(", ")}`);
-        if (e.target) e.target.value = "";
-        return;
-      }
-
       setIsUploading(true);
       setUploadProgress(0);
 
-      const readers = fileList.map((file, index) => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setUploadProgress(Math.round(((index + 1) / fileList.length) * 100));
-            resolve(reader.result as string);
-          };
-          reader.readAsDataURL(file);
+      try {
+        const uploadPromises = fileList.map(async (file, index) => {
+          const result = await uploadFile(file);
+          setUploadProgress(Math.round(((index + 1) / fileList.length) * 100));
+          return result;
         });
-      });
 
-      Promise.all(readers).then(base64s => {
-        // Simulate a small delay for the animation effect
-        setTimeout(() => {
-          setNewHistory(prev => ({ 
-            ...prev, 
-            fileUrls: [...new Set([...prev.fileUrls, ...base64s])] 
-          }));
-          setIsUploading(false);
-          setUploadProgress(0);
-          if (e.target) e.target.value = "";
-          toast.success("Files attached successfully");
-        }, 800);
-      });
+        const uploadedFiles = await Promise.all(uploadPromises);
+        setNewHistory(prev => ({ 
+          ...prev, 
+          files: [...prev.files, ...uploadedFiles] 
+        }));
+        toast.success("Files uploaded successfully");
+      } catch (err) {
+        toast.error("Failed to upload files");
+      } finally {
+        setIsUploading(false);
+        setUploadProgress(0);
+        if (e.target) e.target.value = "";
+      }
     }
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("Image size should be less than 10MB");
-        return;
+      const toastId = toast.loading("Uploading photo...");
+      try {
+        const { url } = await uploadFile(file);
+        setFormData({ ...formData, photoUrl: url });
+        toast.success("Photo uploaded!", { id: toastId });
+      } catch (err) {
+        toast.error("Photo upload failed", { id: toastId });
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, photoUrl: reader.result as string });
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -283,6 +296,19 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       ))}
                     </select>
                   </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground ml-1">Gender</label>
+                  <select 
+                    value={formData.gender}
+                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm appearance-none"
+                  >
+                    <option value="" className="bg-[#0a0a0c]">Select Gender</option>
+                    <option value="MALE" className="bg-[#0a0a0c]">Male</option>
+                    <option value="FEMALE" className="bg-[#0a0a0c]">Female</option>
+                    <option value="OTHER" className="bg-[#0a0a0c]">Other</option>
+                  </select>
                 </div>
               </div>
             </section>
@@ -399,7 +425,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-xs font-bold text-muted-foreground">Important Medications / Notes</label>
+                  <label className="text-xs font-bold text-muted-foreground">Medical Notes / Medications</label>
                   <span className={`text-[10px] font-bold ${(formData.medications?.length || 0) >= 365 ? 'text-destructive' : 'text-muted-foreground'}`}>
                     {formData.medications?.length || 0}/375
                   </span>
@@ -410,7 +436,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   maxLength={375}
                   rows={3}
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all text-sm resize-none"
-                  placeholder="List medications first responders should know about..."
+                  placeholder="List medications or any critical medical notes first responders should know about..."
                 />
               </div>
             </section>
@@ -491,7 +517,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                     <button 
                       type="button"
                       onClick={() => historyFileInputRef.current?.click()}
-                      className="flex items-center gap-1.5 text-[10px] font-black text-primary uppercase hover:opacity-80 transition-all"
+                      className="flex items-center gap-1.5 text-[10px] font-black text-primary uppercase hover:opacity-80 transition-all cursor-pointer"
                     >
                       <FilePlus className="w-3.5 h-3.5" />
                       Add Files
@@ -509,7 +535,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   {isUploading && (
                     <div className="col-span-2 p-4 rounded-2xl bg-primary/5 border border-primary/20 animate-pulse">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">Processing Files...</span>
+                        <span className="text-[10px] font-black text-primary uppercase tracking-widest">Uploading Files...</span>
                         <span className="text-[10px] font-black text-primary uppercase tracking-widest">{uploadProgress}%</span>
                       </div>
                       <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
@@ -521,23 +547,23 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                     </div>
                   )}
 
-                  {newHistory.fileUrls.length > 0 && !isUploading && (
+                  {newHistory.files.length > 0 && !isUploading && (
                     <div className="grid grid-cols-2 gap-2">
-                      {newHistory.fileUrls.map((url, i) => (
+                      {newHistory.files.map((file, i) => (
                         <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10 group">
                           <div className="flex items-center gap-2 overflow-hidden">
                             <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
                             <span className="text-[10px] font-medium text-white/60 truncate">
-                              {url.startsWith('data:') ? 'Newly Uploaded' : 'Existing File'}
+                              {file.name}
                             </span>
                           </div>
                           <button 
                             type="button"
                             onClick={() => setNewHistory({
                               ...newHistory,
-                              fileUrls: newHistory.fileUrls.filter((_, idx) => idx !== i)
+                              files: newHistory.files.filter((_, idx) => idx !== i)
                             })}
-                            className="p-1 text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                            className="p-1 text-destructive opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                           >
                             <X className="w-3.5 h-3.5" />
                           </button>
@@ -551,7 +577,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   <button 
                     type="button" 
                     onClick={addHistoryItem}
-                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {editingHistoryIndex !== null ? <Save className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     {editingHistoryIndex !== null ? "Update Item" : "Add to History"}
@@ -561,9 +587,9 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       type="button" 
                       onClick={() => {
                         setEditingHistoryIndex(null);
-                        setNewHistory({ title: '', date: '', description: '', fileUrls: [] as string[] });
+                        setNewHistory({ title: '', date: '', description: '', files: [] as { name: string, url: string }[] });
                       }}
-                      className="px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all"
+                      className="px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -581,21 +607,28 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       </div>
                       <div className="overflow-hidden">
                         <h4 className="text-sm font-bold truncate">{item.title}</h4>
-                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{item.date}</p>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {item.files?.map((file: any, fIdx: number) => (
+                            <span key={fIdx} className="text-[8px] px-1.5 py-0.5 bg-primary/5 text-primary/60 border border-primary/10 rounded-md truncate max-w-[100px]">
+                              {file.name}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1">{item.date}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <button 
                         type="button"
                         onClick={() => startEditingHistory(index)}
-                        className="p-2 text-muted-foreground hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                        className="p-2 text-muted-foreground hover:text-white hover:bg-white/5 rounded-lg transition-all cursor-pointer"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button 
                         type="button" 
                         onClick={() => removeHistoryItem(index)}
-                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"
+                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

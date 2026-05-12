@@ -10,7 +10,6 @@ interface EmergencyData {
   bloodGroup: string;
   emergencyPhone: string;
   emergencyName: string;
-  emergencyRelation: string;
   allergies?: string[];
   medicalConditions?: string[];
   medications?: string;

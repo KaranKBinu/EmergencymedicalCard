@@ -28,9 +28,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!isPasswordCorrect) return null
 
         return {
-          id: user.id,
+          id: user.email,
           email: user.email,
-          name: user.role,
+          name: user.fullName,
         }
       }
     })
@@ -39,6 +39,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (token.sub && session.user) {
         session.user.id = token.sub
+        session.user.email = token.sub
       }
       return session
     },

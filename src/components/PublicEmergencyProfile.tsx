@@ -13,6 +13,7 @@ interface PublicMedicalRecord {
   medications?: string;
   address?: string;
   dob?: string;
+  gender?: string;
   history: any[];
 }
 
@@ -48,7 +49,11 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
           <div>
             <h1 className="text-3xl font-black tracking-tight">{data.fullName}</h1>
             <div className="flex items-center justify-center gap-4 mt-1">
-              <p className="text-destructive font-bold text-xl">{data.bloodGroup} Positive</p>
+              <p className="text-destructive font-bold text-xl">{data.bloodGroup}</p>
+              <div className="w-1 h-1 rounded-full bg-white/20" />
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <span className="text-sm font-bold uppercase">{data.gender || "N/A"}</span>
+              </div>
               <div className="w-1 h-1 rounded-full bg-white/20" />
               <div className="flex items-center gap-1.5 text-muted-foreground">
                 <Calendar className="w-4 h-4" />
@@ -140,9 +145,10 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
                       {item.description}
                     </p>
                   )}
-                  {item.fileUrls && item.fileUrls.length > 0 && (
+                  {item.files && item.files.length > 0 && (
                     <div className="grid grid-cols-1 gap-2 mt-4">
-                      {item.fileUrls.filter(Boolean).map((url: string, fIdx: number) => {
+                      {item.files.map((file: { name: string, url: string }, fIdx: number) => {
+                        const url = file.url;
                         const isImage = url.startsWith('data:image/') || url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
                         const extension = url.startsWith('data:') 
                           ? (url.match(/data:image\/(\w+)/)?.[1] || url.match(/data:application\/(\w+)/)?.[1] || 'bin')
@@ -154,18 +160,18 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
                               href={url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              download={`Medical-Doc-${fIdx + 1}.${extension}`}
+                              download={file.name}
                               className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group/file cursor-pointer"
                             >
                               <div className="flex items-center gap-3">
                                 {isImage ? <ImageIcon className="w-4 h-4 text-primary" /> : <FileText className="w-4 h-4 text-primary" />}
-                                <span className="text-xs font-bold text-white/80">Document #{fIdx + 1} ({extension.toUpperCase()})</span>
+                                <span className="text-xs font-bold text-white/80">{file.name}</span>
                               </div>
                               <Download className="w-4 h-4 text-muted-foreground group-hover/file:text-white transition-colors" />
                             </a>
                             {isImage && (
                               <div className="mt-1 rounded-xl overflow-hidden border border-white/5 bg-white/5 p-1">
-                                <img src={url} alt="Medical Attachment" className="w-full h-auto max-h-40 object-cover rounded-lg" />
+                                <img src={url} alt={file.name} className="w-full h-auto max-h-40 object-cover rounded-lg" />
                               </div>
                             )}
                           </div>

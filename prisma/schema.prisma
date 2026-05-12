@@ -6,62 +6,69 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  password      String
-  role          String         @default("USER")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  medicalRecord MedicalRecord?
+enum Role {
+  USER
+  ADMIN
 }
 
-model MedicalRecord {
-  id                String   @id @default(uuid())
-  userId            String   @unique
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Personal Info
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+}
+
+model User {
+  // --- ACCOUNT & IDENTITY ---
+  email             String         @id
+  password          String
+  role              Role           @default(USER)
   fullName          String
-  photoUrl          String?
-  dob               String
-  bloodGroup        String
-  gender            String?
+  photoUrl          String?        // Vercel Blob URL
+  dob               String?
+  address           String?
   
-  // Vitals
+  // --- MEDICAL VITAL DATA ---
+  bloodGroup        BloodGroup
+  gender            Gender?
   height            String?
   weight            String?
   
-  // Emergency Contact
+  // --- EMERGENCY CONTACT ---
   emergencyName     String
   emergencyPhone    String
-  emergencyRelation String
   
-  // Medical Details
-  medicalConditions String[] @default([])
-  allergies         String[] @default([])
-  medications       String?
-  pastSurgeries     String?
+  // --- MEDICAL DETAILS ---
+  medicalConditions String[]       @default([])
+  allergies         String[]       @default([])
+  medicalNotes      String?        // Medications, notes, and instructions
   
-  // Privacy/Extra
-  address           String?
-  organDonor        Boolean  @default(false)
-  
+  // --- RELATIONSHIPS ---
   history           MedicalHistory[]
   
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 }
 
 model MedicalHistory {
-  id              String         @id @default(uuid())
-  medicalRecordId String
-  medicalRecord   MedicalRecord  @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  userEmail   String
+  user        User     @relation(fields: [userEmail], references: [email], onDelete: Cascade)
   
-  title           String         // e.g. "Surgery Name" or "Diagnosis"
-  date            String         // e.g. "2023-05" or "Year/Month"
-  description     String?
-  fileUrls        String[]       @default([])
+  title       String         
+  date        String         
+  description String?
+  files       Json     @default("[]") // [{ name: string, url: string }]
   
-  createdAt       DateTime       @default(now())
+  createdAt   DateTime @default(now())
 }

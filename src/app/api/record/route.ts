@@ -2,74 +2,78 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+const BLOOD_GROUP_MAP: Record<string, any> = {
+  "A+": "A_POSITIVE",
+  "A-": "A_NEGATIVE",
+  "B+": "B_POSITIVE",
+  "B-": "B_NEGATIVE",
+  "AB+": "AB_POSITIVE",
+  "AB-": "AB_NEGATIVE",
+  "O+": "O_POSITIVE",
+  "O-": "O_NEGATIVE",
+};
+
 export async function PATCH(req: Request) {
   try {
     const session = await auth();
+    // session.user.id is now the email address
     if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const body = await req.json();
-    console.log("[RECORD_PATCH] Body received:", { 
-      ...body, 
-      photoUrl: body.photoUrl ? "data:..." : null,
-      history: body.history?.map((h: any) => ({ ...h, fileUrls: h.fileUrls?.map(() => "data:...") }))
-    });
     const { 
       fullName, 
       bloodGroup, 
       emergencyName, 
       emergencyPhone, 
-      emergencyRelation,
       allergies,
       medicalConditions,
-      medications,
+      medications, // UI still sends this, we map to medicalNotes
       height,
       weight,
-      organDonor,
       photoUrl,
       address,
       dob,
       gender,
-      pastSurgeries,
       history
     } = body;
 
-    const record = await prisma.medicalRecord.update({
-      where: { userId: session.user.id },
+    const userEmail = session.user.id;
+
+    // Update the User table (Single table schema)
+    const updatedUser = await prisma.user.update({
+      where: { email: userEmail },
       data: {
         fullName,
-        bloodGroup,
+        bloodGroup: BLOOD_GROUP_MAP[bloodGroup] || bloodGroup, // Map or use existing if already enum
         emergencyName,
         emergencyPhone,
-        emergencyRelation,
         allergies: Array.isArray(allergies) ? allergies : [],
         medicalConditions: Array.isArray(medicalConditions) ? medicalConditions : [],
-        medications,
+        medicalNotes: medications, // Renamed in schema
         height,
         weight,
-        organDonor,
         photoUrl,
         address,
         dob,
-        gender,
-        pastSurgeries,
+        gender: gender ? (gender.toUpperCase() as any) : undefined, // Ensure it matches Enum
         history: {
           deleteMany: {},
           create: (Array.isArray(history) ? history : []).map((h: any) => ({
             title: h.title || "",
             date: h.date || "",
             description: h.description || "",
-            fileUrls: Array.isArray(h.fileUrls) ? h.fileUrls : []
+            files: Array.isArray(h.files) ? h.files : []
           }))
         }
       },
       select: {
-        id: true
+        email: true
       }
     });
 
-    return NextResponse.json(record);
+    return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("[RECORD_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });

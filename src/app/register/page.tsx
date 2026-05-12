@@ -17,9 +17,9 @@ export default function Register() {
     password: "",
     fullName: "",
     bloodGroup: "O+",
+    gender: "",
     emergencyName: "",
     emergencyPhone: "",
-    emergencyRelation: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -110,6 +110,18 @@ export default function Register() {
                   />
                 </InputGroup>
               </div>
+              <InputGroup icon={<User />} label="Gender">
+                <select 
+                  name="gender" value={formData.gender} onChange={handleChange}
+                  className="w-full bg-transparent border-none outline-none text-sm appearance-none"
+                  required
+                >
+                  <option value="" className="bg-background">Select Gender</option>
+                  <option value="MALE" className="bg-background">Male</option>
+                  <option value="FEMALE" className="bg-background">Female</option>
+                  <option value="OTHER" className="bg-background">Other</option>
+                </select>
+              </InputGroup>
               <div className="flex gap-4">
                 <button 
                   type="button" onClick={prevStep}
