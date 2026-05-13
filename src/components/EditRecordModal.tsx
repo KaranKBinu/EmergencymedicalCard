@@ -366,6 +366,22 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   </div>
                 </div>
               </div>
+              
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Biological Gender</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {["MALE", "FEMALE", "OTHER"].map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, gender: g })}
+                      className={`py-4 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all ${formData.gender === g ? 'bg-primary/20 border-primary text-white shadow-[0_0_20px_rgba(239,68,68,0.2)]' : 'bg-white/[0.03] border-white/10 text-muted-foreground hover:bg-white/[0.05]'}`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </section>
 
             {/* Emergency Contact */}

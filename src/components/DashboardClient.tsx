@@ -18,6 +18,12 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
+  const isProfileIncomplete = !initialData.fullName || 
+                            !initialData.bloodGroup || 
+                            !initialData.emergencyName || 
+                            !initialData.emergencyPhone || 
+                            !initialData.dob || 
+                            !initialData.gender;
 
   // 3D Tilt Hook Setup
   const x = useMotionValue(0);
@@ -204,6 +210,22 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
             <div className="space-y-1 sm:space-y-2">
               <h1 className="text-3xl sm:text-4xl font-black font-outfit tracking-tight leading-tight">Your Digital Identity</h1>
               <p className="text-muted-foreground text-sm">Welcome back, {initialData.fullName.split(' ')[0]}. Your card is ready.</p>
+              
+              {isProfileIncomplete && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-start gap-3"
+                >
+                  <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-white uppercase tracking-wider">Profile Incomplete</p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      Please complete your medical details (DOB, Gender, and Emergency Name) to enable sharing and high-resolution downloads.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             <div className="glass rounded-[2.5rem] sm:rounded-[3rem] p-4 sm:p-16 flex flex-col items-center border-white/5 w-full overflow-hidden">
@@ -232,8 +254,9 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
               <div className="flex flex-col gap-4 w-full max-w-md mt-10">
                 <div className="relative w-full" ref={dropdownRef}>
                   <button 
-                    onClick={() => setIsDownloadOpen(!isDownloadOpen)}
-                    className={`w-full flex items-center justify-center gap-3 px-6 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all cursor-pointer shadow-[0_10px_20px_-10px_rgba(239,68,68,0.5)] ${isDownloadOpen ? 'ring-2 ring-primary/50' : ''}`}
+                    onClick={() => !isProfileIncomplete && setIsDownloadOpen(!isDownloadOpen)}
+                    disabled={isProfileIncomplete}
+                    className={`w-full flex items-center justify-center gap-3 px-6 py-4 bg-primary text-white rounded-2xl text-sm font-bold transition-all shadow-[0_10px_20px_-10px_rgba(239,68,68,0.5)] ${isDownloadOpen ? 'ring-2 ring-primary/50' : ''} ${isProfileIncomplete ? 'opacity-50 grayscale cursor-not-allowed shadow-none' : 'cursor-pointer hover:scale-[1.02]'}`}
                   >
                     <Download className="w-5 h-5" />
                     <span>Download Your Card</span>
@@ -288,19 +311,20 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
                   </AnimatePresence>
                 </div>
                 <button 
-                  onClick={handleShare}
-                  className="w-full relative overflow-hidden group p-4 bg-white/[0.03] border border-white/5 hover:border-white/10 rounded-[1.5rem] transition-all hover:bg-white/5 cursor-pointer"
+                  onClick={() => !isProfileIncomplete && handleShare()}
+                  disabled={isProfileIncomplete}
+                  className={`w-full relative overflow-hidden group p-4 bg-white/[0.03] border border-white/5 rounded-[1.5rem] transition-all ${isProfileIncomplete ? 'opacity-40 grayscale cursor-not-allowed' : 'hover:border-white/10 hover:bg-white/5 cursor-pointer'}`}
                 >
                   <div className="flex items-center gap-4 relative z-10">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+                    <div className={`w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary transition-transform duration-300 ${!isProfileIncomplete && 'group-hover:scale-110'}`}>
                       <Share2 className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col text-left">
-                      <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">Share Your Public Profile</span>
+                      <span className={`text-sm font-bold text-white transition-colors ${!isProfileIncomplete && 'group-hover:text-primary'}`}>Share Your Public Profile</span>
                       <span className="text-[10px] text-muted-foreground font-medium">Copy a scannable link for first responders</span>
                     </div>
                   </div>
-                  <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  {!isProfileIncomplete && <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />}
                 </button>
               </div>
 
@@ -404,15 +428,17 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
 
               <div className="space-y-3">
                 <button 
-                  onClick={() => window.open(`${window.location.origin}/v/${initialData.publicId}`, '_blank')}
-                  className="w-full py-4 bg-primary text-white text-xs font-bold rounded-2xl shadow-[0_10px_20px_-10px_rgba(239,68,68,0.5)] hover:opacity-90 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  onClick={() => !isProfileIncomplete && window.open(`${window.location.origin}/v/${initialData.publicId}`, '_blank')}
+                  disabled={isProfileIncomplete}
+                  className={`w-full py-4 bg-primary text-white text-xs font-bold rounded-2xl shadow-[0_10px_20px_-10px_rgba(239,68,68,0.5)] transition-all flex items-center justify-center gap-2 ${isProfileIncomplete ? 'opacity-50 grayscale cursor-not-allowed shadow-none' : 'hover:opacity-90 cursor-pointer'}`}
                 >
                   See Your Public Data <ExternalLink className="w-4 h-4" />
                 </button>
                 
                 <button 
-                  onClick={handleShare}
-                  className="w-full py-3 bg-white/5 text-muted-foreground hover:text-white text-[10px] font-bold rounded-xl border border-white/5 hover:border-white/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  onClick={() => !isProfileIncomplete && handleShare()}
+                  disabled={isProfileIncomplete}
+                  className={`w-full py-3 bg-white/5 text-muted-foreground text-[10px] font-bold rounded-xl border border-white/5 transition-all flex items-center justify-center gap-2 ${isProfileIncomplete ? 'opacity-40 grayscale cursor-not-allowed' : 'hover:text-white hover:border-white/10 cursor-pointer'}`}
                 >
                   <Share2 className="w-3.5 h-3.5" /> Copy Profile URL
                 </button>

@@ -20,7 +20,11 @@ const REVERSE_BLOOD_GROUP_MAP: Record<string, string> = Object.fromEntries(
 );
 
 export async function registerUser(formData: any) {
-  const { email, password, fullName, bloodGroup, gender, emergencyName, emergencyPhone } = formData;
+  const { 
+    email, password, fullName, bloodGroup, gender, 
+    emergencyName, emergencyPhone, dob, address,
+    height, weight, allergies, medicalConditions, medicalNotes, photoUrl
+  } = formData;
 
   try {
     const existingUser = await prisma.user.findUnique({
@@ -41,8 +45,15 @@ export async function registerUser(formData: any) {
         bloodGroup: BLOOD_GROUP_MAP[bloodGroup] || "O_POSITIVE",
         gender: gender ? (gender.toUpperCase() as any) : null,
         emergencyName,
-        emergencyPhone,
-        dob: "", // Initial placeholder
+        emergencyPhone: emergencyPhone || "",
+        dob: dob || "",
+        address: address || "",
+        height: height || "",
+        weight: weight || "",
+        medicalNotes: medicalNotes || "",
+        photoUrl: photoUrl || null,
+        allergies: allergies ? allergies.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+        medicalConditions: medicalConditions ? medicalConditions.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
       }
     });
 

@@ -37,7 +37,7 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link 
               href="/register" 
-              className="px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-semibold hover:opacity-90 transition-all emergency-pulse w-full sm:w-auto text-center"
+              className="px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-semibold hover:opacity-90 transition-all w-full sm:w-auto text-center shadow-lg shadow-primary/20"
             >
               Get Started Free
             </Link>
