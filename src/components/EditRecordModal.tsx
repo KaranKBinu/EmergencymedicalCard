@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar, FileText, FilePlus, Edit3, Pill } from "lucide-react";
 import toast from "react-hot-toast";
@@ -25,11 +25,32 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     gender: initialData.gender || "",
     height: initialData.height || "",
     weight: initialData.weight || "",
-    medications: initialData.medicalNotes || "",
+    medications: initialData.medications || initialData.medicalNotes || "",
     allergies: initialData.allergies || [],
     medicalConditions: initialData.medicalConditions || [],
     history: initialData.history || []
   });
+
+  // Re-sync form with latest initialData every time the modal is opened.
+  // useState only captures the initial value on mount, so without this,
+  // the form would show stale data if the user edits, saves, and reopens.
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        ...initialData,
+        photoUrl: initialData.photoUrl || "",
+        address: initialData.address || "",
+        dob: initialData.dob || "",
+        gender: initialData.gender || "",
+        height: initialData.height || "",
+        weight: initialData.weight || "",
+        medications: initialData.medications || initialData.medicalNotes || "",
+        allergies: initialData.allergies || [],
+        medicalConditions: initialData.medicalConditions || [],
+        history: initialData.history || []
+      });
+    }
+  }, [isOpen, initialData]);
 
   const [newAllergy, setNewAllergy] = useState("");
   const [isMedication, setIsMedication] = useState(false);
@@ -43,16 +64,11 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
 
 
-  const uploadFile = async (file: File, overwrite = false) => {
-    const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}&overwrite=${overwrite}`, {
+  const uploadFile = async (file: File) => {
+    const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
       method: "POST",
       body: file,
     });
-
-    if (response.status === 409) {
-      toast.error(`File "${file.name}" already exists. Overwriting...`, { duration: 3000 });
-      return uploadFile(file, true);
-    }
 
     if (!response.ok) {
       throw new Error("Upload failed");
@@ -72,7 +88,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     }
   };
 
-  const saveChanges = async (currentData = formData) => {
+  const saveChanges = async (currentData = formData, { silent = false } = {}) => {
     setLoading(true);
     try {
       const response = await fetch("/api/record", {
@@ -85,9 +101,11 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
         throw new Error("Failed to update record");
       }
 
-      toast.success("Medical record updated successfully!");
       router.refresh();
-      onClose();
+      if (!silent) {
+        toast.success("Medical record updated successfully!");
+        onClose();
+      }
     } catch (error) {
       console.error("Save Error:", error);
       toast.error("Something went wrong. Please try again.");
@@ -216,7 +234,11 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
       const toastId = toast.loading("Uploading photo...");
       try {
         const { url } = await uploadFile(file);
-        setFormData({ ...formData, photoUrl: url });
+        const updatedData = { ...formData, photoUrl: url };
+        setFormData(updatedData);
+        // Auto-save so the new photoUrl is persisted to the database immediately
+        await saveChanges(updatedData, { silent: true });
+        // Delete the old photo from blob storage only after the new URL is saved
         if (oldUrl) await deleteFile(oldUrl);
         toast.success("Photo uploaded!", { id: toastId });
       } catch (err) {
@@ -295,7 +317,10 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                     type="button"
                     onClick={async () => {
                       const urlToDelete = formData.photoUrl;
-                      setFormData({ ...formData, photoUrl: "" });
+                      const updatedData = { ...formData, photoUrl: "" };
+                      setFormData(updatedData);
+                      // Save to DB first, then delete the blob so the URL isn't dangling
+                      await saveChanges(updatedData, { silent: true });
                       await deleteFile(urlToDelete);
                       toast.success("Photo removed");
                     }}

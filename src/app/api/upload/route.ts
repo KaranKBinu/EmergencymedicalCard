@@ -11,26 +11,19 @@ export async function POST(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const filename = searchParams.get("filename");
-    const overwrite = searchParams.get("overwrite") === "true";
 
     if (!filename) {
       return new NextResponse("Filename is required", { status: 400 });
     }
 
-    try {
-      const blob = await put(filename, req.body!, {
-        access: "public",
-        addRandomSuffix: false,
-        allowOverwrite: overwrite,
-      });
+    // addRandomSuffix: true ensures unique URLs so different users uploading
+    // files with the same name never collide in blob storage.
+    const blob = await put(filename, req.body!, {
+      access: "public",
+      addRandomSuffix: true,
+    });
 
-      return NextResponse.json(blob);
-    } catch (error: any) {
-      if (error.message?.includes("already exists") && !overwrite) {
-        return new NextResponse("ALREADY_EXISTS", { status: 409 });
-      }
-      throw error;
-    }
+    return NextResponse.json(blob);
   } catch (error) {
     console.error("[UPLOAD_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
@@ -58,4 +51,5 @@ export async function DELETE(req: Request) {
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
+
 
