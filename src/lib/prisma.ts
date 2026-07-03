@@ -18,8 +18,7 @@ function createPrismaClient() {
   }
   
   const pool = new Pool({
-    connectionString: connectionString as string,
-    max: 1,
+    connectionString,
   });
   const adapter = new PrismaNeon(pool);
   return new PrismaClient({ adapter });
