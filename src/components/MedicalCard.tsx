@@ -74,10 +74,56 @@ export default function MedicalCard({ data }: MedicalCardProps) {
         backgroundColor: '#ffffff'
       });
       exportRef.current.style.display = originalDisplay;
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      pdf.addImage(imgData, 'JPEG', 10, 20, 190, (canvas.height * 190) / canvas.width);
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      
+      // Calculate proper dimensions for landscape layout (both cards side by side)
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const availableWidth = pageWidth - (margin * 2);
+      const availableHeight = pageHeight - (margin * 2);
+      
+      // Calculate scaling to fit page while maintaining aspect ratio
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const aspectRatio = imgHeight / imgWidth;
+      
+      let finalWidth = availableWidth;
+      let finalHeight = finalWidth * aspectRatio;
+      
+      if (finalHeight > availableHeight) {
+        finalHeight = availableHeight;
+        finalWidth = finalHeight / aspectRatio;
+      }
+      
+      const xPos = (pageWidth - finalWidth) / 2;
+      const yPos = (pageHeight - finalHeight) / 2;
+      
+      pdf.addImage(imgData, 'PNG', xPos, yPos, finalWidth, finalHeight);
       pdf.save(`${data.name.replace(/\s+/g, '_')}_MediCard.pdf`);
+      setIsGenerating(false);
+    } catch (err) {
+      console.error(err);
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownloadPNG = async () => {
+    if (!exportRef.current) return;
+    try {
+      setIsGenerating(true);
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(exportRef.current, {
+        scale: 4,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+      
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `${data.name.replace(/\s+/g, '_')}_MediCard.png`;
+      link.click();
       setIsGenerating(false);
     } catch (err) {
       console.error(err);
@@ -368,18 +414,32 @@ export default function MedicalCard({ data }: MedicalCardProps) {
         <CardBack />
       </Stack>
 
-      <Button
-        variant="contained"
-        size="large"
-        startIcon={isGenerating ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
-        onClick={handleDownloadPDF}
-        disabled={isGenerating}
-        sx={{ px: 6, py: 2, borderRadius: 4, fontWeight: 900, fontSize: '1.1rem', boxShadow: '0 8px 32px rgba(255, 75, 43, 0.3)' }}
-      >
-        {isGenerating ? 'Generating Secure PDF...' : 'Download Medical Card PDF'}
-      </Button>
+      <Stack direction="row" spacing={2}>
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={isGenerating ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
+          onClick={handleDownloadPDF}
+          disabled={isGenerating}
+          sx={{ px: 6, py: 2, borderRadius: 4, fontWeight: 900, fontSize: '1.1rem', boxShadow: '0 8px 32px rgba(255, 75, 43, 0.3)' }}
+        >
+          {isGenerating ? 'Generating PDF...' : 'Download PDF'}
+        </Button>
 
-      <Box ref={exportRef} sx={{ display: 'none', flexDirection: 'column', gap: 4, p: 6, bgcolor: '#fff', width: '500px' }}>
+        <Button
+          variant="outlined"
+          size="large"
+          startIcon={isGenerating ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
+          onClick={handleDownloadPNG}
+          disabled={isGenerating}
+          sx={{ px: 6, py: 2, borderRadius: 4, fontWeight: 900, fontSize: '1.1rem', color: 'primary.main', borderColor: 'primary.main' }}
+        >
+          {isGenerating ? 'Generating PNG...' : 'Download PNG'}
+        </Button>
+      </Stack>
+
+      {/* Export container - cards side by side for proper aspect ratio */}
+      <Box ref={exportRef} sx={{ display: 'none', flexDirection: 'row', gap: 4, p: 6, bgcolor: '#fff', width: 'fit-content' }}>
         <CardFront forExport />
         <CardBack forExport />
       </Box>
