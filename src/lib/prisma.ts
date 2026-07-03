@@ -14,10 +14,14 @@ function createPrismaClient() {
   if (typeof window === 'undefined') {
     neonConfig.webSocketConstructor = WebSocket;
     neonConfig.pipelineTLS = false;
+    neonConfig.fetchConnectionCache = true;
   }
   
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaNeon(pool as any);
+  const pool = new Pool({
+    connectionString: connectionString as string,
+    max: 1,
+  });
+  const adapter = new PrismaNeon(pool);
   return new PrismaClient({ adapter });
 }
 
