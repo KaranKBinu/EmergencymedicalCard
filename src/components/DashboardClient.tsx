@@ -312,6 +312,16 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
                     )}
                   </AnimatePresence>
                 </div>
+
+                {/* Edit Button */}
+                <button 
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-800 rounded-[1.5rem] shadow-sm transition-all cursor-pointer font-bold text-sm hover:scale-[1.01]"
+                >
+                  <Edit3 className="w-5 h-5 text-primary" />
+                  <span>Edit Medical Record</span>
+                </button>
+
                 <button 
                   onClick={() => !isProfileIncomplete && handleShare()}
                   disabled={isProfileIncomplete}
