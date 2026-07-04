@@ -43,6 +43,7 @@ export default async function DashboardPage() {
     emergencyName: user.emergencyName,
     allergies: user.allergies,
     medicalConditions: user.medicalConditions,
+    currentMedications: user.currentMedications,
     photoUrl: user.photoUrl || undefined,
     medications: user.medicalNotes || undefined, // Map medicalNotes back to medications for UI
     height: user.height || undefined,

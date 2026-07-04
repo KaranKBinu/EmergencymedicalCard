@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { QrCode, Phone, Droplets, User, ShieldAlert, Activity, Scale, Ruler, Info, Calendar, Pill } from "lucide-react";
+import { Phone, Droplets, User, Activity, Scale, Ruler, Info, Calendar, AlertTriangle } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useRef } from "react";
 
@@ -14,6 +14,7 @@ interface EmergencyData {
   allergies?: string[];
   medicalConditions?: string[];
   medications?: string;
+  currentMedications?: string[];
   height?: string;
   weight?: string;
   photoUrl?: string;
@@ -24,254 +25,336 @@ interface EmergencyData {
 }
 
 const GENDER_ICONS: Record<string, { icon: string, color: string }> = {
-  "MALE": { icon: "https://api.iconify.design/ph:gender-male-bold.svg?color=%233b82f6", color: "text-blue-500" },
-  "FEMALE": { icon: "https://api.iconify.design/ph:gender-female-bold.svg?color=%23ec4899", color: "text-pink-500" },
-  "OTHER": { icon: "https://api.iconify.design/ph:gender-intersex-bold.svg?color=%23a855f7", color: "text-purple-500" },
+  "MALE":   { icon: "https://api.iconify.design/ph:gender-male-bold.svg?color=%2393c5fd",   color: "text-blue-300" },
+  "FEMALE": { icon: "https://api.iconify.design/ph:gender-female-bold.svg?color=%23f9a8d4", color: "text-pink-300" },
+  "OTHER":  { icon: "https://api.iconify.design/ph:gender-intersex-bold.svg?color=%23c4b5fd", color: "text-purple-300" },
 };
 
-export default function EmergencyCard({ data, forcedSide }: { data: EmergencyData, forcedSide?: 'front' | 'back' }) {
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  
-  // Use forcedSide if provided, otherwise use internal state
-  const currentFlipped = forcedSide ? (forcedSide === 'back') : isFlipped;
-  const [publicUrl, setPublicUrl] = useState("");
-  const [scale, setScale] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+/* ── Card visual constants ── */
+const CARD_BG = 'linear-gradient(135deg, #040814 0%, #091026 40%, #130a21 80%, #1f0b20 100%)';
+const CARD_SHADOW = 'none';
+
+/** Ambient glow layers inside the card */
+function CardGlows() {
+  return (
+    <>
+      {/* Cybernetic Medical Grid */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)`,
+          backgroundSize: '16px 16px'
+        }} />
+      
+      {/* Top-right cyan bloom */}
+      <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full pointer-events-none filter blur-2xl"
+        style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%)' }} />
+      
+      {/* Bottom-left rose bloom */}
+      <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full pointer-events-none filter blur-2xl"
+        style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.12) 0%, transparent 70%)' }} />
+
+      {/* Shimmer light streak */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(255,255,255,0.02) 100%)' }} />
+    </>
+  );
+}
+
+const formatHeight = (h?: string) => {
+  if (!h) return "—";
+  const trimmed = h.trim();
+  if (!trimmed) return "—";
+  if (trimmed.includes("cm") || trimmed.includes("ft") || trimmed.includes("'") || trimmed.includes("\"") || trimmed.includes("in") || trimmed.includes("m")) {
+    return trimmed;
+  }
+  const num = parseFloat(trimmed);
+  if (!isNaN(num)) {
+    if (num < 10) return `${trimmed} ft`;
+    return `${trimmed} cm`;
+  }
+  return trimmed;
+};
+
+const formatWeight = (w?: string) => {
+  if (!w) return "—";
+  const trimmed = w.trim();
+  if (!trimmed) return "—";
+  if (trimmed.toLowerCase().includes("kg") || trimmed.toLowerCase().includes("lbs") || trimmed.toLowerCase().includes("lb") || trimmed.toLowerCase().includes("g")) {
+    return trimmed;
+  }
+  const num = parseFloat(trimmed);
+  if (!isNaN(num)) {
+    if (num > 300) return `${trimmed} lbs`; // reasonable threshold to guess scale
+    return `${trimmed} kg`;
+  }
+  return trimmed;
+};
+
+/** Front face */
+function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: string }) {
+  return (
+    <div className="relative h-full flex flex-col p-5 gap-2.5 select-none">
+      {/* ── ROW 1: Premium Header ── */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="relative flex items-center justify-center">
+            <Activity className="w-4 h-4 text-cyan-400 animate-pulse" />
+            <span className="absolute w-3 h-3 bg-cyan-400/30 rounded-full animate-ping" />
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-400 font-sans">Emergency Medical ID</span>
+        </div>
+      </div>
+
+      {/* ── ROW 2: Identity & QR ── */}
+      <div className="flex items-stretch gap-4 my-0.5">
+        {/* Photo with tech frame */}
+        <div className="relative shrink-0">
+          <div className="w-[76px] h-[76px] rounded-2xl overflow-hidden border-2 border-cyan-500/25 bg-slate-900/50 flex items-center justify-center shadow-lg shadow-cyan-500/5">
+            {data.photoUrl
+              ? <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" />
+              : <User className="w-9 h-9 text-slate-500" />
+            }
+          </div>
+          {data.gender && GENDER_ICONS[data.gender.toUpperCase()] && (
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-slate-950 border border-cyan-500/30 flex items-center justify-center backdrop-blur-md shadow-md">
+              <img src={GENDER_ICONS[data.gender.toUpperCase()].icon} alt={data.gender} className="w-4 h-4 object-contain" />
+            </div>
+          )}
+        </div>
+
+        {/* Name and Basic Info */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+          <h3 className="text-xl font-extrabold text-white leading-tight tracking-tight truncate drop-shadow-sm font-sans">
+            {data.fullName}
+          </h3>
+          <div className="flex items-center flex-wrap gap-x-3 gap-y-1">
+            {data.dob && (
+              <div className="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">
+                <Calendar className="w-3 h-3 text-cyan-300 shrink-0" />
+                <span className="text-[9px] font-semibold text-slate-300">{data.dob}</span>
+              </div>
+            )}
+            {data.emergencyName && (
+              <div className="flex items-center gap-1 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md max-w-full">
+                <span className="text-[9px] text-slate-300 truncate">Contact: <strong className="text-white">{data.emergencyName}</strong></span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* QR Code Container */}
+        <div className="shrink-0 self-center flex flex-col items-center gap-1.5">
+          <div className="p-1.5 bg-white rounded-2xl shadow-lg border border-cyan-500/10">
+            <QRCodeSVG value={publicUrl} size={62} level="H" />
+          </div>
+          <span className="text-[7px] font-black uppercase tracking-[0.2em] text-cyan-400/60">Scan Profile</span>
+        </div>
+      </div>
+
+      {/* ── ROW 2.5: Front Allergies & Conditions ── */}
+      <div className="grid grid-cols-2 gap-3 my-0.5">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[7.5px] uppercase tracking-wider text-rose-300 font-extrabold">Allergies</span>
+          <div className="flex flex-wrap gap-1 max-h-[36px] overflow-y-auto pr-0.5 custom-scrollbar">
+            {data.allergies && data.allergies.length > 0
+              ? data.allergies.slice(0, 4).map(a => {
+                  const isMed = a.startsWith('💊 ');
+                  const label = isMed ? a.replace('💊 ', '') : a;
+                  return (
+                    <span key={a} className="px-1.5 py-0.5 rounded-[4px] text-[7.5px] font-bold bg-rose-500/10 text-rose-300 border border-rose-500/20 truncate max-w-[85px]">{label}</span>
+                  );
+                })
+              : <span className="text-[7.5px] text-slate-500 italic">None</span>
+            }
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-0.5 border-l border-white/5 pl-3">
+          <span className="text-[7.5px] uppercase tracking-wider text-cyan-300 font-extrabold">Conditions</span>
+          <div className="flex flex-wrap gap-1 max-h-[36px] overflow-y-auto pr-0.5 custom-scrollbar">
+            {data.medicalConditions && data.medicalConditions.length > 0
+              ? data.medicalConditions.slice(0, 4).map(c => (
+                  <span key={c} className="px-1.5 py-0.5 rounded-[4px] text-[7.5px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 truncate max-w-[85px]">{c}</span>
+                ))
+              : <span className="text-[7.5px] text-slate-500 italic">None</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      {/* ── Divider ── */}
+      <div className="h-[1px] w-full" style={{ background: 'linear-gradient(90deg, rgba(6,182,212,0), rgba(6,182,212,0.25), rgba(6,182,212,0))' }} />
+
+      {/* ── ROW 3: Vitals / Emergency Actions ── */}
+      <div className="flex items-stretch gap-3">
+        {/* Blood Group */}
+        <div className="flex flex-col items-center justify-center rounded-2xl px-4 py-2 shrink-0 bg-rose-500/10 border border-rose-500/30 shadow-inner">
+          <Droplets className="w-4 h-4 text-rose-400 mb-0.5 animate-pulse" />
+          <span className="text-2xl font-black text-rose-500 leading-none tracking-tight">{data.bloodGroup}</span>
+          <span className="text-[7px] uppercase tracking-[0.2em] text-rose-400/80 font-bold mt-1">Blood</span>
+        </div>
+
+        {/* Emergency Call Box */}
+        <div className="flex-1 flex flex-col justify-center rounded-2xl px-4 py-2 bg-gradient-to-r from-rose-950/20 to-red-950/20 border border-rose-500/30">
+          <span className="text-[7.5px] uppercase tracking-[0.2em] text-rose-400 font-extrabold mb-1">Emergency Call</span>
+          <div className="flex items-center gap-1.5">
+            <Phone className="w-3.5 h-3.5 text-rose-400 shrink-0 animate-bounce" />
+            <span className="text-[13.5px] font-black text-white tracking-tight leading-none">{data.emergencyPhone}</span>
+          </div>
+        </div>
+
+        {/* Height / Weight */}
+        <div className="flex gap-4 shrink-0 rounded-2xl px-4 py-2 bg-slate-900/50 border border-white/5">
+          <div className="flex flex-col justify-center gap-0.5">
+            <span className="text-[7px] uppercase tracking-widest text-slate-400 font-bold">Height</span>
+            <div className="flex items-center gap-1">
+              <Ruler className="w-3 h-3 text-cyan-400 shrink-0" />
+              <span className="text-xs font-bold text-white whitespace-nowrap">{formatHeight(data.height)}</span>
+            </div>
+          </div>
+          <div className="w-[1px] bg-white/10" />
+          <div className="flex flex-col justify-center gap-0.5">
+            <span className="text-[7px] uppercase tracking-widest text-slate-400 font-bold">Weight</span>
+            <div className="flex items-center gap-1">
+              <Scale className="w-3 h-3 text-cyan-400 shrink-0" />
+              <span className="text-xs font-bold text-white whitespace-nowrap">{formatWeight(data.weight)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Bottom strip ── */}
+      <div className="mt-auto pt-2 flex items-center justify-between border-t border-white/5">
+        <span className="text-[8px] font-semibold text-slate-500">Secure Emergency Identity Card</span>
+        <span className="text-[8px] text-slate-500 font-medium">
+          REF: #{data.publicId?.substring(0, 8).toUpperCase() || 'SAMPLE'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/** Back face */
+function BackContent({ data }: { data: EmergencyData }) {
+  return (
+    <div className="relative h-full flex flex-col p-5 gap-3 select-none">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 text-cyan-400" />
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-cyan-400">Medical History &amp; Medications</span>
+        </div>
+      </div>
+
+      {/* ── Current Medications ── */}
+      <div className="flex flex-col gap-1 my-1">
+        <span className="text-[8px] uppercase tracking-[0.15em] text-cyan-300 font-extrabold">Current Medications</span>
+        <div className="flex flex-wrap gap-1 content-start max-h-[56px] overflow-y-auto pr-1 custom-scrollbar">
+          {data.currentMedications && data.currentMedications.length > 0
+            ? data.currentMedications.slice(0, 12).map(m => (
+                <span key={m} className="px-2 py-0.5 rounded-md text-[8px] font-bold border bg-cyan-500/10 text-cyan-300 border-cyan-500/25 shadow-sm">{m}</span>
+              ))
+            : <span className="text-[9px] text-slate-500 italic">No medications recorded</span>
+          }
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="h-[1px] w-full" style={{ background: 'linear-gradient(90deg, rgba(6,182,212,0), rgba(6,182,212,0.25), rgba(6,182,212,0))' }} />
+
+      {/* Notes / Meds */}
+      <div className="flex-1 min-h-0 flex flex-col gap-1.5">
+        <div className="flex items-center gap-1.5">
+          <Info className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-cyan-300">Notes &amp; Special Instructions</span>
+        </div>
+        <div className="flex-1 rounded-xl p-3 overflow-y-auto bg-slate-950/45 border border-white/5 custom-scrollbar">
+          <p className={`leading-relaxed text-slate-300 font-medium ${
+            (data.medications?.length || 0) > 150 ? 'text-[9.5px]' : 'text-[10.5px]'
+          }`}>
+            {data.medications || "No special instructions noted."}
+          </p>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="flex items-center justify-between pt-2 border-t border-white/5">
+        <span className="text-[8px] font-semibold text-slate-500">Scan QR Code on front for active updates</span>
+        <span className="text-[8px] text-slate-500 font-medium">EMERGENCY FIRST RESPONSE</span>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   Main component
+ ══════════════════════════════════════════════ */
+export default function EmergencyCard({ data, forcedSide }: { data: EmergencyData; forcedSide?: 'front' | 'back' }) {
+  const [isFlipped, setIsFlipped]   = useState(false);
+  const [isHovered, setIsHovered]   = useState(false);
+  const currentFlipped              = forcedSide ? (forcedSide === 'back') : isFlipped;
+  const [publicUrl, setPublicUrl]   = useState("");
+  const [scale, setScale]           = useState(1);
+  const [isMobile, setIsMobile]     = useState(false);
+  const containerRef                = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-    setPublicUrl(`${baseUrl}/v/${data.publicId || 'sample-id'}`);
+    const base = typeof window !== "undefined" ? window.location.origin : "";
+    setPublicUrl(`${base}/v/${data.publicId || 'sample-id'}`);
 
-    const handleResize = () => {
-      if (containerRef.current) {
-        const width = containerRef.current.offsetWidth;
-        const mobile = window.innerWidth < 640;
-        setIsMobile(mobile);
-        
-        if (mobile) {
-          // On mobile, we rotate 90deg. The card's 304px height becomes its width.
-          // We want this to fit within the container width.
-          const newScale = Math.min(1.1, (width - 32) / 304);
-          setScale(newScale);
-        } else {
-          const newScale = Math.min(1, width / 480);
-          setScale(newScale);
-        }
-      }
+    const resize = () => {
+      if (!containerRef.current) return;
+      const w = containerRef.current.offsetWidth;
+      const mob = window.innerWidth < 640;
+      setIsMobile(mob);
+      setScale(mob ? Math.min(1.1, (w - 32) / 304) : Math.min(1, w / 480));
     };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
-    // Auto-flip animation on load
-    const timer1 = setTimeout(() => setIsFlipped(true), 1200);
-    const timer2 = setTimeout(() => setIsFlipped(false), 2800);
-
-    // Auto-show tooltip hint on mobile
-    let hintTimer: NodeJS.Timeout;
-    let hideTimer: NodeJS.Timeout;
-
+    resize();
+    window.addEventListener('resize', resize);
+    const t1 = setTimeout(() => setIsFlipped(true),  1200);
+    const t2 = setTimeout(() => setIsFlipped(false), 2800);
+    let th: NodeJS.Timeout, th2: NodeJS.Timeout;
     if (window.innerWidth < 640) {
-      hintTimer = setTimeout(() => setIsHovered(true), 3500);
-      hideTimer = setTimeout(() => setIsHovered(false), 8500);
+      th  = setTimeout(() => setIsHovered(true),  3500);
+      th2 = setTimeout(() => setIsHovered(false), 8500);
     }
-
     return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      if (hintTimer) clearTimeout(hintTimer);
-      if (hideTimer) clearTimeout(hideTimer);
+      window.removeEventListener('resize', resize);
+      clearTimeout(t1); clearTimeout(t2);
+      if (th) clearTimeout(th); if (th2) clearTimeout(th2);
     };
   }, [data.publicId]);
 
+  const wrapperStyle = (extra?: React.CSSProperties): React.CSSProperties => ({
+    transform: `scale(${scale}) ${isMobile ? 'rotate(90deg)' : ''}`,
+    marginBottom: isMobile ? `${(480 * scale - 304 * scale) / 2 + 10}px` : `-${304 * (1 - scale)}px`,
+    marginTop:    isMobile ? `${(480 * scale - 304 * scale) / 2 + 10}px` : '0px',
+    boxShadow: CARD_SHADOW,
+    ...extra,
+  });
+
+  /* ── Static (forcedSide) ── */
   if (forcedSide) {
     return (
       <div ref={containerRef} className="flex flex-col items-center py-4 w-full overflow-x-hidden relative">
         <div
-          className={`relative w-[480px] h-[304px] shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem] ${isMobile ? 'origin-center' : 'origin-top'}`}
-          style={{ 
-            transform: `scale(${scale}) ${isMobile ? 'rotate(90deg)' : ''}`, 
-            marginBottom: isMobile ? `${(480 * scale - 304 * scale) / 2 + 10}px` : `-${304 * (1 - scale)}px`,
-            marginTop: isMobile ? `${(480 * scale - 304 * scale) / 2 + 10}px` : '0px'
-          }}
+          className={`relative w-[480px] h-[304px] rounded-[2rem] ${isMobile ? 'origin-center' : 'origin-top'}`}
+          style={wrapperStyle()}
         >
-          {forcedSide === 'front' ? (
-            <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 bg-[#0a0a0c]">
-              {/* Background Accents */}
-              <div className="absolute -top-24 -right-24 w-80 h-80 bg-primary/20 blur-[100px] rounded-full" />
-              <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-accent/10 blur-[100px] rounded-full" />
-
-              <div className="relative h-full p-8 flex flex-col justify-between bg-white/[0.02]">
-                <div className="flex justify-between items-start">
-                  <div className="flex gap-5">
-                    <div className="relative w-20 h-20 shrink-0">
-                      <div className="w-full h-full rounded-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/20 overflow-hidden flex items-center justify-center shadow-inner">
-                        {data.photoUrl ? (
-                          <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" />
-                        ) : (
-                          <User className="w-10 h-10 text-white/20" />
-                        )}
-                      </div>
-                      {data.gender && GENDER_ICONS[data.gender.toUpperCase()] && (
-                        <div 
-                          className="absolute -bottom-2 -right-2 rounded-lg bg-[#121216] border border-white/10 flex items-center justify-center shadow-2xl p-1 transition-transform hover:scale-110"
-                          style={{ width: '24px', height: '24px' }}
-                        >
-                          <img 
-                            src={GENDER_ICONS[data.gender.toUpperCase()].icon} 
-                            alt={data.gender} 
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-black font-outfit tracking-tight text-white leading-tight">{data.fullName}</h3>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">Emergency ID</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Calendar className="w-3 h-3 text-white/20" />
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{data.dob || "--"}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-2.5 bg-white rounded-2xl shadow-xl border border-white/20">
-                    <QRCodeSVG value={publicUrl} size={80} level="H" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-black">Blood Group</span>
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-1.5 rounded-lg bg-primary/10">
-                        <Droplets className="w-5 h-5 text-primary" />
-                      </div>
-                      <span className="text-xl font-black text-white">{data.bloodGroup}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-black">Emergency Call</span>
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-1.5 rounded-lg bg-accent/10">
-                        <Phone className="w-5 h-5 text-accent" />
-                      </div>
-                      <span className="text-lg font-black text-white tracking-tight whitespace-nowrap">{data.emergencyPhone}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5 pb-2">
-                    <span className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-black">Height</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
-                        <Ruler className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <span className="text-sm font-black text-white">{data.height || "--"}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5 pb-2">
-                    <span className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-black">Weight</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
-                        <Scale className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <span className="text-sm font-black text-white">{data.weight || "--"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-2 text-[10px] font-bold text-muted-foreground border-t border-white/5">
-                  <div className="flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-primary" />
-                    <span className="tracking-widest uppercase">Scannable Medical Identity</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 opacity-60">
-                    <span className="text-[8px] uppercase tracking-tighter">Issued:</span>
-                    <span>{data.createdAt ? new Date(data.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : "2024"}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 bg-[#0d0d10]">
-              <div className="relative h-full p-8 flex flex-col bg-white/[0.02]">
-                <div className="grid grid-cols-2 gap-6 mb-4">
-                  {/* Medical Details */}
-                  <div className="space-y-1.5">
-                    <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground font-black">Critical Allergies</span>
-                    <div className="flex flex-wrap gap-1">
-                      {data.allergies && data.allergies.length > 0 ? data.allergies.slice(0, 4).map(a => {
-                        const isMed = a.startsWith('💊 ');
-                        const displayName = isMed ? a.replace('💊 ', '') : a;
-                        return (
-                          <div key={a} className="relative">
-                            {isMed && (
-                              <div className="absolute -top-0.5 -left-0.5 z-10">
-                                <div className="w-3 h-1.5 bg-blue-500 rounded-full shadow-sm border border-blue-500/10 flex items-center overflow-hidden rotate-[-35deg] relative">
-                                  <div className="w-1/2 h-full bg-blue-500" />
-                                  <div className="w-1/2 h-full bg-white" />
-                                </div>
-                              </div>
-                            )}
-                            <span 
-                              className={`px-1.5 py-0.5 rounded-md text-[8px] font-bold border flex items-center gap-0.5 ${
-                                isMed 
-                                  ? 'bg-blue-500/20 text-blue-400 border-blue-500/20 shadow-[0_0_8px_rgba(59,130,246,0.1)] pl-2' 
-                                  : 'bg-destructive/20 text-destructive border-destructive/10'
-                              }`}
-                            >
-                              {displayName}
-                            </span>
-                          </div>
-                        );
-                      }) : <span className="text-[9px] text-white/30 italic">None</span>}
-                    </div>
-                  </div>
-                  <div className="space-y-1.5 border-l border-white/5 pl-6">
-                    <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground font-black">Medical Conditions</span>
-                    <div className="flex flex-wrap gap-1">
-                      {data.medicalConditions && data.medicalConditions.length > 0 ? data.medicalConditions.slice(0, 4).map(c => (
-                        <span key={c} className="px-1.5 py-0.5 rounded-md bg-accent/20 text-accent text-[8px] font-bold border border-accent/10">{c}</span>
-                      )) : <span className="text-[9px] text-white/30 italic">None</span>}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex-1 min-h-0">
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 h-full flex flex-col">
-                    <div className="flex items-center gap-2 text-[8px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2">
-                      <Info className="w-3.5 h-3.5 text-primary" /> Important Medical Notes
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <p className={`leading-relaxed italic text-white/80 ${(data.medications?.length || 0) > 250 ? 'text-[9.5px]' : 'text-[11px]'}`}>
-                        {data.medications || "No additional medications or special instructions provided by the user."}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-4 text-[9px] font-bold text-muted-foreground mt-auto border-t border-white/5">
-                  <div className="flex items-center gap-2">
-                    <Activity className="w-3.5 h-3.5 text-accent" />
-                    <span className="tracking-widest uppercase">Emergency Response Profile</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="relative h-full w-full rounded-[2rem] overflow-hidden border border-cyan-500/25 text-white" style={{ background: CARD_BG }}>
+            <CardGlows />
+            {forcedSide === 'front'
+              ? <FrontContent data={data} publicUrl={publicUrl} />
+              : <BackContent data={data} />
+            }
+          </div>
         </div>
       </div>
     );
   }
 
+  /* ── Interactive flip ── */
   return (
     <div ref={containerRef} className="flex flex-col items-center py-4 w-full overflow-x-hidden relative">
       <AnimatePresence>
@@ -280,214 +363,53 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
             initial={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
             animate={{ opacity: 1, y: 0, scale: 1, x: "-50%" }}
             exit={{ opacity: 0, y: 10, scale: 0.9, x: "-50%" }}
-            className="absolute -top-14 left-1/2 px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2 whitespace-nowrap"
+            className="absolute -top-14 left-1/2 px-4 py-2 bg-slate-950/80 backdrop-blur-md border border-cyan-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-cyan-400 z-[100] shadow-xl pointer-events-none flex items-center gap-2 whitespace-nowrap"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
             Click to flip card
           </motion.div>
         )}
       </AnimatePresence>
 
       <div
-        className={`relative w-[480px] h-[304px] cursor-pointer perspective-1000 shadow-[0_0_50px_-12px_rgba(255,77,77,0.3)] rounded-[2rem] transition-transform duration-500 ${isMobile ? 'origin-center' : 'origin-top'}`}
-        style={{ 
-          transform: `scale(${scale}) ${isMobile ? 'rotate(90deg)' : ''}`, 
-          marginBottom: isMobile ? `${(480 * scale - 304 * scale) / 2 + 10}px` : `-${304 * (1 - scale)}px`,
-          marginTop: isMobile ? `${(480 * scale - 304 * scale) / 2 + 10}px` : '0px'
-        }}
+        className={`relative w-[480px] h-[304px] cursor-pointer perspective-1000 rounded-[2rem] ${isMobile ? 'origin-center' : 'origin-top'}`}
+        style={wrapperStyle()}
         onClick={() => setIsFlipped(!isFlipped)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         <motion.div
-          className="relative w-full h-full transition-all duration-500 preserve-3d"
+          className="relative w-full h-full preserve-3d"
           animate={{ rotateY: currentFlipped ? 180 : 0 }}
           transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
         >
-          {/* FRONT SIDE */}
+          {/* FRONT */}
           <div className="absolute inset-0 backface-hidden">
-            <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 bg-[#0a0a0c]">
-              {/* Background Accents */}
-              <div className="absolute -top-24 -right-24 w-80 h-80 bg-primary/20 blur-[100px] rounded-full" />
-              <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-accent/10 blur-[100px] rounded-full" />
-
-              <div className="relative h-full p-8 flex flex-col justify-between bg-white/[0.02]">
-                <div className="flex justify-between items-start">
-                  <div className="flex gap-5">
-                    <div className="relative w-20 h-20 shrink-0">
-                      <div className="w-full h-full rounded-2xl bg-gradient-to-br from-white/15 to-white/5 border border-white/20 overflow-hidden flex items-center justify-center shadow-inner">
-                        {data.photoUrl ? (
-                          <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" />
-                        ) : (
-                          <User className="w-10 h-10 text-white/20" />
-                        )}
-                      </div>
-                      {data.gender && GENDER_ICONS[data.gender.toUpperCase()] && (
-                        <div 
-                          className="absolute -bottom-2 -right-2 rounded-lg bg-[#121216] border border-white/10 flex items-center justify-center shadow-2xl p-1 transition-transform hover:scale-110"
-                          style={{ width: '24px', height: '24px' }}
-                        >
-                          <img 
-                            src={GENDER_ICONS[data.gender.toUpperCase()].icon} 
-                            alt={data.gender} 
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-black font-outfit tracking-tight text-white leading-tight">{data.fullName}</h3>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">Emergency ID</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Calendar className="w-3 h-3 text-white/20" />
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{data.dob || "--"}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-2.5 bg-white rounded-2xl shadow-xl border border-white/20">
-                    <QRCodeSVG value={publicUrl} size={80} level="H" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-black">Blood Group</span>
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-1.5 rounded-lg bg-primary/10">
-                        <Droplets className="w-5 h-5 text-primary" />
-                      </div>
-                      <span className="text-xl font-black text-white">{data.bloodGroup}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-black">Emergency Call</span>
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-1.5 rounded-lg bg-accent/10">
-                        <Phone className="w-5 h-5 text-accent" />
-                      </div>
-                      <span className="text-lg font-black text-white tracking-tight whitespace-nowrap">{data.emergencyPhone}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5 pb-2">
-                    <span className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-black">Height</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
-                        <Ruler className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <span className="text-sm font-black text-white">{data.height || "--"}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5 pb-2">
-                    <span className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-black">Weight</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
-                        <Scale className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <span className="text-sm font-black text-white">{data.weight || "--"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-2 text-[10px] font-bold text-muted-foreground border-t border-white/5">
-                  <div className="flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-primary" />
-                    <span className="tracking-widest uppercase">Scannable Medical Identity</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 opacity-60">
-                    <span className="text-[8px] uppercase tracking-tighter">Issued:</span>
-                    <span>{data.createdAt ? new Date(data.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : "2024"}</span>
-                  </div>
-                </div>
-              </div>
+            <div className="relative h-full w-full rounded-[2rem] overflow-hidden border border-cyan-500/25 text-white" style={{ background: CARD_BG }}>
+              <CardGlows />
+              <FrontContent data={data} publicUrl={publicUrl} />
             </div>
           </div>
 
-          {/* BACK SIDE */}
+          {/* BACK */}
           <div className="absolute inset-0 rotate-y-180 backface-hidden">
-            <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 bg-[#0d0d10]">
-              <div className="relative h-full p-8 flex flex-col bg-white/[0.02]">
-                <div className="grid grid-cols-2 gap-6 mb-4">
-                  {/* Medical Details */}
-                  <div className="space-y-1.5">
-                    <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground font-black">Critical Allergies</span>
-                    <div className="flex flex-wrap gap-1">
-                      {data.allergies && data.allergies.length > 0 ? data.allergies.slice(0, 4).map(a => {
-                        const isMed = a.startsWith('💊 ');
-                        const displayName = isMed ? a.replace('💊 ', '') : a;
-                        return (
-                          <div key={a} className="relative">
-                            {isMed && (
-                              <div className="absolute -top-0.5 -left-0.5 z-10">
-                                <div className="w-3 h-1.5 bg-blue-500 rounded-full shadow-sm border border-blue-500/10 flex items-center overflow-hidden rotate-[-35deg] relative">
-                                  <div className="w-1/2 h-full bg-blue-500" />
-                                  <div className="w-1/2 h-full bg-white" />
-                                </div>
-                              </div>
-                            )}
-                            <span 
-                              className={`px-1.5 py-0.5 rounded-md text-[8px] font-bold border flex items-center gap-0.5 ${
-                                isMed 
-                                  ? 'bg-blue-500/20 text-blue-400 border-blue-500/20 shadow-[0_0_8px_rgba(59,130,246,0.1)] pl-2' 
-                                  : 'bg-destructive/20 text-destructive border-destructive/10'
-                              }`}
-                            >
-                              {displayName}
-                            </span>
-                          </div>
-                        );
-                      }) : <span className="text-[9px] text-white/30 italic">None</span>}
-                    </div>
-                  </div>
-                  <div className="space-y-1.5 border-l border-white/5 pl-6">
-                    <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground font-black">Medical Conditions</span>
-                    <div className="flex flex-wrap gap-1">
-                      {data.medicalConditions && data.medicalConditions.length > 0 ? data.medicalConditions.slice(0, 4).map(c => (
-                        <span key={c} className="px-1.5 py-0.5 rounded-md bg-accent/20 text-accent text-[8px] font-bold border border-accent/10">{c}</span>
-                      )) : <span className="text-[9px] text-white/30 italic">None</span>}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex-1 min-h-0">
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 h-full flex flex-col">
-                    <div className="flex items-center gap-2 text-[8px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2">
-                      <Info className="w-3.5 h-3.5 text-primary" /> Important Medical Notes
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <p className={`leading-relaxed italic text-white/80 ${(data.medications?.length || 0) > 250 ? 'text-[9.5px]' : 'text-[11px]'}`}>
-                        {data.medications || "No additional medications or special instructions provided by the user."}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-4 text-[9px] font-bold text-muted-foreground mt-auto border-t border-white/5">
-                  <div className="flex items-center gap-2">
-                    <Activity className="w-3.5 h-3.5 text-accent" />
-                    <span className="tracking-widest uppercase">Emergency Response Profile</span>
-                  </div>
-                </div>
-              </div>
+            <div className="relative h-full w-full rounded-[2rem] overflow-hidden border border-cyan-500/25 text-white" style={{ background: CARD_BG }}>
+              <CardGlows />
+              <BackContent data={data} />
             </div>
           </div>
         </motion.div>
       </div>
+
       <AnimatePresence>
         {isHovered && isMobile && (
           <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.9 }}
-            className="px-4 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/90 z-[100] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] pointer-events-none flex items-center gap-2 whitespace-nowrap mt-4"
+            className="px-4 py-2 bg-slate-950/80 backdrop-blur-md border border-cyan-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-cyan-400 z-[100] shadow-xl pointer-events-none flex items-center gap-2 whitespace-nowrap mt-4"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
             Tap to flip card
           </motion.div>
         )}

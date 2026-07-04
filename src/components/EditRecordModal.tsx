@@ -28,6 +28,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     medications: initialData.medications || initialData.medicalNotes || "",
     allergies: initialData.allergies || [],
     medicalConditions: initialData.medicalConditions || [],
+    currentMedications: initialData.currentMedications || [],
     history: initialData.history || []
   });
 
@@ -47,6 +48,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
         medications: initialData.medications || initialData.medicalNotes || "",
         allergies: initialData.allergies || [],
         medicalConditions: initialData.medicalConditions || [],
+        currentMedications: initialData.currentMedications || [],
         history: initialData.history || []
       });
     }
@@ -55,6 +57,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
   const [newAllergy, setNewAllergy] = useState("");
   const [isMedication, setIsMedication] = useState(false);
   const [newCondition, setNewCondition] = useState("");
+  const [newMedication, setNewMedication] = useState("");
   const [newHistory, setNewHistory] = useState({ title: '', date: '', description: '', files: [] as { name: string, url: string }[] });
   const [editingHistoryIndex, setEditingHistoryIndex] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -119,7 +122,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     await saveChanges();
   };
 
-  const addArrayItem = (field: 'allergies' | 'medicalConditions', value: string, setter: (v: string) => void) => {
+  const addArrayItem = (field: 'allergies' | 'medicalConditions' | 'currentMedications', value: string, setter: (v: string) => void) => {
     if (!value.trim()) return;
     let finalValue = value.trim();
     if (field === 'allergies' && isMedication) {
@@ -133,7 +136,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     if (field === 'allergies') setIsMedication(false);
   };
 
-  const removeArrayItem = (field: 'allergies' | 'medicalConditions', index: number) => {
+  const removeArrayItem = (field: 'allergies' | 'medicalConditions' | 'currentMedications', index: number) => {
     const newList = [...formData[field]];
     newList.splice(index, 1);
     setFormData({ ...formData, [field]: newList });
@@ -257,7 +260,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md" 
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" 
             />
             
             <motion.div 
@@ -265,27 +268,27 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="relative w-full max-w-4xl bg-[#0a0a0c] border border-white/10 rounded-t-[3rem] sm:rounded-[3rem] shadow-[0_0_100px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col mb-0 sm:mb-8"
+              className="relative w-full max-w-4xl bg-white border border-slate-100 rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col mb-0 sm:mb-8"
             >
               {/* Premium Header */}
-              <div className="sticky top-0 z-20 bg-[#0a0a0c]/80 backdrop-blur-xl border-b border-white/5 p-6 sm:p-10 flex items-center justify-between">
+              <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-xl border-b border-slate-100 p-6 sm:p-10 flex items-center justify-between">
                 <div className="flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(239,68,68,0.15)]">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_20px_rgba(14,165,233,0.15)]">
                     <Activity className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-2xl sm:text-3xl font-black font-outfit tracking-tight text-white leading-tight">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold font-outfit tracking-tight text-slate-900 leading-tight">
                       Edit Medical Record
                     </h2>
-                    <p className="text-muted-foreground text-xs sm:text-sm font-medium opacity-70">Securing your identity for emergency responders.</p>
+                    <p className="text-slate-500 text-xs sm:text-sm font-medium opacity-80">Securing your identity for emergency responders.</p>
                   </div>
                 </div>
                 <button 
                   type="button" 
                   onClick={onClose} 
-                  className="p-3 hover:bg-white/5 rounded-2xl transition-all cursor-pointer group"
+                  className="p-3 hover:bg-slate-50 rounded-2xl transition-all cursor-pointer group"
                 >
-                  <X className="w-6 h-6 text-muted-foreground group-hover:text-white group-hover:scale-110 transition-transform" />
+                  <X className="w-6 h-6 text-slate-400 group-hover:text-slate-600 group-hover:scale-110 transition-transform" />
                 </button>
               </div>
 
@@ -294,13 +297,13 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
             {/* Photo Section */}
             <section className="flex flex-col items-center gap-4 mb-8">
               <div className="relative group">
-                <div className="w-32 h-32 rounded-[2.5rem] bg-white/5 border-2 border-dashed border-white/10 overflow-hidden flex items-center justify-center transition-all group-hover:border-primary/50">
+                <div className="w-32 h-32 rounded-[2.5rem] bg-slate-50 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center transition-all group-hover:border-primary/50">
                   {formData.photoUrl ? (
                     <img src={formData.photoUrl} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <div className="text-center">
-                      <Camera className="w-8 h-8 text-white/20 mx-auto mb-1" />
-                      <span className="text-[10px] text-white/20 font-bold uppercase tracking-tighter">Optional</span>
+                      <Camera className="w-8 h-8 text-slate-300 mx-auto mb-1" />
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Optional</span>
                     </div>
                   )}
                   <div 
@@ -324,7 +327,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       await deleteFile(urlToDelete);
                       toast.success("Photo removed");
                     }}
-                    className="absolute -top-2 -right-2 p-1.5 bg-destructive text-white rounded-xl shadow-lg hover:scale-110 transition-all"
+                    className="absolute -top-2 -right-2 p-1.5 bg-destructive text-white rounded-xl shadow-lg hover:scale-110 transition-all animate-none"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -338,54 +341,54 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                 className="hidden" 
               />
               <div className="text-center">
-                <p className="text-sm font-bold">Profile Photo</p>
-                <p className="text-xs text-muted-foreground">Upload a clear photo for first responders</p>
+                <p className="text-sm font-bold text-slate-800">Profile Photo</p>
+                <p className="text-xs text-slate-500 font-medium">Upload a clear photo for first responders</p>
               </div>
             </section>
 
             {/* Basic Info */}
             <section className="space-y-8">
-              <div className="flex items-center gap-3 px-1 border-l-2 border-primary/40 pl-4">
-                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Identity & Vitals</h3>
+              <div className="flex items-center gap-3 px-1 border-l-2 border-primary/50 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-slate-850">Identity & Vitals</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Full Name</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
                   <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                     <input 
                       type="text" 
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-sm font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-medium"
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Date of Birth</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Date of Birth</label>
                   <div className="relative group">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none" />
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none" />
                     <input 
                       type="date" 
                       value={formData.dob}
                       onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
                       onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-sm font-medium [color-scheme:dark] cursor-pointer"
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-850 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-medium [color-scheme:light] cursor-pointer"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Blood Group</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Blood Group</label>
                   <div className="relative group">
                     <Droplets className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
                     <select 
                       value={formData.bloodGroup}
                       onChange={(e) => setFormData({ ...formData, bloodGroup: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-sm font-medium appearance-none"
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-850 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-medium appearance-none cursor-pointer"
                     >
                       {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(bg => (
-                        <option key={bg} value={bg} className="bg-[#0a0a0c]">{bg}</option>
+                        <option key={bg} value={bg} className="bg-white text-slate-900">{bg}</option>
                       ))}
                     </select>
                   </div>
@@ -393,14 +396,14 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               </div>
               
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Biological Gender</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Biological Gender</label>
                 <div className="grid grid-cols-3 gap-3">
                   {["MALE", "FEMALE", "OTHER"].map((g) => (
                     <button
                       key={g}
                       type="button"
                       onClick={() => setFormData({ ...formData, gender: g })}
-                      className={`py-4 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all ${formData.gender === g ? 'bg-primary/20 border-primary text-white shadow-[0_0_20px_rgba(239,68,68,0.2)]' : 'bg-white/[0.03] border-white/10 text-muted-foreground hover:bg-white/[0.05]'}`}
+                      className={`py-4 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all ${formData.gender === g ? 'bg-primary/10 border-primary text-primary font-black shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100/60'}`}
                     >
                       {g}
                     </button>
@@ -411,32 +414,32 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
             {/* Emergency Contact */}
             <section className="space-y-8">
-              <div className="flex items-center gap-3 px-1 border-l-2 border-accent/40 pl-4">
-                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Emergency Contact</h3>
+              <div className="flex items-center gap-3 px-1 border-l-2 border-accent/50 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-slate-850">Emergency Contact</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Contact Name</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Contact Name</label>
                   <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-accent transition-colors" />
                     <input 
                       type="text" 
                       value={formData.emergencyName}
                       onChange={(e) => setFormData({ ...formData, emergencyName: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all text-sm font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/50 transition-all text-sm font-medium"
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Phone Number</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
                   <div className="relative group">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-accent transition-colors" />
                     <input 
                       type="tel" 
                       value={formData.emergencyPhone}
                       onChange={(e) => setFormData({ ...formData, emergencyPhone: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all text-sm font-medium"
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/50 transition-all text-sm font-medium"
                       required
                     />
                   </div>
@@ -444,14 +447,14 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Residential Address</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Residential Address</label>
                 <div className="relative group">
                   <MapPin className="absolute left-4 top-4 w-4 h-4 text-accent group-focus-within:text-accent transition-colors" />
                   <textarea 
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     rows={3}
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all text-sm font-medium resize-none"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent/50 transition-all text-sm font-medium resize-none"
                     placeholder="Enter permanent or home address..."
                   />
                 </div>
@@ -460,12 +463,12 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
             {/* Medical Data */}
             <section className="space-y-8">
-              <div className="flex items-center gap-3 px-1 border-l-2 border-blue-500/40 pl-4">
-                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Critical Medical Data</h3>
+              <div className="flex items-center gap-3 px-1 border-l-2 border-primary/50 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-slate-800">Critical Medical Data</h3>
               </div>
               
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Allergies & Reactions</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Allergies & Reactions</label>
                 <div className="flex flex-wrap gap-3 mb-4">
                   {formData.allergies.length > 0 ? formData.allergies.map((a: string, i: number) => {
                     const isMed = a.startsWith('💊 ');
@@ -480,15 +483,15 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                             </div>
                           </div>
                         )}
-                        <span className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all ${isMed ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 pl-5' : 'bg-destructive/10 text-destructive border-destructive/10'}`}>
+                        <span className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all ${isMed ? 'bg-sky-50 text-sky-600 border-sky-200 pl-5' : 'bg-red-50 text-red-600 border-red-200'}`}>
                           {displayName}
-                          <button type="button" onClick={() => removeArrayItem('allergies', i)} className="ml-1 hover:scale-125 transition-transform">
+                          <button type="button" onClick={() => removeArrayItem('allergies', i)} className="ml-1 hover:scale-125 transition-transform cursor-pointer">
                             <X className="w-3.5 h-3.5" />
                           </button>
                         </span>
                       </div>
                     );
-                  }) : <p className="text-xs text-muted-foreground italic ml-1">No allergies added yet.</p>}
+                  }) : <p className="text-xs text-slate-400 italic ml-1 font-medium">No allergies added yet.</p>}
                 </div>
                 <div className="flex flex-col gap-4">
                   <div className="flex gap-3">
@@ -497,13 +500,13 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       value={newAllergy}
                       onChange={(e) => setNewAllergy(e.target.value)}
                       placeholder="e.g. Peanuts, Penicillin..."
-                      className="flex-1 bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm font-medium"
+                      className="flex-1 bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-medium"
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('allergies', newAllergy, setNewAllergy))}
                     />
                     <button 
                       type="button"
                       onClick={() => addArrayItem('allergies', newAllergy, setNewAllergy)}
-                      className="px-6 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all cursor-pointer flex items-center justify-center group"
+                      className="px-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 text-slate-600 transition-all cursor-pointer flex items-center justify-center group shadow-sm"
                     >
                       <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     </button>
@@ -511,7 +514,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   <button
                     type="button"
                     onClick={() => setIsMedication(!isMedication)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-2xl border transition-all self-start ${isMedication ? 'bg-blue-500/20 border-blue-500 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : 'bg-white/[0.03] border-white/10 text-muted-foreground hover:bg-white/[0.05]'}`}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-2xl border transition-all self-start ${isMedication ? 'bg-sky-50 border-sky-300 text-sky-600 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100/60'}`}
                   >
                     <Pill className={`w-4 h-4 ${isMedication ? 'animate-bounce' : ''}`} />
                     <span className="text-[10px] font-black uppercase tracking-[0.1em]">
@@ -522,16 +525,16 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Chronic Conditions</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Chronic Conditions</label>
                 <div className="flex flex-wrap gap-3 mb-4">
                   {formData.medicalConditions.length > 0 ? formData.medicalConditions.map((c: string, i: number) => (
-                    <span key={i} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 text-accent text-xs font-bold border border-accent/20">
+                    <span key={i} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-50 text-teal-600 text-xs font-bold border border-teal-200">
                       {c}
-                      <button type="button" onClick={() => removeArrayItem('medicalConditions', i)} className="hover:scale-125 transition-transform">
+                      <button type="button" onClick={() => removeArrayItem('medicalConditions', i)} className="hover:scale-125 transition-transform cursor-pointer">
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </span>
-                  )) : <p className="text-xs text-muted-foreground italic ml-1">No chronic conditions listed.</p>}
+                  )) : <p className="text-xs text-slate-400 italic ml-1 font-medium">No chronic conditions listed.</p>}
                 </div>
                 <div className="flex gap-3">
                   <input 
@@ -539,13 +542,44 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                     value={newCondition}
                     onChange={(e) => setNewCondition(e.target.value)}
                     placeholder="e.g. Asthma, Type 2 Diabetes..."
-                    className="flex-1 bg-white/[0.03] border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all text-sm font-medium"
+                    className="flex-1 bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-medium"
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('medicalConditions', newCondition, setNewCondition))}
                   />
                   <button 
                     type="button"
                     onClick={() => addArrayItem('medicalConditions', newCondition, setNewCondition)}
-                    className="px-6 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all cursor-pointer flex items-center justify-center group"
+                    className="px-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 text-slate-600 transition-all cursor-pointer flex items-center justify-center group shadow-sm"
+                  >
+                    <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Current Medications</label>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {formData.currentMedications && formData.currentMedications.length > 0 ? formData.currentMedications.map((m: string, i: number) => (
+                    <span key={i} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 text-xs font-bold border border-blue-200">
+                      {m}
+                      <button type="button" onClick={() => removeArrayItem('currentMedications', i)} className="hover:scale-125 transition-transform cursor-pointer">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  )) : <p className="text-xs text-slate-400 italic ml-1 font-medium">No current medications listed.</p>}
+                </div>
+                <div className="flex gap-3">
+                  <input 
+                    type="text" 
+                    value={newMedication}
+                    onChange={(e) => setNewMedication(e.target.value)}
+                    placeholder="e.g. Paracetamol, Insulin..."
+                    className="flex-1 bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl py-4 px-6 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-medium"
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addArrayItem('currentMedications', newMedication, setNewMedication))}
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => addArrayItem('currentMedications', newMedication, setNewMedication)}
+                    className="px-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 text-slate-600 transition-all cursor-pointer flex items-center justify-center group shadow-sm"
                   >
                     <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   </button>
@@ -554,8 +588,8 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Medications & Notes</label>
-                  <span className={`text-[10px] font-bold ${(formData.medications?.length || 0) >= 365 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Medications & Notes</label>
+                  <span className={`text-[10px] font-bold ${(formData.medications?.length || 0) >= 365 ? 'text-destructive' : 'text-slate-400'}`}>
                     {formData.medications?.length || 0}/375
                   </span>
                 </div>
@@ -564,22 +598,22 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
                   maxLength={375}
                   rows={4}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-[1.5rem] py-5 px-6 focus:outline-none focus:ring-2 focus:ring-white/10 transition-all text-sm font-medium resize-none leading-relaxed"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-850 rounded-[1.5rem] py-5 px-6 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-medium resize-none leading-relaxed"
                   placeholder="List active medications or critical notes for responders..."
                 />
               </div>
             </section>
             <section className="space-y-8">
-              <div className="flex items-center gap-3 px-1 border-l-2 border-white/20 pl-4">
-                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Measurements</h3>
+              <div className="flex items-center gap-3 px-1 border-l-2 border-primary/50 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-slate-800">Measurements</h3>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {/* Height Input */}
                 <div className="space-y-3 group">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Height</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Height</label>
                   <div className="relative">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-primary text-muted-foreground">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-primary text-slate-400">
                       <Ruler className="w-4 h-4" />
                     </div>
                     <input 
@@ -587,25 +621,25 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       value={formData.height}
                       onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                       placeholder={unitSystem === "metric" ? "180 cm" : "5'11\""}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-[1.25rem] py-4.5 pl-14 pr-24 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all text-sm font-bold"
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-850 rounded-[1.25rem] py-4.5 pl-14 pr-24 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-bold"
                     />
                     <button 
                       type="button"
                       onClick={() => setUnitSystem(unitSystem === "metric" ? "imperial" : "metric")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-2 cursor-pointer shadow-inner"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                     >
-                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-primary" : "text-muted-foreground opacity-40"}`}>cm</span>
-                      <div className="w-[1px] h-3 bg-white/10" />
-                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-primary" : "text-muted-foreground opacity-40"}`}>ft</span>
+                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-primary" : "text-slate-400 opacity-50"}`}>cm</span>
+                      <div className="w-[1px] h-3 bg-slate-200" />
+                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-primary" : "text-slate-400 opacity-50"}`}>ft</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Weight Input */}
                 <div className="space-y-3 group">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Weight</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Weight</label>
                   <div className="relative">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-accent text-muted-foreground">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-300 group-focus-within:text-accent text-slate-400">
                       <Scale className="w-4 h-4" />
                     </div>
                     <input 
@@ -613,16 +647,16 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                       value={formData.weight}
                       onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                       placeholder={unitSystem === "metric" ? "75 kg" : "165 lbs"}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-[1.25rem] py-4.5 pl-14 pr-24 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all text-sm font-bold"
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-850 rounded-[1.25rem] py-4.5 pl-14 pr-24 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 transition-all text-sm font-bold"
                     />
                     <button 
                       type="button"
                       onClick={() => setUnitSystem(unitSystem === "metric" ? "imperial" : "metric")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-2 cursor-pointer shadow-inner"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                     >
-                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-accent" : "text-muted-foreground opacity-40"}`}>kg</span>
-                      <div className="w-[1px] h-3 bg-white/10" />
-                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-accent" : "text-muted-foreground opacity-40"}`}>lbs</span>
+                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "metric" ? "text-accent" : "text-slate-400 opacity-50"}`}>kg</span>
+                      <div className="w-[1px] h-3 bg-slate-200" />
+                      <span className={`text-[10px] font-black uppercase tracking-tight ${unitSystem === "imperial" ? "text-accent" : "text-slate-400 opacity-50"}`}>lbs</span>
                     </button>
                   </div>
                 </div>
@@ -630,51 +664,51 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
             </section>
 
             {/* Medical History Section */}
-            <section className="space-y-8 pt-10 border-t border-white/5">
-              <div className="flex items-center gap-3 px-1 border-l-2 border-white/20 pl-4">
-                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-white/90">Medical History Archive</h3>
+            <section className="space-y-8 pt-10 border-t border-slate-100">
+              <div className="flex items-center gap-3 px-1 border-l-2 border-primary/50 pl-4">
+                <h3 className="text-xs font-black font-outfit uppercase tracking-[0.3em] text-slate-850">Medical History Archive</h3>
               </div>
               
               {/* Add new history form */}
-              <div id="medical-history-form" className="space-y-6 p-8 rounded-[2.5rem] bg-white/[0.03] border border-white/10 relative overflow-hidden group">
+              <div id="medical-history-form" className="space-y-6 p-8 rounded-[2.5rem] bg-slate-50 border border-slate-200 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Entry Title</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Entry Title</label>
                     <input 
                       type="text" 
                       value={newHistory.title}
                       onChange={(e) => setNewHistory({...newHistory, title: e.target.value})}
                       placeholder="e.g. Major Heart Surgery"
-                      className="w-full p-4 bg-[#0a0a0c] border border-white/10 rounded-2xl text-sm font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full p-4 bg-white border border-slate-200 rounded-2xl text-slate-800 text-sm font-bold outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Completion Date</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Completion Date</label>
                     <input 
                       type="text" 
                       value={newHistory.date}
                       onChange={(e) => setNewHistory({...newHistory, date: e.target.value})}
                       placeholder="e.g. June 2023"
-                      className="w-full p-4 bg-[#0a0a0c] border border-white/10 rounded-2xl text-sm font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all"
+                      className="w-full p-4 bg-white border border-slate-200 rounded-2xl text-slate-805 text-sm font-bold outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 opacity-60">Detailed Description</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Detailed Description</label>
                   <textarea 
                     value={newHistory.description}
                     onChange={(e) => setNewHistory({...newHistory, description: e.target.value})}
                     placeholder="Brief details about the procedure, diagnosis, or outcome..."
-                    className="w-full p-4 bg-[#0a0a0c] border border-white/10 rounded-2xl text-sm font-medium outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 min-h-[100px] resize-none"
+                    className="w-full p-4 bg-white border border-slate-200 rounded-2xl text-slate-800 text-sm font-medium outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 min-h-[100px] resize-none"
                   />
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between px-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Document Attachments</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Document Attachments</label>
                     <button 
                       type="button"
                       onClick={() => historyFileInputRef.current?.click()}
@@ -701,7 +735,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                         <span className="text-[11px] font-black text-primary uppercase tracking-widest">Uploading High-Res Documents...</span>
                         <span className="text-[11px] font-black text-primary">{uploadProgress}%</span>
                       </div>
-                      <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                         <motion.div 
                           className="h-full bg-primary" 
                           initial={{ width: 0 }}
@@ -714,12 +748,12 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   {newHistory.files.length > 0 && !isUploading && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {newHistory.files.map((file, i) => (
-                        <div key={i} className="flex items-center justify-between p-3.5 rounded-xl bg-[#0a0a0c] border border-white/10 group/file">
+                        <div key={i} className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 group/file">
                           <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center shrink-0 shadow-sm">
                               <FileText className="w-4 h-4 text-primary" />
                             </div>
-                            <span className="text-xs font-bold text-white/80 truncate">
+                            <span className="text-xs font-bold text-slate-700 truncate">
                               {file.name}
                             </span>
                           </div>
@@ -752,7 +786,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                   <button 
                     type="button" 
                     onClick={addHistoryItem}
-                    className="flex-1 py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 cursor-pointer shadow-[0_10px_30px_-10px_rgba(239,68,68,0.3)] hover:opacity-90"
+                    className="flex-1 py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 cursor-pointer shadow-[0_10px_30px_-10px_rgba(14,165,233,0.3)] hover:bg-sky-600"
                   >
                     {editingHistoryIndex !== null ? <Save className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                     {editingHistoryIndex !== null ? "Update History Item" : "Add to Medical Archive"}
@@ -764,7 +798,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                         setEditingHistoryIndex(null);
                         setNewHistory({ title: '', date: '', description: '', files: [] as { name: string, url: string }[] });
                       }}
-                      className="px-6 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-xs font-black uppercase tracking-widest border border-white/10 transition-all cursor-pointer"
+                      className="px-6 py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest border border-slate-200 transition-all cursor-pointer"
                     >
                       Cancel
                     </button>
@@ -775,43 +809,43 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
               {/* List of existing history */}
               <div className="grid grid-cols-1 gap-4">
                 {formData.history.length > 0 ? formData.history.map((item: any, index: number) => (
-                  <div key={index} className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/[0.04] hover:border-white/10 transition-all">
+                  <div key={index} className="p-6 rounded-[2rem] bg-slate-50 border border-slate-200 flex items-center justify-between group hover:bg-slate-100/50 hover:border-slate-305 transition-all">
                     <div className="flex items-center gap-5 overflow-hidden">
                       <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
                         <Activity className="w-6 h-6 text-primary opacity-60 group-hover:opacity-100 transition-opacity" />
                       </div>
                       <div className="overflow-hidden">
-                        <h4 className="text-base font-black tracking-tight">{item.title}</h4>
+                        <h4 className="text-base font-black tracking-tight text-slate-800">{item.title}</h4>
                         <div className="flex flex-wrap gap-2 mt-2">
                           {item.files?.map((file: any, fIdx: number) => (
-                            <span key={fIdx} className="text-[10px] px-2 py-1 bg-white/5 text-white/40 border border-white/5 rounded-lg truncate max-w-[120px]">
+                            <span key={fIdx} className="text-[10px] px-2 py-1 bg-white text-slate-500 border border-slate-200 rounded-lg truncate max-w-[120px] font-medium">
                               {file.name}
                             </span>
                           ))}
                         </div>
-                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-2 opacity-60">{item.date}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">{item.date}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 pl-4">
                       <button 
                         type="button"
                         onClick={() => startEditingHistory(index)}
-                        className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-white hover:bg-white/10 rounded-xl transition-all cursor-pointer"
+                        className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 rounded-xl transition-all cursor-pointer border border-transparent hover:border-slate-200"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button 
                         type="button" 
                         onClick={() => removeHistoryItem(index)}
-                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all cursor-pointer"
+                        className="p-2 text-slate-400 hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 )) : (
-                  <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-[2.5rem]">
-                    <p className="text-sm text-muted-foreground italic">No medical history records found.</p>
+                  <div className="text-center py-12 border-2 border-dashed border-slate-200 bg-slate-50/50 rounded-[2.5rem]">
+                    <p className="text-sm text-slate-400 italic font-medium">No medical history records found.</p>
                   </div>
                 )}
               </div>
@@ -820,18 +854,18 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
         </div>
 
               {/* Floating Action Bar */}
-              <div className="sticky bottom-0 z-20 bg-[#0a0a0c]/80 backdrop-blur-xl border-t border-white/5 p-6 sm:p-8 flex items-center gap-4">
+              <div className="sticky bottom-0 z-20 bg-white/95 backdrop-blur-xl border-t border-slate-100 p-6 sm:p-8 flex items-center gap-4">
                 <button 
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-4 sm:py-5 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all border border-white/5 cursor-pointer text-sm"
+                  className="flex-1 py-4 sm:py-5 bg-slate-50 hover:bg-slate-100 text-slate-650 rounded-2xl font-bold transition-all border border-slate-200 cursor-pointer text-sm"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="flex-[2] py-4 sm:py-5 bg-primary text-white rounded-2xl font-bold transition-all hover:opacity-90 flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer text-sm shadow-[0_10px_30px_-10px_rgba(239,68,68,0.4)]"
+                  className="flex-[2] py-4 sm:py-5 bg-primary text-white rounded-2xl font-bold transition-all hover:bg-sky-600 flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer text-sm shadow-[0_10px_30px_-10px_rgba(14,165,233,0.3)]"
                 >
                   {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
                   Save Changes

@@ -51,7 +51,8 @@ model User {
   // --- MEDICAL DETAILS ---
   medicalConditions String[]       @default([])
   allergies         String[]       @default([])
-  medicalNotes      String?        // Medications, notes, and instructions
+  currentMedications String[]      @default([])
+  medicalNotes      String?        // Free-text notes and instructions
   
   // --- RELATIONSHIPS ---
   history           MedicalHistory[]

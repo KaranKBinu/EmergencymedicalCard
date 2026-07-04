@@ -113,17 +113,18 @@ export default function RegisterForm() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg glass p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border border-white/10"
+        className="w-full max-w-lg bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-slate-100"
       >
         <div className="text-center mb-8">
           <motion.div 
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4 border border-primary/30"
+            className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 border border-primary/20 shadow-sm"
           >
-            <Heart className="w-7 h-7 text-primary fill-primary" />
+            <Activity className="w-7 h-7 text-primary" />
           </motion.div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">Create Life ID</h1>
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary">Registration Portal</span>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mt-2 font-outfit">Create PulseID</h1>
           
           {/* Progress Indicator */}
           <div className="flex items-center justify-center gap-2 mt-6">
@@ -131,12 +132,12 @@ export default function RegisterForm() {
               <div 
                 key={s}
                 className={`h-1.5 rounded-full transition-all duration-500 ${
-                  step === s ? "w-10 bg-primary" : step > s ? "w-4 bg-primary/40" : "w-2 bg-white/10"
+                  step === s ? "w-10 bg-primary" : step > s ? "w-4 bg-primary/40" : "w-2 bg-slate-100"
                 }`}
               />
             ))}
           </div>
-          <p className="text-[10px] uppercase tracking-[0.25em] font-black text-muted-foreground mt-4">Step {step} of 4</p>
+          <p className="text-[10px] uppercase tracking-[0.25em] font-black text-slate-400 mt-4">Step {step} of 4</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -170,14 +171,14 @@ export default function RegisterForm() {
                 </InputGroup>
                 <div className="grid grid-cols-2 gap-4">
                   <InputGroup icon={<Calendar className="w-5 h-5" />} label="Birth Date" required>
-                    <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="input-field [color-scheme:dark]" required />
+                    <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="input-field [color-scheme:light]" required />
                   </InputGroup>
                   <InputGroup icon={<User className="w-5 h-5" />} label="Gender" required>
                     <select name="gender" value={formData.gender} onChange={handleChange} className="input-field appearance-none cursor-pointer" required>
-                      <option value="" className="bg-card">Gender</option>
-                      <option value="MALE" className="bg-card">Male</option>
-                      <option value="FEMALE" className="bg-card">Female</option>
-                      <option value="OTHER" className="bg-card">Other</option>
+                      <option value="" className="bg-white text-slate-900">Gender</option>
+                      <option value="MALE" className="bg-white text-slate-900">Male</option>
+                      <option value="FEMALE" className="bg-white text-slate-900">Female</option>
+                      <option value="OTHER" className="bg-white text-slate-900">Other</option>
                     </select>
                   </InputGroup>
                 </div>
@@ -203,7 +204,7 @@ export default function RegisterForm() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <InputGroup icon={<Droplets className="w-5 h-5" />} label="Blood Group" required>
                     <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} className="input-field appearance-none cursor-pointer">
-                      {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => <option key={bg} value={bg} className="bg-card">{bg}</option>)}
+                      {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => <option key={bg} value={bg} className="bg-white text-slate-900">{bg}</option>)}
                     </select>
                   </InputGroup>
                   <div className="grid grid-cols-2 gap-2">
@@ -239,7 +240,7 @@ export default function RegisterForm() {
                 </InputGroup>
                 
                 <div className="space-y-2 text-left group">
-                  <label className="text-[10px] uppercase font-bold text-muted-foreground/60 tracking-[0.15em] ml-1">Emergency Phone *</label>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] ml-1">Emergency Phone *</label>
                   <div className="flex gap-2">
                     {/* Country Code Selector */}
                     <div className="w-24 relative">
@@ -249,21 +250,21 @@ export default function RegisterForm() {
                           if (c) setSelectedCountry(c);
                         }}
                         value={selectedCountry?.code || ""}
-                        className="w-full h-full bg-white/[0.03] border border-white/10 rounded-2xl px-2 py-3.5 appearance-none text-xs text-white text-center cursor-pointer outline-none focus:border-primary/40 transition-all"
+                        className="w-full h-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-3.5 appearance-none text-xs text-slate-800 text-center cursor-pointer outline-none focus:border-primary/50 focus:bg-white transition-all"
                       >
                         {countries.map(c => (
-                          <option key={c.code} value={c.code} className="bg-card">
+                          <option key={c.code} value={c.code} className="bg-white text-slate-900">
                             {c.dialCode}
                           </option>
                         ))}
                       </select>
                       <div className="absolute top-1/2 right-2 -translate-y-1/2 pointer-events-none">
-                        <Globe className="w-3 h-3 text-muted-foreground/50" />
+                        <Globe className="w-3 h-3 text-slate-400" />
                       </div>
                     </div>
                     {/* Phone Number Input */}
-                    <div className="flex-1 flex items-center gap-3.5 px-4 py-3.5 bg-white/[0.03] border border-white/10 rounded-2xl focus-within:border-primary/40 focus-within:bg-white/[0.05] transition-all duration-300">
-                      <Phone className="w-5 h-5 text-muted-foreground/50" />
+                    <div className="flex-1 flex items-center gap-3.5 px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-primary/50 focus-within:bg-white transition-all duration-300">
+                      <Phone className="w-5 h-5 text-slate-400" />
                       <input type="tel" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} className="input-field" placeholder="9876543210" required />
                     </div>
                   </div>
@@ -277,7 +278,7 @@ export default function RegisterForm() {
                   <motion.button 
                     whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
                     type="submit" disabled={loading}
-                    className="flex-[2] py-4 bg-primary text-white rounded-2xl font-bold disabled:opacity-50 shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                    className="flex-[2] py-4 bg-primary text-white rounded-2xl font-bold disabled:opacity-50 shadow-lg shadow-sky-500/20 flex items-center justify-center gap-2"
                   >
                     {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><CheckCircle2 className="w-4 h-4" /> Finish Setup</>}
                   </motion.button>
@@ -287,8 +288,8 @@ export default function RegisterForm() {
           </AnimatePresence>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-white/5 text-center">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+          <p className="text-sm text-slate-500 font-medium">
             Already have an account? <Link href="/login" className="text-primary font-bold hover:underline underline-offset-4">Sign In</Link>
           </p>
         </div>
@@ -302,11 +303,11 @@ export default function RegisterForm() {
           border: none;
           outline: none;
           font-size: 15px;
-          color: white;
+          color: #0f172a;
           padding: 2px 0;
         }
         .input-field::placeholder {
-          color: rgba(255, 255, 255, 0.2);
+          color: #94a3b8;
         }
         .btn-next {
           width: 100%;
@@ -320,7 +321,7 @@ export default function RegisterForm() {
           justify-content: center;
           gap: 0.5rem;
           transition: all 0.3s;
-          box-shadow: 0 10px 20px -10px rgba(255, 77, 77, 0.3);
+          box-shadow: 0 10px 20px -10px rgba(14, 165, 233, 0.3);
         }
         .btn-next:hover {
           opacity: 0.9;
@@ -329,11 +330,11 @@ export default function RegisterForm() {
         .btn-back {
           flex: 1;
           padding: 1rem;
-          background: rgba(255, 255, 255, 0.05);
-          color: white;
+          background: #f1f5f9;
+          color: #475569;
           border-radius: 1rem;
           font-weight: 700;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid #e2e8f0;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -341,7 +342,7 @@ export default function RegisterForm() {
           transition: all 0.3s;
         }
         .btn-back:hover {
-          background: rgba(255, 255, 255, 0.1);
+          background: #e2e8f0;
         }
       `}</style>
     </div>
@@ -356,13 +357,13 @@ function InputGroup({
   return (
     <div className="space-y-2 text-left group">
       <div className="flex items-center justify-between ml-1">
-        <label className="text-[10px] uppercase font-bold text-muted-foreground/60 tracking-[0.15em] group-focus-within:text-primary transition-colors">
+        <label className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] group-focus-within:text-primary transition-colors">
           {label} {required && <span className="text-primary ml-0.5">*</span>}
         </label>
-        {optional && <span className="text-[9px] text-muted-foreground/30 font-bold uppercase tracking-widest">(Optional)</span>}
+        {optional && <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">(Optional)</span>}
       </div>
-      <div className="flex items-center gap-3.5 px-4 py-3.5 bg-white/[0.03] border border-white/10 rounded-2xl focus-within:border-primary/40 focus-within:bg-white/[0.05] transition-all duration-300">
-        <div className="text-muted-foreground/50 group-focus-within:text-primary/70 transition-colors">
+      <div className="flex items-center gap-3.5 px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-primary/50 focus-within:bg-white transition-all duration-300">
+        <div className="text-slate-400 group-focus-within:text-primary/80 transition-colors">
           {icon}
         </div>
         {children}

@@ -41,6 +41,7 @@ export default async function PublicViewPage({ params }: { params: Promise<{ id:
     emergencyPhone: user.emergencyPhone,
     medicalConditions: user.medicalConditions,
     allergies: user.allergies,
+    currentMedications: user.currentMedications,
     medications: user.medicalNotes || undefined, // Map medicalNotes to medications for the component
     address: user.address || undefined,
     dob: user.dob || undefined,

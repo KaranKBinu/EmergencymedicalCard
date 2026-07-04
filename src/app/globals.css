@@ -2,30 +2,30 @@
 
 @theme {
   /* Core Colors */
-  --color-background: #0a0a0c;
-  --color-foreground: #f8fafc;
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
   
-  --color-card: #111114;
-  --color-card-foreground: #f8fafc;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
   
-  --color-primary: #ff4d4d;
+  --color-primary: #0ea5e9;
   --color-primary-foreground: #ffffff;
   
-  --color-secondary: #1e1e24;
-  --color-secondary-foreground: #f8fafc;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #0f172a;
   
-  --color-muted: #1e1e24;
-  --color-muted-foreground: #94a3b8;
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #64748b;
   
-  --color-accent: #00d2ff;
+  --color-accent: #0d9488;
   --color-accent-foreground: #ffffff;
   
   --color-destructive: #ef4444;
-  --color-destructive-foreground: #f8fafc;
+  --color-destructive-foreground: #ffffff;
   
-  --color-border: #26262b;
-  --color-input: #26262b;
-  --color-ring: #ff4d4d;
+  --color-border: #e2e8f0;
+  --color-input: #f1f5f9;
+  --color-ring: #0ea5e9;
 
   /* Custom Radius */
   --radius-xl: 0.75rem;
@@ -45,21 +45,22 @@
 
 /* Custom Design Utilities */
 @utility glass {
-  background-color: rgb(17 17 20 / 0.6);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgb(255 255 255 / 0.05);
+  background-color: rgb(255 255 255 / 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgb(226 232 240 / 0.8);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
 }
 
 @utility glass-dark {
-  background-color: rgb(0 0 0 / 0.4);
-  backdrop-filter: blur(40px);
+  background-color: rgb(15 23 42 / 0.85);
+  backdrop-filter: blur(24px);
   border: 1px solid rgb(255 255 255 / 0.1);
 }
 
 @utility text-gradient {
   background-clip: text;
   color: transparent;
-  background-image: linear-gradient(to bottom right, white, white, rgb(255 255 255 / 0.4));
+  background-image: linear-gradient(to bottom right, #0f172a, #1e293b, #475569);
 }
 
 @utility emergency-pulse {

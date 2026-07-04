@@ -30,6 +30,7 @@ export async function PATCH(req: Request) {
       allergies,
       medicalConditions,
       medications, // UI still sends this, we map to medicalNotes
+      currentMedications,
       height,
       weight,
       photoUrl,
@@ -51,6 +52,7 @@ export async function PATCH(req: Request) {
         emergencyPhone,
         allergies: Array.isArray(allergies) ? allergies : [],
         medicalConditions: Array.isArray(medicalConditions) ? medicalConditions : [],
+        currentMedications: Array.isArray(currentMedications) ? currentMedications : [],
         medicalNotes: medications, // Renamed in schema
         height,
         weight,

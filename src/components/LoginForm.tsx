@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Heart, ArrowRight } from "lucide-react";
+import { Mail, Lock, Heart, ArrowRight, Activity } from "lucide-react";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
@@ -55,19 +55,20 @@ export default function LoginForm() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md glass p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border border-white/10"
+        className="w-full max-w-md bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-slate-100"
       >
         <div className="text-center mb-8">
           <motion.div 
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 border border-primary/20"
+            className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 border border-primary/20 shadow-sm"
           >
-            <Heart className="w-7 h-7 text-primary fill-primary/20" />
+            <Activity className="w-7 h-7 text-primary" />
           </motion.div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Welcome Back</h1>
-          <p className="text-muted-foreground text-sm mt-2">Enter your credentials to access your Life ID</p>
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary">Clinical Portal</span>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mt-2 font-outfit">Sign In to PulseID</h1>
+          <p className="text-slate-500 text-sm mt-1.5 font-medium">Access your secure emergency medical profile.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -75,14 +76,14 @@ export default function LoginForm() {
             <InputGroup icon={<Mail className="w-5 h-5" />} label="Email">
               <input 
                 type="email" name="email" value={formData.email} onChange={handleChange}
-                className="w-full bg-transparent border-none outline-none text-[15px] placeholder:text-muted-foreground/50" 
+                className="w-full bg-transparent border-none outline-none text-[15px] text-slate-900 placeholder:text-slate-400" 
                 placeholder="name@example.com" required 
               />
             </InputGroup>
             <InputGroup icon={<Lock className="w-5 h-5" />} label="Password">
               <input 
                 type="password" name="password" value={formData.password} onChange={handleChange}
-                className="w-full bg-transparent border-none outline-none text-[15px] placeholder:text-muted-foreground/50" 
+                className="w-full bg-transparent border-none outline-none text-[15px] text-slate-900 placeholder:text-slate-400" 
                 placeholder="••••••••" required 
               />
             </InputGroup>
@@ -92,7 +93,7 @@ export default function LoginForm() {
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             type="submit" disabled={loading}
-            className="w-full py-4 bg-primary text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 shadow-lg shadow-primary/20 mt-2"
+            className="w-full py-4 bg-primary text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-sky-600 transition-all disabled:opacity-50 shadow-lg shadow-sky-500/20 mt-2"
           >
             {loading ? (
               <span className="flex items-center gap-2">
@@ -107,9 +108,9 @@ export default function LoginForm() {
           </motion.button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-white/5 text-center">
-          <p className="text-sm text-muted-foreground">
-            Don't have an account? <Link href="/register" className="text-primary font-bold hover:underline underline-offset-4">Create Life ID</Link>
+        <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+          <p className="text-sm text-slate-500 font-medium">
+            Don't have an account? <Link href="/register" className="text-primary font-bold hover:underline underline-offset-4">Create PulseID</Link>
           </p>
         </div>
       </motion.div>
@@ -120,9 +121,9 @@ export default function LoginForm() {
 function InputGroup({ icon, label, children }: { icon: React.ReactNode, label: string, children: React.ReactNode }) {
   return (
     <div className="space-y-2 text-left">
-      <label className="text-[10px] uppercase font-bold text-muted-foreground/70 tracking-[0.15em] ml-1">{label}</label>
-      <div className="flex items-center gap-3.5 px-4 py-3.5 bg-white/[0.03] border border-white/10 rounded-2xl focus-within:border-primary/40 focus-within:bg-white/[0.05] transition-all duration-300">
-        <div className="text-muted-foreground/60">
+      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] ml-1">{label}</label>
+      <div className="flex items-center gap-3.5 px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-primary/50 focus-within:bg-white transition-all duration-300">
+        <div className="text-slate-400">
           {icon}
         </div>
         {children}
@@ -130,4 +131,5 @@ function InputGroup({ icon, label, children }: { icon: React.ReactNode, label: s
     </div>
   );
 }
+
 
