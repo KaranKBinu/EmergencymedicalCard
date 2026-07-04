@@ -202,17 +202,19 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
                         const isPdf = url.match(/\.pdf$/i) || url.startsWith('data:application/pdf');
 
                         return (
-                          <div key={fIdx} className="flex flex-col gap-2">
-                            <div 
-                              onClick={() => setActivePreview({ name: file.name, url })}
-                              className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-all group/file cursor-pointer"
-                            >
+                          <div 
+                            key={fIdx}
+                            onClick={() => setActivePreview({ name: file.name, url })}
+                            className="flex flex-col p-3 rounded-2xl bg-slate-50 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all group/file cursor-pointer shadow-sm"
+                          >
+                            {/* File Info Row */}
+                            <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 {isImage ? <ImageIcon className="w-4 h-4 text-primary" /> : isPdf ? <FileText className="w-4 h-4 text-rose-500" /> : <FileText className="w-4 h-4 text-primary" />}
-                                <span className="text-xs font-bold text-slate-700 group-hover:text-primary transition-colors">{file.name}</span>
+                                <span className="text-xs font-bold text-slate-700 group-hover/file:text-primary transition-colors">{file.name}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-black uppercase text-slate-400 group-hover:text-primary transition-colors pr-1">Preview</span>
+                                <span className="text-[10px] font-black uppercase text-slate-400 group-hover/file:text-primary transition-colors pr-1">Preview</span>
                                 <a 
                                   href={url}
                                   download={file.name}
@@ -224,12 +226,22 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
                                 </a>
                               </div>
                             </div>
+
+                            {/* Unified Preview Box inside Capsule */}
                             {isImage && (
-                              <div 
-                                onClick={() => setActivePreview({ name: file.name, url })}
-                                className="mt-1 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-1 cursor-pointer hover:opacity-90 transition-opacity"
-                              >
+                              <div className="mt-2.5 rounded-xl overflow-hidden border border-slate-200 bg-white p-0.5 shadow-inner">
                                 <img src={url} alt={file.name} className="w-full h-auto max-h-40 object-cover rounded-lg" />
+                              </div>
+                            )}
+                            {isPdf && (
+                              <div className="mt-2.5 rounded-xl overflow-hidden border border-slate-200 bg-white p-0.5 shadow-inner h-40 relative flex items-center justify-center">
+                                <iframe src={`${url}#toolbar=0&navpanes=0&scrollbar=0`} className="w-full h-full rounded-lg bg-white border-0 pointer-events-none select-none overflow-hidden" style={{ minHeight: '150px' }} />
+                                {/* Overlay to block interaction and show indicator */}
+                                <div className="absolute inset-0 bg-slate-950/[0.01] hover:bg-slate-950/[0.04] transition-colors rounded-lg flex items-end p-2.5">
+                                  <span className="text-[8px] font-black uppercase tracking-wider bg-rose-500 text-white px-2 py-0.5 rounded shadow-sm flex items-center gap-1 z-10">
+                                    <FileText className="w-2.5 h-2.5" /> PDF Document
+                                  </span>
+                                </div>
                               </div>
                             )}
                           </div>
