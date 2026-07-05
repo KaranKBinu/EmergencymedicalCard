@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import PublicEmergencyProfile from "@/components/PublicEmergencyProfile";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 const REVERSE_BLOOD_GROUP_MAP: Record<string, string> = {
   "A_POSITIVE": "A+",
@@ -15,6 +16,8 @@ const REVERSE_BLOOD_GROUP_MAP: Record<string, string> = {
 
 export default async function PublicViewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
   // Decode the ID if it was URL encoded (since it's an email)
   const email = decodeURIComponent(id);
 
@@ -51,5 +54,5 @@ export default async function PublicViewPage({ params }: { params: Promise<{ id:
     })),
   };
 
-  return <PublicEmergencyProfile data={medicalData} />;
+  return <PublicEmergencyProfile data={medicalData} isLoggedIn={isLoggedIn} />;
 }

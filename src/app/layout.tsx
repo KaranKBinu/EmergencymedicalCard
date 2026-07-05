@@ -8,8 +8,13 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "Emergency Medical Card | Life-Saving Digital ID",
-  description: "Create your secure digital emergency medical card with instant QR access for first responders.",
+  title: "PulseID | Secure Digital Emergency Medical Card",
+  description: "Create your secure digital emergency medical card. Generate scannable QR codes for EMTs & first responders to access your clinical identity.",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  }
 };
 
 export default function RootLayout({

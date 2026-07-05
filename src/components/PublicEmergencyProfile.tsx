@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import {
   Phone, AlertCircle, Info, Activity, User, MapPin, Calendar,
   FileText, Download, Image as ImageIcon, Pill, X,
-  Shield, Clock
+  Shield, Clock, ArrowRight
 } from "lucide-react";
 
 interface PublicMedicalRecord {
@@ -46,7 +47,7 @@ const glassDark = {
   WebkitBackdropFilter: "blur(14px)",
 } as React.CSSProperties;
 
-export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRecord }) {
+export default function PublicEmergencyProfile({ data, isLoggedIn = true }: { data: PublicMedicalRecord, isLoggedIn?: boolean }) {
   const [activePreview, setActivePreview] = useState<{ name: string, url: string } | null>(null);
 
   return (
@@ -127,6 +128,7 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
                 <Phone className="w-5 h-5 text-red-300 fill-red-300/20" />
               </div>
             </motion.a>
+
 
 
             {/* Address — sidebar desktop only */}
@@ -352,6 +354,31 @@ export default function PublicEmergencyProfile({ data }: { data: PublicMedicalRe
           {/* end right content */}
         </div>
       </div>
+
+      {/* ── Fixed Floating CTA Button for Anonymous Viewers ── */}
+      {!isLoggedIn && (
+        <motion.div
+          initial={{ opacity: 0, x: 100, y: 0 }}
+          animate={{ opacity: 1, x: 0, y: 0 }}
+          transition={{ type: "spring", delay: 0.8, stiffness: 220, damping: 22 }}
+          className="fixed bottom-6 right-6 z-50 max-w-[280px] sm:max-w-xs w-[calc(100vw-3rem)]"
+        >
+          <Link
+            href="/register"
+            className="flex items-center justify-between p-4 rounded-2xl border border-sky-500/30 hover:border-sky-400/50 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer group shadow-2xl shadow-black/40 w-full text-left"
+            style={{ background: "rgba(10,22,40,0.85)", backdropFilter: "blur(20px)" }}
+          >
+            <div className="min-w-0 pr-3">
+              <span className="text-[8px] uppercase font-black text-sky-400 tracking-widest block mb-0.5">Get Protected</span>
+              <p className="text-xs font-black text-white leading-tight group-hover:text-sky-300 transition-colors">Create Your Own Pass</p>
+              <p className="text-[9px] text-white/45 font-medium mt-0.5">Free digital medical identity card</p>
+            </div>
+            <div className="w-8 h-8 shrink-0 rounded-lg bg-sky-500/25 border border-sky-400/35 flex items-center justify-center group-hover:translate-x-0.5 transition-all shadow-md shadow-sky-500/10">
+              <ArrowRight className="w-3.5 h-3.5 text-sky-300" />
+            </div>
+          </Link>
+        </motion.div>
+      )}
 
       {/* ── File Preview Modal ── */}
       <AnimatePresence>
