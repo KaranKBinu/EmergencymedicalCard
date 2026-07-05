@@ -15,9 +15,6 @@ const BLOOD_GROUP_MAP: Record<string, any> = {
   "O-": "O_NEGATIVE",
 };
 
-const REVERSE_BLOOD_GROUP_MAP: Record<string, string> = Object.fromEntries(
-  Object.entries(BLOOD_GROUP_MAP).map(([k, v]) => [v, k])
-);
 
 export async function registerUser(formData: any) {
   const { 

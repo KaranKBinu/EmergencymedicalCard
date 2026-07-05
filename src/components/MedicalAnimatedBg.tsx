@@ -67,8 +67,7 @@ function buildEcgPath(width: number, height: number, cycles: number): string {
 
 export default function MedicalAnimatedBg({ theme = "light", fixed = false, className = "" }: MedicalAnimatedBgProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const [particles] = useState<Particle[]>(generateParticles);
   const [dims, setDims] = useState({ w: 1440, h: 900 });
   const rafRef = useRef<number | null>(null);
   const targetMouse = useRef({ x: 0.5, y: 0.5 });
@@ -85,10 +84,6 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
   }, []);
 
   useEffect(() => {
-    // Generate particles client-side only to avoid hydration mismatch
-    setParticles(generateParticles());
-    setMounted(true);
-
     const el = containerRef.current;
     if (!el) return;
 
@@ -160,18 +155,7 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
   const ecgPath1 = buildEcgPath(dims.w, 80, ECG_CYCLES);
   const ecgPath2 = buildEcgPath(dims.w, 60, ECG_CYCLES);
 
-  // Render nothing (just the bg color div) until client mounts —
-  // prevents hydration mismatch from Math.random() in particles
-  if (!mounted) {
-    return (
-      <div
-        ref={containerRef}
-        className={`${fixed ? 'fixed' : 'absolute'} inset-0 overflow-hidden pointer-events-none select-none ${fixed ? 'z-0' : ''} ${className}`}
-        aria-hidden="true"
-        style={{ background: t.bg }}
-      />
-    );
-  }
+
 
   return (
     <div

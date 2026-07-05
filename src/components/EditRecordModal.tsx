@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar, FileText, FilePlus, Edit3, Pill, Download } from "lucide-react";
 import toast from "react-hot-toast";
@@ -32,27 +32,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
     history: initialData.history || []
   });
 
-  // Re-sync form with latest initialData every time the modal is opened.
-  // useState only captures the initial value on mount, so without this,
-  // the form would show stale data if the user edits, saves, and reopens.
-  useEffect(() => {
-    if (isOpen) {
-      setFormData({
-        ...initialData,
-        photoUrl: initialData.photoUrl || "",
-        address: initialData.address || "",
-        dob: initialData.dob || "",
-        gender: initialData.gender || "",
-        height: initialData.height || "",
-        weight: initialData.weight || "",
-        medications: initialData.medications || initialData.medicalNotes || "",
-        allergies: initialData.allergies || [],
-        medicalConditions: initialData.medicalConditions || [],
-        currentMedications: initialData.currentMedications || [],
-        history: initialData.history || []
-      });
-    }
-  }, [isOpen, initialData]);
+
 
   const [newAllergy, setNewAllergy] = useState("");
   const [isMedication, setIsMedication] = useState(false);
@@ -156,7 +136,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
       return;
     }
     
-    let updatedHistory = [...formData.history];
+    const updatedHistory = [...formData.history];
     if (editingHistoryIndex !== null) {
       updatedHistory[editingHistoryIndex] = newHistory;
       const updatedData = { ...formData, history: updatedHistory };
@@ -221,7 +201,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
           files: [...prev.files, ...uploadedFiles] 
         }));
         toast.success("Files uploaded successfully");
-      } catch (err) {
+      } catch {
         toast.error("Failed to upload files");
       } finally {
         setIsUploading(false);
@@ -245,7 +225,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
         // Delete the old photo from blob storage only after the new URL is saved
         if (oldUrl) await deleteFile(oldUrl);
         toast.success("Photo uploaded!", { id: toastId });
-      } catch (err) {
+      } catch {
         toast.error("Photo upload failed", { id: toastId });
       }
     }

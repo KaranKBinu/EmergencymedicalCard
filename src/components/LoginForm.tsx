@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Heart, ArrowRight, Activity } from "lucide-react";
+import { Mail, Lock, ArrowRight, Activity } from "lucide-react";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
@@ -38,7 +38,7 @@ export default function LoginForm() {
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (error) {
+    } catch {
       toast.error("Login failed.");
     } finally {
       setLoading(false);
@@ -110,7 +110,7 @@ export default function LoginForm() {
 
         <div className="mt-8 pt-6 border-t border-slate-100 text-center">
           <p className="text-sm text-slate-500 font-medium">
-            Don't have an account? <Link href="/register" className="text-primary font-bold hover:underline underline-offset-4">Create PulseID</Link>
+            Don&apos;t have an account? <Link href="/register" className="text-primary font-bold hover:underline underline-offset-4">Create PulseID</Link>
           </p>
         </div>
       </motion.div>

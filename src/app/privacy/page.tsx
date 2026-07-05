@@ -39,7 +39,7 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-black uppercase tracking-wider font-outfit">Important Liability Disclaimer</h2>
           </div>
           <p className="text-red-200/80 text-sm leading-relaxed font-semibold">
-            By generating and sharing your QR code, you acknowledge that any medical records or profile details you select as "Public" will be accessible to anyone who scans your card. PulseID acts strictly as a secure hosting service and does not filter, verify, or restrict who scans your public QR endpoints. 
+            By generating and sharing your QR code, you acknowledge that any medical records or profile details you select as &quot;Public&quot; will be accessible to anyone who scans your card. PulseID acts strictly as a secure hosting service and does not filter, verify, or restrict who scans your public QR endpoints. 
           </p>
           <p className="text-red-200/80 text-sm leading-relaxed font-bold">
             YOU ARE SOLELY RESPONSIBLE FOR WHAT DATA YOU CHOOSE TO EXPOSE. PULSEID, ITS CREATORS, AND AFFILIATES ACCEPT ABSOLUTELY ZERO LIABILITY OR RESPONSIBILITY FOR ANY CONSEQUENTIAL PRIVACY VIOLATIONS, LEGAL ACTION, OR DAMAGES ARISING FROM SCANNABLE PUBLIC DATA EXPOSED BY PROFILE OWNERS.
@@ -97,7 +97,7 @@ export default function PrivacyPage() {
               <Shield className="w-5 h-5 text-sky-400" /> 4. User Responsibilities
             </h3>
             <p>
-              You agree to use this platform responsibly and submit accurate clinical details. Submitting falsified medical conditions or using another person's biological facts is strictly prohibited and can result in profile termination. You are responsible for keeping your login credentials secure.
+              You agree to use this platform responsibly and submit accurate clinical details. Submitting falsified medical conditions or using another person&apos;s biological facts is strictly prohibited and can result in profile termination. You are responsible for keeping your login credentials secure.
             </p>
           </section>
         </div>

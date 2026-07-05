@@ -59,5 +59,5 @@ export default async function DashboardPage() {
     publicId: user.email // Using email as the public ID
   };
 
-  return <DashboardClient initialData={userData} userId={user.email} />;
+  return <DashboardClient initialData={userData} />;
 }

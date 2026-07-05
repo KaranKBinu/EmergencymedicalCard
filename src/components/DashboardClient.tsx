@@ -2,15 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import EmergencyCard from "@/components/EmergencyCard";
-import { QrCode, Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Activity, Pill, ChevronDown, FileText, Image as ImageIcon, ExternalLink } from "lucide-react";
+import { Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Activity, ChevronDown, FileText, Image as ImageIcon, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
 import { signOut } from "next-auth/react";
 import EditRecordModal from "@/components/EditRecordModal";
-import MedicalAnimatedBgClient from "@/components/MedicalAnimatedBgClient";
 
-export default function DashboardClient({ initialData, userId }: { initialData: any, userId: string }) {
-  const [mounted, setMounted] = useState(false);
+export default function DashboardClient({ initialData }: { initialData: any }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -51,8 +49,6 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
   };
 
   useEffect(() => {
-    setMounted(true);
-
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDownloadOpen(false);
@@ -462,16 +458,18 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
           </div>
         </div>
       </div>
-      <EditRecordModal 
-        isOpen={isEditModalOpen} 
-        onClose={() => setIsEditModalOpen(false)} 
-        initialData={initialData} 
-      />
+      {isEditModalOpen && (
+        <EditRecordModal 
+          isOpen={isEditModalOpen} 
+          onClose={() => setIsEditModalOpen(false)} 
+          initialData={initialData} 
+        />
+      )}
     </div>
   );
 }
 
-function StatusCard({ icon, label, value, accent }: { icon: React.ReactNode, label: string, value: string, accent: string }) {
+function StatusCard({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
   return (
     <div className="p-4 rounded-2xl border border-white/6 flex items-center justify-between group/card transition-all hover:scale-[1.02] hover:border-white/12" style={{background: 'rgba(255,255,255,0.02)'}}>
       <div className="flex items-center gap-3">

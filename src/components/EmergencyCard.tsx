@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Droplets, User, Activity, Scale, Ruler, Info, Calendar, AlertTriangle } from "lucide-react";
+import { Phone, Droplets, User, Activity, Scale, Ruler, Info, Calendar } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useRef } from "react";
 
@@ -293,14 +293,17 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
   const [isFlipped, setIsFlipped]   = useState(false);
   const [isHovered, setIsHovered]   = useState(false);
   const currentFlipped              = forcedSide ? (forcedSide === 'back') : isFlipped;
-  const [publicUrl, setPublicUrl]   = useState("");
+  const [isMounted, setIsMounted] = useState(false);
   const [scale, setScale]           = useState(1);
   const [isMobile, setIsMobile]     = useState(false);
   const containerRef                = useRef<HTMLDivElement>(null);
 
+  const publicUrl = isMounted && typeof window !== "undefined"
+    ? `${window.location.origin}/v/${data.publicId || 'sample-id'}`
+    : "";
+
   useEffect(() => {
-    const base = typeof window !== "undefined" ? window.location.origin : "";
-    setPublicUrl(`${base}/v/${data.publicId || 'sample-id'}`);
+    setTimeout(() => setIsMounted(true), 0);
 
     const resize = () => {
       if (!containerRef.current) return;

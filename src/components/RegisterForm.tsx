@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
-  User, Mail, Lock, Phone, Droplets, Heart, 
+  User, Mail, Lock, Phone, Droplets, 
   ChevronRight, ChevronLeft, CheckCircle2, 
   Calendar, MapPin, Ruler, Scale, Activity, 
   Stethoscope, FileText, Camera, Globe
@@ -108,7 +108,7 @@ export default function RegisterForm() {
         toast.success("Account created successfully!");
         router.push("/login");
       }
-    } catch (error) {
+    } catch {
       toast.error("Registration failed.");
     } finally {
       setLoading(false);
