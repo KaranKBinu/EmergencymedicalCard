@@ -4,16 +4,18 @@ import { auth } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
     const { searchParams } = new URL(req.url);
     const filename = searchParams.get("filename");
 
     if (!filename) {
       return new NextResponse("Filename is required", { status: 400 });
+    }
+
+    const session = await auth();
+    const isImage = /\.(jpe?g|png|webp|gif)$/i.test(filename);
+    
+    if (!session?.user?.id && !isImage) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
     // addRandomSuffix: true ensures unique URLs so different users uploading

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, ArrowRight, Activity } from "lucide-react";
+import { Mail, Lock, ArrowRight, Activity, Home, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 export default function LoginForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -46,7 +47,16 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center p-4 md:p-6 bg-background relative overflow-hidden">
+    <div className="min-h-[100dvh] flex items-center justify-center p-4 md:p-6 bg-transparent relative overflow-hidden">
+      {/* Back to Home Button */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white/60 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all shadow-sm backdrop-blur-sm z-50"
+      >
+        <Home className="w-3.5 h-3.5" />
+        <span>Back to Home</span>
+      </Link>
+
       {/* Dynamic Background Elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-primary/10 blur-[80px] md:blur-[120px] rounded-full -z-10 animate-pulse" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[250px] md:w-[400px] h-[250px] md:h-[400px] bg-accent/5 blur-[80px] md:blur-[120px] rounded-full -z-10" />
@@ -55,7 +65,7 @@ export default function LoginForm() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-white p-6 md:p-10 rounded-[2.5rem] shadow-xl border border-slate-100"
+        className="w-full max-w-md glass-dark p-6 md:p-10 rounded-[2.5rem] shadow-2xl"
       >
         <div className="text-center mb-8">
           <motion.div 
@@ -67,8 +77,8 @@ export default function LoginForm() {
             <Activity className="w-7 h-7 text-primary" />
           </motion.div>
           <span className="text-[10px] font-black uppercase tracking-[0.25em] text-primary">Clinical Portal</span>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 mt-2 font-outfit">Sign In to PulseID</h1>
-          <p className="text-slate-500 text-sm mt-1.5 font-medium">Access your secure emergency medical profile.</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white mt-2 font-outfit">Sign In to PulseID</h1>
+          <p className="text-slate-400 text-sm mt-1.5 font-medium">Access your secure emergency medical profile.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -77,17 +87,22 @@ export default function LoginForm() {
               <input 
                 id="email"
                 type="email" name="email" value={formData.email} onChange={handleChange}
-                className="w-full bg-transparent border-none outline-none text-[15px] text-slate-900 placeholder:text-slate-400" 
+                className="w-full bg-transparent border-none outline-none text-[15px] text-white placeholder:text-slate-500" 
                 placeholder="name@example.com" required 
               />
             </InputGroup>
             <InputGroup icon={<Lock className="w-5 h-5" />} label="Password" id="password">
-              <input 
-                id="password"
-                type="password" name="password" value={formData.password} onChange={handleChange}
-                className="w-full bg-transparent border-none outline-none text-[15px] text-slate-900 placeholder:text-slate-400" 
-                placeholder="••••••••" required 
-              />
+              <div className="relative flex items-center w-full flex-1">
+                <input 
+                  id="password"
+                  type={showPassword ? "text" : "password"} name="password" value={formData.password} onChange={handleChange}
+                  className="w-full bg-transparent border-none outline-none text-[15px] text-white placeholder:text-slate-500 pr-8" 
+                  placeholder="Enter Password" required 
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 text-slate-400 hover:text-white transition-colors focus:outline-none flex items-center justify-center h-full">
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </InputGroup>
           </div>
 
@@ -110,8 +125,8 @@ export default function LoginForm() {
           </motion.button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-          <p className="text-sm text-slate-500 font-medium">
+        <div className="mt-8 pt-6 border-t border-white/10 text-center">
+          <p className="text-sm text-slate-400 font-medium">
             Don&apos;t have an account? <Link href="/register" className="text-primary font-bold hover:underline underline-offset-4">Create PulseID</Link>
           </p>
         </div>
@@ -123,8 +138,8 @@ export default function LoginForm() {
 function InputGroup({ icon, label, children, id }: { icon: React.ReactNode, label: string, children: React.ReactNode, id: string }) {
   return (
     <div className="space-y-2 text-left">
-      <label htmlFor={id} className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] ml-1">{label}</label>
-      <div className="flex items-center gap-3.5 px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-primary/50 focus-within:bg-white transition-all duration-300">
+      <label htmlFor={id} className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.15em] ml-1">{label}</label>
+      <div className="flex items-center gap-3.5 px-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl focus-within:border-primary/50 focus-within:bg-white/10 transition-all duration-300">
         <div className="text-slate-400">
           {icon}
         </div>

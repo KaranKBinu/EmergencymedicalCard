@@ -20,7 +20,7 @@ export async function registerUser(formData: any) {
   const { 
     email, password, fullName, bloodGroup, gender, 
     emergencyName, emergencyPhone, dob, address,
-    height, weight, allergies, medicalConditions, medicalNotes, photoUrl
+    height, weight, allergies, medicalConditions, currentMedications, medicalNotes, photoUrl
   } = formData;
 
   try {
@@ -49,8 +49,9 @@ export async function registerUser(formData: any) {
         weight: weight || "",
         medicalNotes: medicalNotes || "",
         photoUrl: photoUrl || null,
-        allergies: allergies ? allergies.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
-        medicalConditions: medicalConditions ? medicalConditions.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
+        allergies: Array.isArray(allergies) ? allergies : (allergies ? allergies.split(',').map((s: string) => s.trim()).filter(Boolean) : []),
+        medicalConditions: Array.isArray(medicalConditions) ? medicalConditions : (medicalConditions ? medicalConditions.split(',').map((s: string) => s.trim()).filter(Boolean) : []),
+        currentMedications: Array.isArray(currentMedications) ? currentMedications : (currentMedications ? currentMedications.split(',').map((s: string) => s.trim()).filter(Boolean) : []),
       }
     });
 
@@ -58,6 +59,18 @@ export async function registerUser(formData: any) {
   } catch (error) {
     console.error("Registration error:", error);
     return { error: "Failed to create account" };
+  }
+}
+
+export async function checkEmailExists(email: string) {
+  try {
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+    return { exists: !!existingUser };
+  } catch (error) {
+    console.error("Error checking email:", error);
+    return { error: "Failed to check email" };
   }
 }
 
