@@ -11,28 +11,28 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* Landing Page Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
+    <div className="flex flex-col min-h-screen text-white">
+      {/* Landing Page Navbar — glass over fixed bg */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/5 backdrop-blur-2xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-sky-500/30">
               <Activity className="w-5 h-5 text-white" />
             </div>
-            <span className="font-black font-outfit tracking-tight text-xl text-slate-800">
-              Pulse<span className="text-primary">ID</span>
+            <span className="font-black font-outfit tracking-tight text-xl text-white">
+              Pulse<span className="text-sky-400">ID</span>
             </span>
           </div>
           <div className="flex items-center gap-6">
             <Link 
               href="/login" 
-              className="text-sm font-bold text-slate-600 hover:text-primary transition-colors"
+              className="text-sm font-bold text-white/70 hover:text-white transition-colors"
             >
               Sign In
             </Link>
             <Link 
               href="/register" 
-              className="px-5 py-2.5 bg-primary hover:bg-sky-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-sky-500/10 hover:shadow-sky-500/20"
+              className="px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-sky-500/30 hover:shadow-sky-500/40"
             >
               Get Free ID
             </Link>
@@ -40,28 +40,26 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative pt-40 pb-24 overflow-hidden bg-white">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[550px] bg-primary/10 blur-[120px] rounded-full -z-10 opacity-70" />
-        
+      {/* Hero Section — transparent, bg comes from fixed layout layer */}
+      <section className="relative pt-48 pb-32 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-xs font-bold text-primary mb-8 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-900/60 border border-sky-500/30 text-xs font-bold text-sky-300 mb-8 shadow-sm backdrop-blur-sm">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-400"></span>
             </span>
             Life-Saving Emergency Medical Card
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 text-slate-900 leading-tight max-w-4xl mx-auto font-outfit">
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 text-white leading-tight max-w-4xl mx-auto font-outfit">
             Your Medical History <br />
-            <span className="text-primary relative inline-block">
+            <span className="text-sky-400 relative inline-block">
               Saves Your Life
-              <span className="absolute bottom-2 left-0 w-full h-3 bg-primary/10 -z-10 rounded"></span>
+              <span className="absolute bottom-2 left-0 w-full h-3 bg-sky-400/15 -z-10 rounded"></span>
             </span>.
           </h1>
           
-          <p className="max-w-2xl mx-auto text-slate-500 text-lg sm:text-xl mb-12 leading-relaxed font-medium">
+          <p className="max-w-2xl mx-auto text-sky-200/75 text-lg sm:text-xl mb-12 leading-relaxed font-medium">
             Create your secure digital emergency profile in minutes. Generate a unique, scannable QR code 
             for first responders to access your vital health data when every second counts.
           </p>
@@ -69,7 +67,7 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
             <Link 
               href="/register" 
-              className="px-8 py-5 bg-primary text-white rounded-2xl font-bold hover:bg-sky-600 transition-all w-full text-center shadow-lg shadow-sky-500/20 flex items-center justify-center gap-2 group"
+              className="px-8 py-5 bg-sky-500 text-white rounded-2xl font-bold hover:bg-sky-400 transition-all w-full text-center shadow-lg shadow-sky-500/30 flex items-center justify-center gap-2 group"
             >
               Get Started Free <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -77,27 +75,27 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-24 bg-slate-50 border-t border-slate-100">
+      {/* Features Grid — glass panels */}
+      <section className="py-24 border-t border-white/8">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary">Key Benefits</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-outfit tracking-tight">Engineered for Rapid Assistance</h2>
-            <p className="text-slate-500 font-medium">Designed alongside medical guidelines to ensure EMTs and doctors get critical facts immediately.</p>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-sky-400">Key Benefits</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-outfit tracking-tight">Engineered for Rapid Assistance</h2>
+            <p className="text-white/50 font-medium">Designed alongside medical guidelines to ensure EMTs and doctors get critical facts immediately.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FeatureCard 
-              icon={<Zap className="w-6 h-6 text-primary" />}
+              icon={<Zap className="w-6 h-6 text-sky-400" />}
               title="Instant Scan System"
               description="EMTs can scan your card's QR code using any smartphone to instantly see your blood type, chronic conditions, and allergies."
             />
             <FeatureCard 
-              icon={<Shield className="w-6 h-6 text-teal-600" />}
+              icon={<Shield className="w-6 h-6 text-teal-400" />}
               title="HIPAA & Privacy First"
               description="You have full control over what data is public. Hide sensitive medical records behind your private user dashboard securely."
             />
             <FeatureCard 
-              icon={<QrCode className="w-6 h-6 text-slate-700" />}
+              icon={<QrCode className="w-6 h-6 text-white/70" />}
               title="Wallet-Ready & Print"
               description="Download your digital pass to your phone wallet, save as an offline image, or print a high-resolution wallet-sized card."
             />
@@ -105,31 +103,31 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* How it Works Step-by-Step */}
-      <section className="py-24 bg-white border-t border-slate-100">
+      {/* How it Works */}
+      <section className="py-24 border-t border-white/8">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-20 space-y-4">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary">Process Flow</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-outfit tracking-tight">How PulseID Protects You</h2>
-            <p className="text-slate-500 font-medium">Three simple steps to secure your clinical identity and prepare for unexpected emergencies.</p>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-sky-400">Process Flow</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-outfit tracking-tight">How PulseID Protects You</h2>
+            <p className="text-white/50 font-medium">Three simple steps to secure your clinical identity and prepare for unexpected emergencies.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
             <StepItem 
               num="01"
-              icon={<UserPlus className="w-6 h-6 text-primary" />}
+              icon={<UserPlus className="w-6 h-6 text-sky-400" />}
               title="Fill Out Vitals Profile"
               description="Enter your biological gender, blood group, chronic diseases, current medication details, and allergy warnings."
             />
             <StepItem 
               num="02"
-              icon={<FileText className="w-6 h-6 text-teal-600" />}
+              icon={<FileText className="w-6 h-6 text-teal-400" />}
               title="Generate Scannable Card"
               description="Our system automatically formats a clean, medical-grade card preview with a unique QR code linked to your public emergency page."
             />
             <StepItem 
               num="03"
-              icon={<Sparkles className="w-6 h-6 text-[#ef4444]" />}
+              icon={<Sparkles className="w-6 h-6 text-red-400" />}
               title="First Responders Scan"
               description="In an emergency event, responders scan the physical card to immediately view vital data and speed up triage decisions."
             />
@@ -138,25 +136,25 @@ export default async function Home() {
       </section>
       
       {/* Card Preview Section */}
-      <section className="py-24 border-t border-slate-100 bg-slate-50">
+      <section className="py-24 border-t border-white/8">
         <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1 text-left space-y-6">
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary">Card Interface</span>
-            <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 font-outfit leading-tight">
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-sky-400">Card Interface</span>
+            <h2 className="text-4xl font-extrabold tracking-tight text-white font-outfit leading-tight">
               The Card That <br/> Speaks For You.
             </h2>
-            <p className="text-slate-500 leading-relaxed font-medium text-lg">
+            <p className="text-white/55 leading-relaxed font-medium text-lg">
               When communication is impossible, your physical medical pass ensures doctors, EMTs, and good samaritans know exactly how to handle your treatment.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               {[
-                { label: 'One-tap emergency call', icon: <Heart className="w-4 h-4 text-primary fill-primary/10" /> },
-                { label: 'Allergy warning badges', icon: <AlertCircle className="w-4 h-4 text-[#ef4444] fill-red-50" /> },
-                { label: 'Blood group indicator', icon: <Activity className="w-4 h-4 text-teal-600" /> },
-                { label: 'Printed wallet pass size', icon: <QrCode className="w-4 h-4 text-slate-600" /> }
+                { label: 'One-tap emergency call', icon: <Heart className="w-4 h-4 text-sky-400 fill-sky-400/20" /> },
+                { label: 'Allergy warning badges', icon: <AlertCircle className="w-4 h-4 text-red-400 fill-red-400/10" /> },
+                { label: 'Blood group indicator', icon: <Activity className="w-4 h-4 text-teal-400" /> },
+                { label: 'Printed wallet pass size', icon: <QrCode className="w-4 h-4 text-white/60" /> }
               ].map((item) => (
-                <div key={item.label} className="flex items-center gap-3 text-slate-700 font-semibold text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                <div key={item.label} className="flex items-center gap-3 text-white/70 font-semibold text-sm">
+                  <div className="w-8 h-8 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center" style={{background:'rgba(255,255,255,0.08)'}}>
                     {item.icon}
                   </div>
                   {item.label}
@@ -166,8 +164,7 @@ export default async function Home() {
           </div>
           
           <div className="flex-1 w-full flex justify-center">
-            <div className="rounded-[2.5rem] p-8 aspect-[1.58/1] w-full max-w-md shadow-2xl relative overflow-hidden group border border-slate-200/50 bg-gradient-to-br from-sky-600 via-blue-600 to-blue-800 text-white transform hover:scale-[1.02] transition-transform duration-300">
-              {/* Card Hologram stripes */}
+            <div className="rounded-[2.5rem] p-8 aspect-[1.58/1] w-full max-w-md shadow-2xl relative overflow-hidden group border border-white/15 bg-gradient-to-br from-sky-600 via-blue-600 to-blue-800 text-white transform hover:scale-[1.02] transition-transform duration-300">
               <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/10 blur-[40px] rounded-full" />
               <div className="absolute top-8 right-8">
                 <QrCode className="w-20 h-20 text-white opacity-30 group-hover:opacity-60 transition-opacity" />
@@ -190,22 +187,22 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Professional Clinical Footer */}
-      <footer className="bg-white border-t border-slate-100 py-12 text-center">
+      {/* Footer */}
+      <footer className="border-t border-white/8 py-12 text-center" style={{background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)'}}>
         <div className="max-w-7xl mx-auto px-6 space-y-6">
           <div className="flex items-center justify-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Activity className="w-4 h-4 text-white" />
             </div>
-            <span className="font-black font-outfit tracking-tight text-lg text-slate-800">
-              Pulse<span className="text-primary">ID</span>
+            <span className="font-black font-outfit tracking-tight text-lg text-white">
+              Pulse<span className="text-sky-400">ID</span>
             </span>
           </div>
-          <p className="text-xs text-slate-400 max-w-xl mx-auto leading-relaxed font-medium">
+          <p className="text-xs text-white/35 max-w-xl mx-auto leading-relaxed font-medium">
             PulseID is a secure clinical digital information pass. We prioritize security and encryption protocols. 
             Medical records listed on public QR endpoints are solely managed and consented to by the profile owner.
           </p>
-          <div className="text-[11px] text-slate-300 font-bold uppercase tracking-wider">
+          <div className="text-[11px] text-white/25 font-bold uppercase tracking-wider">
             &copy; 2026 PulseID. All rights reserved.
           </div>
         </div>
@@ -216,12 +213,12 @@ export default async function Home() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <div className="bg-white p-8 rounded-3xl border border-slate-100 hover:border-sky-100 hover:shadow-lg hover:shadow-sky-500/5 transition-all duration-300 shadow-sm cursor-default">
-      <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center mb-6">
+    <div className="p-8 rounded-3xl border border-white/10 hover:border-sky-500/30 transition-all duration-300 cursor-default group" style={{background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)'}}>
+      <div className="w-12 h-12 rounded-2xl border border-white/10 flex items-center justify-center mb-6 group-hover:border-sky-500/30 transition-colors" style={{background: 'rgba(255,255,255,0.08)'}}>
         {icon}
       </div>
-      <h3 className="text-xl font-extrabold text-slate-800 mb-3 tracking-tight font-outfit">{title}</h3>
-      <p className="text-slate-500 text-sm leading-relaxed font-medium">
+      <h3 className="text-xl font-extrabold text-white mb-3 tracking-tight font-outfit">{title}</h3>
+      <p className="text-white/50 text-sm leading-relaxed font-medium">
         {description}
       </p>
     </div>
@@ -232,13 +229,13 @@ function StepItem({ num, icon, title, description }: { num: string, icon: React.
   return (
     <div className="relative space-y-4">
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
+        <div className="w-12 h-12 rounded-2xl border border-white/10 flex items-center justify-center" style={{background: 'rgba(255,255,255,0.07)'}}>
           {icon}
         </div>
-        <div className="text-3xl font-black text-slate-200 font-outfit tracking-tight">{num}</div>
+        <div className="text-3xl font-black text-white/15 font-outfit tracking-tight">{num}</div>
       </div>
-      <h3 className="text-lg font-black text-slate-850 tracking-tight font-outfit">{title}</h3>
-      <p className="text-slate-500 text-sm leading-relaxed font-medium">{description}</p>
+      <h3 className="text-lg font-black text-white tracking-tight font-outfit">{title}</h3>
+      <p className="text-white/50 text-sm leading-relaxed font-medium">{description}</p>
     </div>
   );
 }

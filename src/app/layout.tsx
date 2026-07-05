@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import MedicalAnimatedBgClient from "@/components/MedicalAnimatedBgClient";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -19,8 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body className={`${inter.variable} ${outfit.variable} font-inter antialiased`}>
+        {/* Global fixed animated medical background — covers entire app, doesn't scroll */}
+        <MedicalAnimatedBgClient theme="blue" fixed={true} />
         <Toaster position="top-right" />
-        <main className="min-h-screen">
+        <main className="relative min-h-screen" style={{ zIndex: 1 }}>
           {children}
         </main>
       </body>

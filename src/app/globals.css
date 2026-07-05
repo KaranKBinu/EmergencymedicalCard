@@ -38,7 +38,9 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply antialiased;
+    background-color: #0a1628;
+    color: #ffffff;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -118,4 +120,10 @@
   background: #94a3b8;
   border: 2px solid transparent;
   background-clip: padding-box;
+}
+
+/* Medical Background — ensure content layers above */
+.med-bg-content {
+  position: relative;
+  z-index: 1;
 }

@@ -66,7 +66,18 @@ export default function RegisterForm() {
         const defaultCountry = formatted.find(c => c.code === "IN") || formatted[0];
         setSelectedCountry(defaultCountry);
       } catch (error) {
-        console.error("Failed to fetch countries", error);
+        console.error("Failed to fetch countries, using fallback list.", error);
+        const fallbackCountries: Country[] = [
+          { name: "India", flag: "https://flagcdn.com/w320/in.png", code: "IN", dialCode: "+91" },
+          { name: "United States", flag: "https://flagcdn.com/w320/us.png", code: "US", dialCode: "+1" },
+          { name: "United Kingdom", flag: "https://flagcdn.com/w320/gb.png", code: "GB", dialCode: "+44" },
+          { name: "Canada", flag: "https://flagcdn.com/w320/ca.png", code: "CA", dialCode: "+1" },
+          { name: "Australia", flag: "https://flagcdn.com/w320/au.png", code: "AU", dialCode: "+61" },
+          { name: "Germany", flag: "https://flagcdn.com/w320/de.png", code: "DE", dialCode: "+49" },
+          { name: "United Arab Emirates", flag: "https://flagcdn.com/w320/ae.png", code: "AE", dialCode: "+971" }
+        ];
+        setCountries(fallbackCountries);
+        setSelectedCountry(fallbackCountries[0]);
       }
     }
     fetchCountries();
