@@ -69,7 +69,6 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
   const containerRef = useRef<HTMLDivElement>(null);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [mounted, setMounted] = useState(false);
-  const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
   const [dims, setDims] = useState({ w: 1440, h: 900 });
   const rafRef = useRef<number | null>(null);
   const targetMouse = useRef({ x: 0.5, y: 0.5 });
@@ -92,19 +91,35 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
 
     const el = containerRef.current;
     if (!el) return;
+
     const ro = new ResizeObserver((entries) => {
       const e = entries[0].contentRect;
       setDims({ w: e.width, h: e.height });
+      el.style.setProperty("--bg-width", e.width.toString());
+      el.style.setProperty("--bg-height", e.height.toString());
     });
     ro.observe(el);
-    setDims({ w: el.offsetWidth, h: el.offsetHeight });
+
+    const w = el.offsetWidth || 1440;
+    const h = el.offsetHeight || 900;
+    setDims({ w, h });
+    el.style.setProperty("--bg-width", w.toString());
+    el.style.setProperty("--bg-height", h.toString());
+    el.style.setProperty("--mouse-x", "0.5");
+    el.style.setProperty("--mouse-y", "0.5");
+
     window.addEventListener("mousemove", onMouseMove);
 
     const animate = () => {
       const lerp = 0.06;
       smoothMouse.current.x += (targetMouse.current.x - smoothMouse.current.x) * lerp;
       smoothMouse.current.y += (targetMouse.current.y - smoothMouse.current.y) * lerp;
-      setMouse({ x: smoothMouse.current.x, y: smoothMouse.current.y });
+      
+      const container = containerRef.current;
+      if (container) {
+        container.style.setProperty("--mouse-x", smoothMouse.current.x.toFixed(4));
+        container.style.setProperty("--mouse-y", smoothMouse.current.y.toFixed(4));
+      }
       rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
@@ -144,13 +159,6 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
 
   const ecgPath1 = buildEcgPath(dims.w, 80, ECG_CYCLES);
   const ecgPath2 = buildEcgPath(dims.w, 60, ECG_CYCLES);
-
-  // Cursor parallax offset
-  const orbDx = (mouse.x - 0.5) * 90;
-  const orbDy = (mouse.y - 0.5) * 65;
-
-  const cursorX = mouse.x * dims.w;
-  const cursorY = mouse.y * dims.h;
 
   // Render nothing (just the bg color div) until client mounts —
   // prevents hydration mismatch from Math.random() in particles
@@ -204,7 +212,7 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
             </feMerge>
           </filter>
           <filter id="mbg-orbblur">
-            <feGaussianBlur stdDeviation="70" />
+            <feGaussianBlur stdDeviation="60" />
           </filter>
           <filter id="mbg-partglow">
             <feGaussianBlur stdDeviation="1.8" result="b" />
@@ -213,19 +221,51 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+          <pattern id="mbg-dot-grid" width="38" height="38" patternUnits="userSpaceOnUse">
+            <circle cx="19" cy="19" r="1" fill={t.grid} />
+          </pattern>
         </defs>
 
-        {/* Dot grid */}
-        {Array.from({ length: Math.ceil(dims.w / 38) + 1 }, (_, col) =>
-          Array.from({ length: Math.ceil(dims.h / 38) + 1 }, (_, row) => (
-            <circle key={`${col}-${row}`} cx={col * 38} cy={row * 38} r={1} fill={t.grid} />
-          ))
-        )}
+        {/* Dot grid pattern — replaces 1,400+ separate DOM nodes */}
+        <rect width="100%" height="100%" fill="url(#mbg-dot-grid)" />
 
-        {/* Color orbs — parallax */}
-        <ellipse cx={dims.w * 0.22 + orbDx} cy={dims.h * 0.28 + orbDy} rx={dims.w * 0.4} ry={dims.h * 0.46} fill="url(#mbg-orb1)" filter="url(#mbg-orbblur)" />
-        <ellipse cx={dims.w * 0.8 + orbDx * 0.55} cy={dims.h * 0.7 + orbDy * 0.55} rx={dims.w * 0.34} ry={dims.h * 0.38} fill="url(#mbg-orb2)" filter="url(#mbg-orbblur)" />
-        <ellipse cx={dims.w * 0.6 - orbDx * 0.35} cy={dims.h * 0.12 - orbDy * 0.35} rx={dims.w * 0.24} ry={dims.h * 0.28} fill="url(#mbg-orb3)" filter="url(#mbg-orbblur)" />
+        {/* Color orbs — parallax using GPU-driven CSS transforms */}
+        <ellipse 
+          cx={dims.w * 0.22} 
+          cy={dims.h * 0.28} 
+          rx={dims.w * 0.4} 
+          ry={dims.h * 0.46} 
+          fill="url(#mbg-orb1)" 
+          filter="url(#mbg-orbblur)" 
+          style={{
+            transform: "translate(calc((var(--mouse-x, 0.5) - 0.5) * 90px), calc((var(--mouse-y, 0.5) - 0.5) * 65px))",
+            transformOrigin: "center",
+          }}
+        />
+        <ellipse 
+          cx={dims.w * 0.8} 
+          cy={dims.h * 0.7} 
+          rx={dims.w * 0.34} 
+          ry={dims.h * 0.38} 
+          fill="url(#mbg-orb2)" 
+          filter="url(#mbg-orbblur)" 
+          style={{
+            transform: "translate(calc((var(--mouse-x, 0.5) - 0.5) * 49.5px), calc((var(--mouse-y, 0.5) - 0.5) * 35.75px))",
+            transformOrigin: "center",
+          }}
+        />
+        <ellipse 
+          cx={dims.w * 0.6} 
+          cy={dims.h * 0.12} 
+          rx={dims.w * 0.24} 
+          ry={dims.h * 0.28} 
+          fill="url(#mbg-orb3)" 
+          filter="url(#mbg-orbblur)" 
+          style={{
+            transform: "translate(calc((var(--mouse-x, 0.5) - 0.5) * -31.5px), calc((var(--mouse-y, 0.5) - 0.5) * -22.75px))",
+            transformOrigin: "center",
+          }}
+        />
 
         {/* ECG Line 1 — 30% down */}
         <g transform={`translate(0, ${dims.h * 0.3 - 40})`} filter="url(#mbg-ecgglow)">
@@ -247,14 +287,8 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
         {particles.map((p) => {
           const px = (p.x / 100) * dims.w;
           const py = (p.y / 100) * dims.h;
-          const dx = px - cursorX;
-          const dy = py - cursorY;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const repulse = Math.max(0, 1 - dist / 200) * 40;
-          const fx = px + (dx / dist) * repulse;
-          const fy = py + (dy / dist) * repulse;
           const animDur = `${p.speed}s`;
-          const animVals = `${fx},${fy}; ${fx + p.drift},${fy - p.speed * 0.7}; ${fx},${fy}`;
+          const animVals = `${px},${py}; ${px + p.drift},${py - p.speed * 0.7}; ${px},${py}`;
 
           return (
             <g key={p.id} opacity={p.opacity} filter="url(#mbg-partglow)">
@@ -266,7 +300,7 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
                 begin={`${p.delay}s`}
                 repeatCount="indefinite"
               />
-              <g transform={`translate(${fx}, ${fy})`}>
+              <g transform={`translate(${px}, ${py})`}>
                 {p.type === "cross" && (
                   <>
                     <rect x={-p.size * 0.14} y={-p.size * 0.44} width={p.size * 0.28} height={p.size * 0.88} rx={p.size * 0.08} fill={t.particle} />
@@ -325,8 +359,18 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
           );
         })}
 
-        {/* Cursor glow orb */}
-        <ellipse cx={cursorX} cy={cursorY} rx={180} ry={180} fill="url(#mbg-cursor)" />
+        {/* Cursor glow orb via GPU-driven CSS transform */}
+        <ellipse 
+          cx={0} 
+          cy={0} 
+          rx={180} 
+          ry={180} 
+          fill="url(#mbg-cursor)" 
+          style={{
+            transform: "translate(calc(var(--mouse-x, 0.5) * var(--bg-width, 1440) * 1px), calc(var(--mouse-y, 0.5) * var(--bg-height, 900) * 1px))",
+            transformOrigin: "center",
+          }}
+        />
 
         {/* Big background medical cross — bottom right */}
         <g opacity="0.04" transform={`translate(${dims.w - 110}, ${dims.h - 110})`}>

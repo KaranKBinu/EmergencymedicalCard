@@ -5,10 +5,8 @@ import EmergencyCard from "@/components/EmergencyCard";
 import { QrCode, Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Activity, Pill, ChevronDown, FileText, Image as ImageIcon, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
-import { toPng } from "html-to-image";
 import { signOut } from "next-auth/react";
 import EditRecordModal from "@/components/EditRecordModal";
-import { jsPDF } from "jspdf";
 import MedicalAnimatedBgClient from "@/components/MedicalAnimatedBgClient";
 
 export default function DashboardClient({ initialData, userId }: { initialData: any, userId: string }) {
@@ -70,6 +68,7 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
     try {
       if (!frontRef.current || !backRef.current) return;
       
+      const { toPng } = await import("html-to-image");
       const frontDataUrl = await toPng(frontRef.current, { pixelRatio: 3 });
       const backDataUrl = await toPng(backRef.current, { pixelRatio: 3 });
       
@@ -93,6 +92,9 @@ export default function DashboardClient({ initialData, userId }: { initialData: 
     const toastId = toast.loading("Preparing your PDF document...");
     try {
       if (!frontRef.current || !backRef.current) return;
+      
+      const { toPng } = await import("html-to-image");
+      const { jsPDF } = await import("jspdf");
       
       // Capture both sides
       const frontImg = await toPng(frontRef.current, { pixelRatio: 2 });
