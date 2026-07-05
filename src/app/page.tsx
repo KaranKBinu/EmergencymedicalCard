@@ -202,8 +202,10 @@ export default async function Home() {
             PulseID is a secure clinical digital information pass. We prioritize security and encryption protocols. 
             Medical records listed on public QR endpoints are solely managed and consented to by the profile owner.
           </p>
-          <div className="text-[11px] text-white/25 font-bold uppercase tracking-wider">
-            &copy; 2026 PulseID. All rights reserved.
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-[11px] text-white/25 font-bold uppercase tracking-wider">
+            <span>&copy; 2026 PulseID. All rights reserved.</span>
+            <span className="hidden sm:inline">•</span>
+            <Link href="/privacy" className="hover:text-white/60 transition-colors underline">Privacy Policy & Disclaimer</Link>
           </div>
         </div>
       </footer>
