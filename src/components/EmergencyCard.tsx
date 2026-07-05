@@ -87,6 +87,12 @@ const formatWeight = (w?: string) => {
 
 /** Front face */
 function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: string }) {
+  const [isImgLoading, setIsImgLoading] = useState(true);
+
+  useEffect(() => {
+    setIsImgLoading(true);
+  }, [data.photoUrl]);
+
   return (
     <div className="relative h-full flex flex-col p-5 gap-2.5 select-none">
       {/* ── ROW 1: Premium Header ── */}
@@ -105,17 +111,26 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
         {/* Photo with tech frame */}
         <div className="relative shrink-0">
           <div className="w-[76px] h-[76px] rounded-2xl overflow-hidden border-2 border-cyan-500/25 bg-slate-900/50 flex items-center justify-center shadow-lg shadow-cyan-500/5">
-            {data.photoUrl
-              ? <Image 
+            {data.photoUrl ? (
+              <div className="relative w-full h-full">
+                {isImgLoading && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 animate-pulse flex items-center justify-center">
+                    <User className="w-8 h-8 text-slate-600/50" />
+                  </div>
+                )}
+                <Image 
                   src={data.photoUrl} 
                   alt={data.fullName} 
-                  className="w-full h-full object-cover" 
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${isImgLoading ? 'opacity-0' : 'opacity-100'}`}
                   width={76}
                   height={76}
                   priority={true}
+                  onLoad={() => setIsImgLoading(false)}
                 />
-              : <User className="w-9 h-9 text-slate-400" />
-            }
+              </div>
+            ) : (
+              <User className="w-9 h-9 text-slate-400" />
+            )}
           </div>
           {data.gender && (
             <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-slate-950 border border-cyan-500/30 flex items-center justify-center backdrop-blur-md shadow-md">
