@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Droplets, User, Activity, Scale, Ruler, Info, Calendar } from "lucide-react";
+import { Phone, Droplets, User, Activity, Scale, Ruler, Info, Calendar, AlertTriangle } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useRef } from "react";
 

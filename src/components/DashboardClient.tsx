@@ -364,19 +364,16 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
                   icon={<Droplets className="w-4 h-4 text-primary fill-primary/10" />} 
                   label="Blood Group" 
                   value={initialData.bloodGroup} 
-                  accent="border-slate-100 bg-slate-50/50"
                 />
                 <StatusCard 
                   icon={<Calendar className="w-4 h-4 text-teal-600" />} 
                   label="Date of Birth" 
                   value={initialData.dob || "Not Set"} 
-                  accent="border-slate-100 bg-slate-50/50"
                 />
                 <StatusCard 
                   icon={<Phone className="w-4 h-4 text-emerald-600 fill-emerald-600/10" />} 
                   label="Emergency Call" 
                   value={initialData.emergencyPhone} 
-                  accent="border-slate-100 bg-slate-50/50"
                 />
                 <div className="p-4 rounded-2xl border border-white/8 space-y-2" style={{background:'rgba(255,255,255,0.03)'}}>
                   <div className="flex items-center gap-2 text-[10px] font-black text-white/40 uppercase tracking-widest">
