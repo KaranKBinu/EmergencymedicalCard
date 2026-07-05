@@ -24,7 +24,7 @@ interface MedicalAnimatedBgProps {
   className?: string;
 }
 
-const PARTICLE_COUNT = 22;
+const PARTICLE_COUNT = 10;
 const ECG_CYCLES = 3;
 
 function generateParticles(): Particle[] {
@@ -69,18 +69,29 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
   const containerRef = useRef<HTMLDivElement>(null);
   const [particles] = useState<Particle[]>(generateParticles);
   const [dims, setDims] = useState({ w: 1440, h: 900 });
+  const rectRef = useRef<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 1440, height: 900 });
   const rafRef = useRef<number | null>(null);
   const targetMouse = useRef({ x: 0.5, y: 0.5 });
   const smoothMouse = useRef({ x: 0.5, y: 0.5 });
+  const [isReady, setIsReady] = useState(false);
 
   const onMouseMove = useCallback((e: MouseEvent) => {
-    const el = containerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
+    const rect = rectRef.current;
+    if (rect.width === 0 || rect.height === 0) return;
     targetMouse.current = {
       x: (e.clientX - rect.left) / rect.width,
       y: (e.clientY - rect.top) / rect.height,
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 640) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 1200);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -92,6 +103,14 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
       setDims({ w: e.width, h: e.height });
       el.style.setProperty("--bg-width", e.width.toString());
       el.style.setProperty("--bg-height", e.height.toString());
+
+      const r = el.getBoundingClientRect();
+      rectRef.current = {
+        left: r.left,
+        top: r.top,
+        width: r.width || 1440,
+        height: r.height || 900,
+      };
     });
     ro.observe(el);
 
@@ -102,6 +121,22 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
     el.style.setProperty("--bg-height", h.toString());
     el.style.setProperty("--mouse-x", "0.5");
     el.style.setProperty("--mouse-y", "0.5");
+
+    const initialRect = el.getBoundingClientRect();
+    rectRef.current = {
+      left: initialRect.left,
+      top: initialRect.top,
+      width: initialRect.width || 1440,
+      height: initialRect.height || 900,
+    };
+
+    return () => {
+      ro.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isReady) return;
 
     window.addEventListener("mousemove", onMouseMove);
 
@@ -120,11 +155,10 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      ro.disconnect();
       window.removeEventListener("mousemove", onMouseMove);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [onMouseMove]);
+  }, [onMouseMove, isReady]);
 
   const themes = {
     light: {
@@ -155,8 +189,6 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
   const ecgPath1 = buildEcgPath(dims.w, 80, ECG_CYCLES);
   const ecgPath2 = buildEcgPath(dims.w, 60, ECG_CYCLES);
 
-
-
   return (
     <div
       ref={containerRef}
@@ -164,6 +196,73 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
       aria-hidden="true"
       style={{ background: t.bg }}
     >
+      {/* GPU Accelerated Color Orbs */}
+      <div 
+        className="absolute rounded-full pointer-events-none opacity-80"
+        style={{
+          left: "22%",
+          top: "28%",
+          width: "80vw",
+          height: "92vh",
+          transform: isReady 
+            ? "translate(-50%, -50%) translate(calc((var(--mouse-x, 0.5) - 0.5) * 90px), calc((var(--mouse-y, 0.5) - 0.5) * 65px))"
+            : "translate(-50%, -50%)",
+          background: `radial-gradient(circle, ${t.orb1} 0%, transparent 70%)`,
+          filter: "blur(90px)",
+          willChange: "transform",
+          transition: isReady ? "none" : "transform 0.5s ease-out",
+        }}
+      />
+      <div 
+        className="absolute rounded-full pointer-events-none opacity-80"
+        style={{
+          left: "80%",
+          top: "70%",
+          width: "68vw",
+          height: "76vh",
+          transform: isReady 
+            ? "translate(-50%, -50%) translate(calc((var(--mouse-x, 0.5) - 0.5) * 49.5px), calc((var(--mouse-y, 0.5) - 0.5) * 35.75px))"
+            : "translate(-50%, -50%)",
+          background: `radial-gradient(circle, ${t.orb2} 0%, transparent 70%)`,
+          filter: "blur(90px)",
+          willChange: "transform",
+          transition: isReady ? "none" : "transform 0.5s ease-out",
+        }}
+      />
+      <div 
+        className="absolute rounded-full pointer-events-none opacity-80"
+        style={{
+          left: "60%",
+          top: "12%",
+          width: "48vw",
+          height: "56vh",
+          transform: isReady 
+            ? "translate(-50%, -50%) translate(calc((var(--mouse-x, 0.5) - 0.5) * -31.5px), calc((var(--mouse-y, 0.5) - 0.5) * -22.75px))"
+            : "translate(-50%, -50%)",
+          background: `radial-gradient(circle, ${t.orb3} 0%, transparent 70%)`,
+          filter: "blur(90px)",
+          willChange: "transform",
+          transition: isReady ? "none" : "transform 0.5s ease-out",
+        }}
+      />
+
+      {/* GPU Accelerated Cursor Glow Orb */}
+      {isReady && (
+        <div 
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: "360px",
+            height: "360px",
+            left: "0",
+            top: "0",
+            transform: "translate(-50%, -50%) translate(calc(var(--mouse-x, 0.5) * var(--bg-width, 1440) * 1px), calc(var(--mouse-y, 0.5) * var(--bg-height, 900) * 1px))",
+            background: "radial-gradient(circle, rgba(14,165,233,0.18) 0%, transparent 70%)",
+            filter: "blur(20px)",
+            willChange: "transform",
+          }}
+        />
+      )}
+
       <svg
         width="100%"
         height="100%"
@@ -172,39 +271,6 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
         style={{ position: "absolute", inset: 0 }}
       >
         <defs>
-          <radialGradient id="mbg-orb1" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={t.orb1} />
-            <stop offset="100%" stopColor="transparent" />
-          </radialGradient>
-          <radialGradient id="mbg-orb2" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={t.orb2} />
-            <stop offset="100%" stopColor="transparent" />
-          </radialGradient>
-          <radialGradient id="mbg-orb3" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={t.orb3} />
-            <stop offset="100%" stopColor="transparent" />
-          </radialGradient>
-          <radialGradient id="mbg-cursor" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(14,165,233,0.18)" />
-            <stop offset="100%" stopColor="transparent" />
-          </radialGradient>
-          <filter id="mbg-ecgglow" x="-20%" y="-200%" width="140%" height="500%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <filter id="mbg-orbblur">
-            <feGaussianBlur stdDeviation="60" />
-          </filter>
-          <filter id="mbg-partglow">
-            <feGaussianBlur stdDeviation="1.8" result="b" />
-            <feMerge>
-              <feMergeNode in="b" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
           <pattern id="mbg-dot-grid" width="38" height="38" patternUnits="userSpaceOnUse">
             <circle cx="19" cy="19" r="1" fill={t.grid} />
           </pattern>
@@ -213,69 +279,43 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
         {/* Dot grid pattern — replaces 1,400+ separate DOM nodes */}
         <rect width="100%" height="100%" fill="url(#mbg-dot-grid)" />
 
-        {/* Color orbs — parallax using GPU-driven CSS transforms */}
-        <ellipse 
-          cx={dims.w * 0.22} 
-          cy={dims.h * 0.28} 
-          rx={dims.w * 0.4} 
-          ry={dims.h * 0.46} 
-          fill="url(#mbg-orb1)" 
-          filter="url(#mbg-orbblur)" 
-          style={{
-            transform: "translate(calc((var(--mouse-x, 0.5) - 0.5) * 90px), calc((var(--mouse-y, 0.5) - 0.5) * 65px))",
-            transformOrigin: "center",
-          }}
-        />
-        <ellipse 
-          cx={dims.w * 0.8} 
-          cy={dims.h * 0.7} 
-          rx={dims.w * 0.34} 
-          ry={dims.h * 0.38} 
-          fill="url(#mbg-orb2)" 
-          filter="url(#mbg-orbblur)" 
-          style={{
-            transform: "translate(calc((var(--mouse-x, 0.5) - 0.5) * 49.5px), calc((var(--mouse-y, 0.5) - 0.5) * 35.75px))",
-            transformOrigin: "center",
-          }}
-        />
-        <ellipse 
-          cx={dims.w * 0.6} 
-          cy={dims.h * 0.12} 
-          rx={dims.w * 0.24} 
-          ry={dims.h * 0.28} 
-          fill="url(#mbg-orb3)" 
-          filter="url(#mbg-orbblur)" 
-          style={{
-            transform: "translate(calc((var(--mouse-x, 0.5) - 0.5) * -31.5px), calc((var(--mouse-y, 0.5) - 0.5) * -22.75px))",
-            transformOrigin: "center",
-          }}
-        />
+        {/* ECG Line 1 — 30% down with CSS-driven double path glow */}
+        {isReady && dims.w >= 640 && (
+          <g transform={`translate(0, ${dims.h * 0.3 - 40})`}>
+            <path d={ecgPath1} fill="none" stroke={t.ecg} strokeWidth="5.5" opacity="0.22" strokeLinecap="round" strokeLinejoin="round">
+              <animate attributeName="stroke-dashoffset" from={dims.w} to={-dims.w} dur="6s" repeatCount="indefinite" />
+              <animate attributeName="stroke-dasharray" values={`0 ${dims.w * 2}; ${dims.w * 0.5} ${dims.w * 1.5}; 0 ${dims.w * 2}`} dur="6s" repeatCount="indefinite" />
+            </path>
+            <path d={ecgPath1} fill="none" stroke={t.ecg} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <animate attributeName="stroke-dashoffset" from={dims.w} to={-dims.w} dur="6s" repeatCount="indefinite" />
+              <animate attributeName="stroke-dasharray" values={`0 ${dims.w * 2}; ${dims.w * 0.5} ${dims.w * 1.5}; 0 ${dims.w * 2}`} dur="6s" repeatCount="indefinite" />
+            </path>
+          </g>
+        )}
 
-        {/* ECG Line 1 — 30% down */}
-        <g transform={`translate(0, ${dims.h * 0.3 - 40})`} filter="url(#mbg-ecgglow)">
-          <path d={ecgPath1} fill="none" stroke={t.ecg} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <animate attributeName="stroke-dashoffset" from={dims.w} to={-dims.w} dur="6s" repeatCount="indefinite" />
-            <animate attributeName="stroke-dasharray" values={`0 ${dims.w * 2}; ${dims.w * 0.5} ${dims.w * 1.5}; 0 ${dims.w * 2}`} dur="6s" repeatCount="indefinite" />
-          </path>
-        </g>
+        {/* ECG Line 2 — 72% down with CSS-driven double path glow */}
+        {isReady && dims.w >= 640 && (
+          <g transform={`translate(0, ${dims.h * 0.72 - 30})`}>
+            <path d={ecgPath2} fill="none" stroke={t.ecg} strokeWidth="4.0" opacity="0.12" strokeLinecap="round" strokeLinejoin="round">
+              <animate attributeName="stroke-dashoffset" from={dims.w} to={-dims.w} dur="8s" begin="-3s" repeatCount="indefinite" />
+              <animate attributeName="stroke-dasharray" values={`0 ${dims.w * 2}; ${dims.w * 0.5} ${dims.w * 1.5}; 0 ${dims.w * 2}`} dur="8s" begin="-3s" repeatCount="indefinite" />
+            </path>
+            <path d={ecgPath2} fill="none" stroke={t.ecg} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6">
+              <animate attributeName="stroke-dashoffset" from={dims.w} to={-dims.w} dur="8s" begin="-3s" repeatCount="indefinite" />
+              <animate attributeName="stroke-dasharray" values={`0 ${dims.w * 2}; ${dims.w * 0.5} ${dims.w * 1.5}; 0 ${dims.w * 2}`} dur="8s" begin="-3s" repeatCount="indefinite" />
+            </path>
+          </g>
+        )}
 
-        {/* ECG Line 2 — 72% down */}
-        <g transform={`translate(0, ${dims.h * 0.72 - 30})`} filter="url(#mbg-ecgglow)">
-          <path d={ecgPath2} fill="none" stroke={t.ecg} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6">
-            <animate attributeName="stroke-dashoffset" from={dims.w} to={-dims.w} dur="8s" begin="-3s" repeatCount="indefinite" />
-            <animate attributeName="stroke-dasharray" values={`0 ${dims.w * 2}; ${dims.w * 0.5} ${dims.w * 1.5}; 0 ${dims.w * 2}`} dur="8s" begin="-3s" repeatCount="indefinite" />
-          </path>
-        </g>
-
-        {/* Floating particles */}
-        {particles.map((p) => {
+        {/* Floating particles (optimized without SVG blur filters) */}
+        {isReady && dims.w >= 640 && particles.map((p) => {
           const px = (p.x / 100) * dims.w;
           const py = (p.y / 100) * dims.h;
           const animDur = `${p.speed}s`;
           const animVals = `${px},${py}; ${px + p.drift},${py - p.speed * 0.7}; ${px},${py}`;
 
           return (
-            <g key={p.id} opacity={p.opacity} filter="url(#mbg-partglow)">
+            <g key={p.id} opacity={p.opacity}>
               <animateTransform
                 attributeName="transform"
                 type="translate"
@@ -342,19 +382,6 @@ export default function MedicalAnimatedBg({ theme = "light", fixed = false, clas
             </g>
           );
         })}
-
-        {/* Cursor glow orb via GPU-driven CSS transform */}
-        <ellipse 
-          cx={0} 
-          cy={0} 
-          rx={180} 
-          ry={180} 
-          fill="url(#mbg-cursor)" 
-          style={{
-            transform: "translate(calc(var(--mouse-x, 0.5) * var(--bg-width, 1440) * 1px), calc(var(--mouse-y, 0.5) * var(--bg-height, 900) * 1px))",
-            transformOrigin: "center",
-          }}
-        />
 
         {/* Big background medical cross — bottom right */}
         <g opacity="0.04" transform={`translate(${dims.w - 110}, ${dims.h - 110})`}>

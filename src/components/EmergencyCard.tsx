@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Droplets, User, Activity, Scale, Ruler, Info, Calendar, AlertTriangle } from "lucide-react";
+import { Phone, Droplets, User, Activity, Scale, Ruler, Info, Calendar, AlertTriangle, Mars, Venus, Transgender } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useRef } from "react";
+import Image from "next/image";
 
 interface EmergencyData {
   fullName: string;
@@ -23,12 +24,6 @@ interface EmergencyData {
   gender?: string;
   createdAt?: Date;
 }
-
-const GENDER_ICONS: Record<string, { icon: string, color: string }> = {
-  "MALE":   { icon: "https://api.iconify.design/ph:gender-male-bold.svg?color=%2393c5fd",   color: "text-blue-300" },
-  "FEMALE": { icon: "https://api.iconify.design/ph:gender-female-bold.svg?color=%23f9a8d4", color: "text-pink-300" },
-  "OTHER":  { icon: "https://api.iconify.design/ph:gender-intersex-bold.svg?color=%23c4b5fd", color: "text-purple-300" },
-};
 
 /* ── Card visual constants ── */
 const CARD_BG = 'linear-gradient(135deg, #040814 0%, #091026 40%, #130a21 80%, #1f0b20 100%)';
@@ -111,13 +106,22 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
         <div className="relative shrink-0">
           <div className="w-[76px] h-[76px] rounded-2xl overflow-hidden border-2 border-cyan-500/25 bg-slate-900/50 flex items-center justify-center shadow-lg shadow-cyan-500/5">
             {data.photoUrl
-              ? <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" />
-              : <User className="w-9 h-9 text-slate-500" />
+              ? <Image 
+                  src={data.photoUrl} 
+                  alt={data.fullName} 
+                  className="w-full h-full object-cover" 
+                  width={76}
+                  height={76}
+                  priority={true}
+                />
+              : <User className="w-9 h-9 text-slate-400" />
             }
           </div>
-          {data.gender && GENDER_ICONS[data.gender.toUpperCase()] && (
+          {data.gender && (
             <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-slate-950 border border-cyan-500/30 flex items-center justify-center backdrop-blur-md shadow-md">
-              <img src={GENDER_ICONS[data.gender.toUpperCase()].icon} alt={data.gender} className="w-4 h-4 object-contain" />
+              {data.gender.toUpperCase() === "MALE" && <Mars className="w-4 h-4 text-blue-300" aria-label="Male" />}
+              {data.gender.toUpperCase() === "FEMALE" && <Venus className="w-4 h-4 text-pink-300" aria-label="Female" />}
+              {data.gender.toUpperCase() === "OTHER" && <Transgender className="w-4 h-4 text-purple-300" aria-label="Other Gender" />}
             </div>
           )}
         </div>
@@ -147,7 +151,7 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
           <div className="p-1.5 bg-white rounded-2xl shadow-lg border border-cyan-500/10">
             <QRCodeSVG value={publicUrl} size={62} level="H" />
           </div>
-          <span className="text-[7px] font-black uppercase tracking-[0.2em] text-cyan-400/60">Scan Profile</span>
+          <span className="text-[7px] font-black uppercase tracking-[0.2em] text-cyan-400">Scan Profile</span>
         </div>
       </div>
 
@@ -164,7 +168,7 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
                     <span key={a} className="px-1.5 py-0.5 rounded-[4px] text-[7.5px] font-bold bg-rose-500/10 text-rose-300 border border-rose-500/20 truncate max-w-[85px]">{label}</span>
                   );
                 })
-              : <span className="text-[7.5px] text-slate-500 italic">None</span>
+              : <span className="text-[7.5px] text-slate-400 italic">None</span>
             }
           </div>
         </div>
@@ -176,7 +180,7 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
               ? data.medicalConditions.slice(0, 4).map(c => (
                   <span key={c} className="px-1.5 py-0.5 rounded-[4px] text-[7.5px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 truncate max-w-[85px]">{c}</span>
                 ))
-              : <span className="text-[7.5px] text-slate-500 italic">None</span>
+              : <span className="text-[7.5px] text-slate-400 italic">None</span>
             }
           </div>
         </div>
@@ -191,7 +195,7 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
         <div className="flex flex-col items-center justify-center rounded-2xl px-4 py-2 shrink-0 bg-rose-500/10 border border-rose-500/30 shadow-inner">
           <Droplets className="w-4 h-4 text-rose-400 mb-0.5 animate-pulse" />
           <span className="text-2xl font-black text-rose-500 leading-none tracking-tight">{data.bloodGroup}</span>
-          <span className="text-[7px] uppercase tracking-[0.2em] text-rose-400/80 font-bold mt-1">Blood</span>
+          <span className="text-[7px] uppercase tracking-[0.2em] text-rose-400 font-bold mt-1">Blood</span>
         </div>
 
         {/* Emergency Call Box */}
@@ -225,8 +229,8 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
 
       {/* ── Bottom strip ── */}
       <div className="mt-auto pt-2 flex items-center justify-between border-t border-white/5">
-        <span className="text-[8px] font-semibold text-slate-500">Secure Emergency Identity Card</span>
-        <span className="text-[8px] text-slate-500 font-medium">
+        <span className="text-[8px] font-semibold text-slate-400">Secure Emergency Identity Card</span>
+        <span className="text-[8px] text-slate-400 font-medium">
           REF: #{data.publicId?.substring(0, 8).toUpperCase() || 'SAMPLE'}
         </span>
       </div>
@@ -254,7 +258,7 @@ function BackContent({ data }: { data: EmergencyData }) {
             ? data.currentMedications.slice(0, 12).map(m => (
                 <span key={m} className="px-2 py-0.5 rounded-md text-[8px] font-bold border bg-cyan-500/10 text-cyan-300 border-cyan-500/25 shadow-sm">{m}</span>
               ))
-            : <span className="text-[9px] text-slate-500 italic">No medications recorded</span>
+            : <span className="text-[9px] text-slate-400 italic">No medications recorded</span>
           }
         </div>
       </div>
@@ -279,8 +283,8 @@ function BackContent({ data }: { data: EmergencyData }) {
 
       {/* Bottom bar */}
       <div className="flex items-center justify-between pt-2 border-t border-white/5">
-        <span className="text-[8px] font-semibold text-slate-500">Scan QR Code on front for active updates</span>
-        <span className="text-[8px] text-slate-500 font-medium">EMERGENCY FIRST RESPONSE</span>
+        <span className="text-[8px] font-semibold text-slate-400">Scan QR Code on front for active updates</span>
+        <span className="text-[8px] text-slate-400 font-medium">EMERGENCY FIRST RESPONSE</span>
       </div>
     </div>
   );
@@ -315,17 +319,26 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
 
     resize();
     window.addEventListener('resize', resize);
-    const t1 = setTimeout(() => setIsFlipped(true),  1200);
-    const t2 = setTimeout(() => setIsFlipped(false), 2800);
-    let th: NodeJS.Timeout, th2: NodeJS.Timeout;
-    if (window.innerWidth < 640) {
+    
+    let t1: NodeJS.Timeout | undefined;
+    let t2: NodeJS.Timeout | undefined;
+    let th: NodeJS.Timeout | undefined;
+    let th2: NodeJS.Timeout | undefined;
+
+    if (window.innerWidth >= 640) {
+      t1 = setTimeout(() => setIsFlipped(true),  1200);
+      t2 = setTimeout(() => setIsFlipped(false), 2800);
+    } else {
       th  = setTimeout(() => setIsHovered(true),  3500);
       th2 = setTimeout(() => setIsHovered(false), 8500);
     }
+
     return () => {
       window.removeEventListener('resize', resize);
-      clearTimeout(t1); clearTimeout(t2);
-      if (th) clearTimeout(th); if (th2) clearTimeout(th2);
+      if (t1) clearTimeout(t1);
+      if (t2) clearTimeout(t2);
+      if (th) clearTimeout(th);
+      if (th2) clearTimeout(th2);
     };
   }, [data.publicId]);
 
@@ -340,7 +353,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
   /* ── Static (forcedSide) ── */
   if (forcedSide) {
     return (
-      <div ref={containerRef} className="flex flex-col items-center py-4 w-full overflow-x-hidden relative">
+      <div ref={containerRef} className="flex flex-col items-center justify-center min-h-[320px] sm:min-h-[350px] py-4 w-full overflow-x-hidden relative">
         <div
           className={`relative w-[480px] h-[304px] rounded-[2rem] ${isMobile ? 'origin-center' : 'origin-top'}`}
           style={wrapperStyle()}
@@ -359,7 +372,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
 
   /* ── Interactive flip ── */
   return (
-    <div ref={containerRef} className="flex flex-col items-center py-4 w-full overflow-x-hidden relative">
+    <div ref={containerRef} className="flex flex-col items-center justify-center min-h-[320px] sm:min-h-[350px] py-4 w-full overflow-x-hidden relative">
       <AnimatePresence>
         {isHovered && !isMobile && (
           <motion.div

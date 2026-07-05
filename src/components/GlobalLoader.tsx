@@ -11,12 +11,12 @@ export default function GlobalLoader() {
     // Small delay to ensure the animations render nicely before fading out
     const fadeTimer = setTimeout(() => {
       setMounted(true);
-    }, 1100);
+    }, 100);
 
     // Completely remove loader from DOM after transition completes
     const destroyTimer = setTimeout(() => {
       setShouldRender(false);
-    }, 1800);
+    }, 400);
 
     return () => {
       clearTimeout(fadeTimer);

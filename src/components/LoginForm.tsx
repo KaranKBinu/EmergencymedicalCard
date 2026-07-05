@@ -73,15 +73,17 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-4">
-            <InputGroup icon={<Mail className="w-5 h-5" />} label="Email">
+            <InputGroup icon={<Mail className="w-5 h-5" />} label="Email" id="email">
               <input 
+                id="email"
                 type="email" name="email" value={formData.email} onChange={handleChange}
                 className="w-full bg-transparent border-none outline-none text-[15px] text-slate-900 placeholder:text-slate-400" 
                 placeholder="name@example.com" required 
               />
             </InputGroup>
-            <InputGroup icon={<Lock className="w-5 h-5" />} label="Password">
+            <InputGroup icon={<Lock className="w-5 h-5" />} label="Password" id="password">
               <input 
+                id="password"
                 type="password" name="password" value={formData.password} onChange={handleChange}
                 className="w-full bg-transparent border-none outline-none text-[15px] text-slate-900 placeholder:text-slate-400" 
                 placeholder="••••••••" required 
@@ -118,10 +120,10 @@ export default function LoginForm() {
   );
 }
 
-function InputGroup({ icon, label, children }: { icon: React.ReactNode, label: string, children: React.ReactNode }) {
+function InputGroup({ icon, label, children, id }: { icon: React.ReactNode, label: string, children: React.ReactNode, id: string }) {
   return (
     <div className="space-y-2 text-left">
-      <label className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] ml-1">{label}</label>
+      <label htmlFor={id} className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] ml-1">{label}</label>
       <div className="flex items-center gap-3.5 px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-primary/50 focus-within:bg-white transition-all duration-300">
         <div className="text-slate-400">
           {icon}

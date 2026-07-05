@@ -159,11 +159,11 @@ export default function RegisterForm() {
                 key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <InputGroup icon={<Mail className="w-5 h-5" />} label="Email Address" required>
-                  <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-field" placeholder="john@example.com" required />
+                <InputGroup icon={<Mail className="w-5 h-5" />} label="Email Address" id="email" required>
+                  <input id="email" type="email" name="email" value={formData.email} onChange={handleChange} className="input-field" placeholder="john@example.com" required />
                 </InputGroup>
-                <InputGroup icon={<Lock className="w-5 h-5" />} label="Password" required>
-                  <input type="password" name="password" value={formData.password} onChange={handleChange} className="input-field" placeholder="••••••••" required />
+                <InputGroup icon={<Lock className="w-5 h-5" />} label="Password" id="password" required>
+                  <input id="password" type="password" name="password" value={formData.password} onChange={handleChange} className="input-field" placeholder="••••••••" required />
                 </InputGroup>
                 <button type="button" onClick={nextStep} className="btn-next">
                   Continue <ChevronRight className="w-4 h-4" />
@@ -177,15 +177,15 @@ export default function RegisterForm() {
                 key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <InputGroup icon={<User className="w-5 h-5" />} label="Full Name" required>
-                  <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="input-field" placeholder="John Doe" required />
+                <InputGroup icon={<User className="w-5 h-5" />} label="Full Name" id="fullName" required>
+                  <input id="fullName" type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="input-field" placeholder="John Doe" required />
                 </InputGroup>
                 <div className="grid grid-cols-2 gap-4">
-                  <InputGroup icon={<Calendar className="w-5 h-5" />} label="Birth Date" required>
-                    <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="input-field [color-scheme:light]" required />
+                  <InputGroup icon={<Calendar className="w-5 h-5" />} label="Birth Date" id="dob" required>
+                    <input id="dob" type="date" name="dob" value={formData.dob} onChange={handleChange} className="input-field [color-scheme:light]" required />
                   </InputGroup>
-                  <InputGroup icon={<User className="w-5 h-5" />} label="Gender" required>
-                    <select name="gender" value={formData.gender} onChange={handleChange} className="input-field appearance-none cursor-pointer" required>
+                  <InputGroup icon={<User className="w-5 h-5" />} label="Gender" id="gender" required>
+                    <select id="gender" name="gender" value={formData.gender} onChange={handleChange} className="input-field appearance-none cursor-pointer" required>
                       <option value="" className="bg-white text-slate-900">Gender</option>
                       <option value="MALE" className="bg-white text-slate-900">Male</option>
                       <option value="FEMALE" className="bg-white text-slate-900">Female</option>
@@ -193,11 +193,11 @@ export default function RegisterForm() {
                     </select>
                   </InputGroup>
                 </div>
-                <InputGroup icon={<MapPin className="w-5 h-5" />} label="Residential Address" optional>
-                  <input type="text" name="address" value={formData.address} onChange={handleChange} className="input-field" placeholder="City, State, Country" />
+                <InputGroup icon={<MapPin className="w-5 h-5" />} label="Residential Address" id="address" optional>
+                  <input id="address" type="text" name="address" value={formData.address} onChange={handleChange} className="input-field" placeholder="City, State, Country" />
                 </InputGroup>
-                <InputGroup icon={<Camera className="w-5 h-5" />} label="Profile Photo URL" optional>
-                  <input type="url" name="photoUrl" value={formData.photoUrl} onChange={handleChange} className="input-field" placeholder="https://image.com/photo.jpg" />
+                <InputGroup icon={<Camera className="w-5 h-5" />} label="Profile Photo URL" id="photoUrl" optional>
+                  <input id="photoUrl" type="url" name="photoUrl" value={formData.photoUrl} onChange={handleChange} className="input-field" placeholder="https://image.com/photo.jpg" />
                 </InputGroup>
                 <div className="flex gap-4 pt-2">
                   <button type="button" onClick={prevStep} className="btn-back"><ChevronLeft className="w-4 h-4" /> Back</button>
@@ -213,25 +213,25 @@ export default function RegisterForm() {
                 className="space-y-4"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <InputGroup icon={<Droplets className="w-5 h-5" />} label="Blood Group" required>
-                    <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} className="input-field appearance-none cursor-pointer">
+                  <InputGroup icon={<Droplets className="w-5 h-5" />} label="Blood Group" id="bloodGroup" required>
+                    <select id="bloodGroup" name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} className="input-field appearance-none cursor-pointer">
                       {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => <option key={bg} value={bg} className="bg-white text-slate-900">{bg}</option>)}
                     </select>
                   </InputGroup>
                   <div className="grid grid-cols-2 gap-2">
-                    <InputGroup icon={<Ruler className="w-4 h-4" />} label="Height" optional>
-                      <input type="text" name="height" value={formData.height} onChange={handleChange} className="input-field" placeholder="180cm" />
+                    <InputGroup icon={<Ruler className="w-4 h-4" />} label="Height" id="height" optional>
+                      <input id="height" type="text" name="height" value={formData.height} onChange={handleChange} className="input-field" placeholder="180cm" />
                     </InputGroup>
-                    <InputGroup icon={<Scale className="w-4 h-4" />} label="Weight" optional>
-                      <input type="text" name="weight" value={formData.weight} onChange={handleChange} className="input-field" placeholder="75kg" />
+                    <InputGroup icon={<Scale className="w-4 h-4" />} label="Weight" id="weight" optional>
+                      <input id="weight" type="text" name="weight" value={formData.weight} onChange={handleChange} className="input-field" placeholder="75kg" />
                     </InputGroup>
                   </div>
                 </div>
-                <InputGroup icon={<Activity className="w-5 h-5" />} label="Allergies" optional>
-                  <input type="text" name="allergies" value={formData.allergies} onChange={handleChange} className="input-field" placeholder="Peanuts, Penicillin (comma separated)" />
+                <InputGroup icon={<Activity className="w-5 h-5" />} label="Allergies" id="allergies" optional>
+                  <input id="allergies" type="text" name="allergies" value={formData.allergies} onChange={handleChange} className="input-field" placeholder="Peanuts, Penicillin (comma separated)" />
                 </InputGroup>
-                <InputGroup icon={<Stethoscope className="w-5 h-5" />} label="Medical Conditions" optional>
-                  <input type="text" name="medicalConditions" value={formData.medicalConditions} onChange={handleChange} className="input-field" placeholder="Asthma, Diabetes (comma separated)" />
+                <InputGroup icon={<Stethoscope className="w-5 h-5" />} label="Medical Conditions" id="medicalConditions" optional>
+                  <input id="medicalConditions" type="text" name="medicalConditions" value={formData.medicalConditions} onChange={handleChange} className="input-field" placeholder="Asthma, Diabetes (comma separated)" />
                 </InputGroup>
                 <div className="flex gap-4 pt-2">
                   <button type="button" onClick={prevStep} className="btn-back"><ChevronLeft className="w-4 h-4" /> Back</button>
@@ -246,12 +246,12 @@ export default function RegisterForm() {
                 key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
-                <InputGroup icon={<User className="w-5 h-5" />} label="Emergency Contact Name" required>
-                  <input type="text" name="emergencyName" value={formData.emergencyName} onChange={handleChange} className="input-field" placeholder="John Doe" required />
+                <InputGroup icon={<User className="w-5 h-5" />} label="Emergency Contact Name" id="emergencyName" required>
+                  <input id="emergencyName" type="text" name="emergencyName" value={formData.emergencyName} onChange={handleChange} className="input-field" placeholder="John Doe" required />
                 </InputGroup>
                 
                 <div className="space-y-2 text-left group">
-                  <label className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] ml-1">Emergency Phone *</label>
+                  <label htmlFor="emergencyPhone" className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] ml-1">Emergency Phone *</label>
                   <div className="flex gap-2">
                     {/* Country Code Selector */}
                     <div className="w-24 relative">
@@ -276,13 +276,13 @@ export default function RegisterForm() {
                     {/* Phone Number Input */}
                     <div className="flex-1 flex items-center gap-3.5 px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-primary/50 focus-within:bg-white transition-all duration-300">
                       <Phone className="w-5 h-5 text-slate-400" />
-                      <input type="tel" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} className="input-field" placeholder="9876543210" required />
+                      <input id="emergencyPhone" type="tel" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} className="input-field" placeholder="9876543210" required />
                     </div>
                   </div>
                 </div>
 
-                <InputGroup icon={<FileText className="w-5 h-5" />} label="Medical Notes & Instructions" optional>
-                  <textarea name="medicalNotes" value={formData.medicalNotes} onChange={handleChange} className="input-field min-h-[80px] py-3 resize-none" placeholder="Medications, special instructions, etc." />
+                <InputGroup icon={<FileText className="w-5 h-5" />} label="Medical Notes & Instructions" id="medicalNotes" optional>
+                  <textarea id="medicalNotes" name="medicalNotes" value={formData.medicalNotes} onChange={handleChange} className="input-field min-h-[80px] py-3 resize-none" placeholder="Medications, special instructions, etc." />
                 </InputGroup>
                 <div className="flex gap-4 pt-2">
                   <button type="button" onClick={prevStep} className="btn-back"><ChevronLeft className="w-4 h-4" /> Back</button>
@@ -361,14 +361,14 @@ export default function RegisterForm() {
 }
 
 function InputGroup({ 
-  icon, label, children, required, optional 
+  icon, label, children, id, required, optional 
 }: { 
-  icon: React.ReactNode, label: string, children: React.ReactNode, required?: boolean, optional?: boolean
+  icon: React.ReactNode, label: string, children: React.ReactNode, id: string, required?: boolean, optional?: boolean
 }) {
   return (
     <div className="space-y-2 text-left group">
       <div className="flex items-center justify-between ml-1">
-        <label className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] group-focus-within:text-primary transition-colors">
+        <label htmlFor={id} className="text-[10px] uppercase font-bold text-slate-500 tracking-[0.15em] group-focus-within:text-primary transition-colors">
           {label} {required && <span className="text-primary ml-0.5">*</span>}
         </label>
         {optional && <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">(Optional)</span>}

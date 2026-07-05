@@ -6,7 +6,12 @@ import { Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Act
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
 import { signOut } from "next-auth/react";
-import EditRecordModal from "@/components/EditRecordModal";
+import dynamic from "next/dynamic";
+
+const EditRecordModal = dynamic(
+  () => import("@/components/EditRecordModal"),
+  { ssr: false }
+);
 
 export default function DashboardClient({ initialData }: { initialData: any }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -190,6 +195,7 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
             <button 
               onClick={() => setIsEditModalOpen(true)}
               className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm rounded-xl transition-all text-[11px] font-black uppercase tracking-widest text-white/80 hover:text-white shadow-sm"
+              aria-label="Edit card"
             >
               <Edit3 className="w-3.5 h-3.5 text-sky-400" />
               <span className="hidden sm:inline">Edit Card</span>
@@ -198,6 +204,7 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
             <button 
               onClick={() => signOut()}
               className="p-2 hover:bg-destructive/10 rounded-xl transition-all group"
+              aria-label="Log out"
             >
               <LogOut className="w-5 h-5 text-slate-400 group-hover:text-destructive" />
             </button>
@@ -339,14 +346,16 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
                 </button>
               </div>
 
-              <div className="fixed -left-[4000px] top-0 pointer-events-none opacity-0">
-                <div ref={frontRef} style={{ width: '480px' }}>
-                  <EmergencyCard data={initialData} forcedSide="front" />
+              {(isDownloadOpen || isEditModalOpen) && (
+                <div className="fixed -left-[4000px] top-0 pointer-events-none opacity-0">
+                  <div ref={frontRef} style={{ width: '480px' }}>
+                    <EmergencyCard data={initialData} forcedSide="front" />
+                  </div>
+                  <div ref={backRef} style={{ width: '480px' }} className="mt-4">
+                    <EmergencyCard data={initialData} forcedSide="back" />
+                  </div>
                 </div>
-                <div ref={backRef} style={{ width: '480px' }} className="mt-4">
-                  <EmergencyCard data={initialData} forcedSide="back" />
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
