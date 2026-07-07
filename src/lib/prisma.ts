@@ -14,7 +14,7 @@ if (!globalForPrisma.pgPool) {
     connectionString,
     max: 8, // Keep pool small to avoid exhausting Postgres connection limits
     idleTimeoutMillis: 15000, // Release idle clients after 15s
-    connectionTimeoutMillis: 2500, // Timeout fast if connection fails
+    connectionTimeoutMillis: 15000, // Increased timeout to 15s to handle slower connections/cold starts
   })
 }
 

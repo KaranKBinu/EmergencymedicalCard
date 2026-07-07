@@ -7,9 +7,10 @@ import {
   User, Mail, Lock, Phone, Droplets,
   ChevronRight, ChevronLeft, CheckCircle2,
   Calendar, MapPin, Ruler, Scale, Activity,
-  Stethoscope, FileText, Camera, Globe, Home, Eye, EyeOff, X, Plus, Pill
+  Stethoscope, FileText, Camera, Globe, Home, Eye, EyeOff, X, Plus, Pill, QrCode, Smartphone, Download, AlertTriangle, Syringe, HeartPulse, ShieldAlert, Check, ShieldCheck, Heart, Cross, ScanFace, FileUp, Loader2, Info
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { processFileForWeb } from "@/lib/fileProcessing";
 import { registerUser, checkEmailExists } from "@/lib/actions";
 import { motion, AnimatePresence } from "framer-motion";
 import CountryList from "country-list-with-dial-code-and-flag";
@@ -302,12 +303,13 @@ export default function RegisterForm() {
 
     setUploading(true);
     try {
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": file.type,
-        },
-        body: file,
+      // Process the file to compress it (if image) and make the filename web-compatible
+      const processedFile = await processFileForWeb(file);
+
+      // Upload to your Next.js API route using the processed file
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(processedFile.name)}`, {
+        method: 'POST',
+        body: processedFile,
       });
 
       if (!res.ok) {

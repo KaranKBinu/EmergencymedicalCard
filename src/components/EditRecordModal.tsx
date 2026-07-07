@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Save, Plus, Trash2, Droplets, User, Phone, Activity, Ruler, Scale, Camera, Image as ImageIcon, MapPin, Calendar, FileText, FilePlus, Edit3, Pill, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { processFileForWeb } from "@/lib/fileProcessing";
 
 
 interface EditRecordModalProps {
@@ -49,9 +50,12 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
 
 
   const uploadFile = async (file: File) => {
-    const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+    // Process the file to compress it and make the filename web-compatible
+    const processedFile = await processFileForWeb(file);
+    
+    const response = await fetch(`/api/upload?filename=${encodeURIComponent(processedFile.name)}`, {
       method: "POST",
-      body: file,
+      body: processedFile,
     });
 
     if (!response.ok) {
