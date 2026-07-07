@@ -253,8 +253,8 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
             <div className="backdrop-blur-2xl rounded-[2.5rem] sm:rounded-[3rem] p-4 sm:p-16 flex flex-col items-center border border-white/8 shadow-2xl shadow-black/30 w-full overflow-hidden" style={{background: 'rgba(255,255,255,0.03)'}}>
               <div 
                 className="w-full flex justify-center perspective-1000"
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
+                onMouseMove={isMobile ? undefined : handleMouseMove}
+                onMouseLeave={isMobile ? undefined : handleMouseLeave}
               >
                 <motion.div 
                   style={isMobile ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
