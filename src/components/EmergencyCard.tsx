@@ -308,7 +308,7 @@ function BackContent({ data }: { data: EmergencyData }) {
 /* ══════════════════════════════════════════════
    Main component
  ══════════════════════════════════════════════ */
-export default function EmergencyCard({ data, forcedSide, priority = false }: { data: EmergencyData; forcedSide?: 'front' | 'back'; priority?: boolean }) {
+export default function EmergencyCard({ data, forcedSide, priority = false, disableResponsive = false, innerRef }: { data: EmergencyData; forcedSide?: 'front' | 'back'; priority?: boolean; disableResponsive?: boolean; innerRef?: React.RefObject<HTMLDivElement | null> }) {
   const [isFlipped, setIsFlipped]   = useState(false);
   const [isHovered, setIsHovered]   = useState(false);
   const currentFlipped              = forcedSide ? (forcedSide === 'back') : isFlipped;
@@ -323,6 +323,12 @@ export default function EmergencyCard({ data, forcedSide, priority = false }: { 
 
   useEffect(() => {
     setTimeout(() => setIsMounted(true), 0);
+
+    if (disableResponsive) {
+      setIsMobile(false);
+      setScale(1);
+      return;
+    }
 
     const resize = () => {
       if (!containerRef.current) return;
@@ -355,7 +361,7 @@ export default function EmergencyCard({ data, forcedSide, priority = false }: { 
       if (th) clearTimeout(th);
       if (th2) clearTimeout(th2);
     };
-  }, [data.publicId]);
+  }, [data.publicId, disableResponsive]);
 
   const wrapperStyle = (extra?: React.CSSProperties): React.CSSProperties => ({
     transform: `scale(${scale}) ${isMobile ? 'rotate(90deg)' : ''}`,
@@ -370,6 +376,7 @@ export default function EmergencyCard({ data, forcedSide, priority = false }: { 
     return (
       <div ref={containerRef} className="flex flex-col items-center justify-center min-h-[320px] sm:min-h-[350px] py-4 w-full overflow-x-hidden relative">
         <div
+          ref={innerRef}
           className={`relative w-[480px] h-[304px] rounded-[2rem] ${isMobile ? 'origin-center' : 'origin-top'}`}
           style={wrapperStyle()}
         >

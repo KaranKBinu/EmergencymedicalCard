@@ -116,9 +116,9 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
       });
       
       const pageWidth = pdf.internal.pageSize.getWidth();
-      const cardWidth = 120; // 12cm
-      const cardHeight = (cardWidth / 1.582);
-      const margin = (pageWidth - cardWidth) / 2;
+      const cardWidth = 85.6; // Standard credit card width (85.6mm)
+      const cardHeight = 54.1; // Standard credit card height (54.1mm)
+      const margin = (pageWidth - (cardWidth * 2)) / 2; // Centers the side-by-side cards (19.4mm)
       
       // Add Title (Centered)
       pdf.setFont("helvetica", "bold");
@@ -144,26 +144,31 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
       pdf.addImage(frontImg, 'PNG', margin, 60, cardWidth, cardHeight);
       
       // Add Back Card
-      pdf.addImage(backImg, 'PNG', margin, 70 + cardHeight, cardWidth, cardHeight);
+      pdf.addImage(backImg, 'PNG', margin + cardWidth, 60, cardWidth, cardHeight);
+
+      // Add a subtle vertical folding guide line between the cards
+      pdf.setDrawColor(200, 200, 200);
+      pdf.setLineWidth(0.2);
+      pdf.line(margin + cardWidth, 60, margin + cardWidth, 60 + cardHeight);
       
       // Add Instructions Box
-      const footerY = 85 + (cardHeight * 2);
+      const footerY = 60 + cardHeight + 15;
       pdf.setFillColor(245, 245, 245);
-      pdf.roundedRect(margin, footerY, cardWidth, 25, 3, 3, 'F');
+      pdf.roundedRect(margin, footerY, cardWidth * 2, 28, 3, 3, 'F');
       
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(9);
       pdf.setTextColor(50, 50, 50);
-      pdf.text("PRINTING INSTRUCTIONS", margin + 5, footerY + 8);
+      pdf.text("PRINTING & FOLDING INSTRUCTIONS", margin + 5, footerY + 8);
       
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8);
       pdf.setTextColor(100, 100, 100);
       const instructions = [
-        "1. Print this document on high-quality A4 paper or cardstock.",
-        "2. Carefully cut along the edges of both card sides.",
-        "3. Fold or glue the sides together to create your double-sided emergency card.",
-        "4. Place in your wallet or behind your phone case for easy access."
+        "1. Print this document at 100% scale (actual size) on high-quality A4 paper or cardstock.",
+        "2. Carefully cut out the combined rectangle outline (do not cut the middle vertical line).",
+        "3. Fold down the vertical center line to align the front and back sides.",
+        "4. Glue the inner sides. Once folded, it will fit perfectly in a standard credit card wallet slot."
       ];
       instructions.forEach((line, i) => {
         pdf.text(line, margin + 5, footerY + 14 + (i * 3.5));
@@ -358,11 +363,11 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
               </div>
 
               <div className="fixed -left-[4000px] top-0 pointer-events-none opacity-0">
-                <div ref={frontRef} style={{ width: '480px' }}>
-                  <EmergencyCard data={initialData} forcedSide="front" priority={true} />
+                <div style={{ width: '480px' }}>
+                  <EmergencyCard data={initialData} forcedSide="front" priority={true} disableResponsive={true} innerRef={frontRef} />
                 </div>
-                <div ref={backRef} style={{ width: '480px' }} className="mt-4">
-                  <EmergencyCard data={initialData} forcedSide="back" priority={true} />
+                <div style={{ width: '480px' }} className="mt-4">
+                  <EmergencyCard data={initialData} forcedSide="back" priority={true} disableResponsive={true} innerRef={backRef} />
                 </div>
               </div>
             </div>
