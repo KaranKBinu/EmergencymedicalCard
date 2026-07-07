@@ -27,6 +27,12 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
                             !initialData.dob || 
                             !initialData.gender;
 
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    setIsMobile(window.matchMedia('(pointer: coarse)').matches);
+  }, []);
+
   // 3D Tilt Hook Setup
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -37,6 +43,7 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
   const shineOpacity = useTransform(mouseYSpring, [-0.5, 0.5], [0.2, 0]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
@@ -84,6 +91,7 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
       setTimeout(() => download(backDataUrl, 'Back'), 500);
       
       toast.success("PNGs downloaded!", { id: toastId });
+      setIsDownloadOpen(false);
     } catch (err) {
       toast.error("Failed to generate PNGs.", { id: toastId });
     }
@@ -167,6 +175,7 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
       
       pdf.save(`Medical-ID-${initialData.fullName.replace(/\s+/g, '-')}.pdf`);
       toast.success("PDF document ready!", { id: toastId });
+      setIsDownloadOpen(false);
     } catch (err) {
       console.error(err);
       toast.error("Failed to generate PDF.", { id: toastId });
@@ -243,19 +252,23 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
                 onMouseLeave={handleMouseLeave}
               >
                 <motion.div 
-                  style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+                  style={isMobile ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
                   className="relative group cursor-pointer transition-shadow"
                 >
                   <EmergencyCard data={initialData} />
                   
                   {/* Premium Shine Effect */}
-                  <motion.div 
-                    style={{ opacity: shineOpacity }}
-                    className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" 
-                  />
+                  {!isMobile && (
+                    <motion.div 
+                      style={{ opacity: shineOpacity }}
+                      className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" 
+                    />
+                  )}
                   
                   {/* Subtle Floating Shadow */}
-                  <div className="absolute -inset-4 bg-sky-500/10 blur-3xl opacity-0 group-hover:opacity-30 transition-opacity -z-10 rounded-full" />
+                  {!isMobile && (
+                    <div className="absolute -inset-4 bg-sky-500/10 blur-3xl opacity-0 group-hover:opacity-30 transition-opacity -z-10 rounded-full" />
+                  )}
                 </motion.div>
               </div>
               
@@ -283,7 +296,6 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
                           <button
                             onClick={() => {
                               handleDownloadPDF();
-                              setIsDownloadOpen(false);
                             }}
                             className="flex items-center gap-3 p-4 hover:bg-white/5 rounded-xl transition-all group text-left w-full cursor-pointer"
                           >
@@ -301,7 +313,6 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
                           <button
                             onClick={() => {
                               handleDownloadPNG();
-                              setIsDownloadOpen(false);
                             }}
                             className="flex items-center gap-3 p-4 hover:bg-white/5 rounded-xl transition-all group text-left w-full cursor-pointer"
                           >
@@ -346,16 +357,14 @@ export default function DashboardClient({ initialData }: { initialData: any }) {
                 </button>
               </div>
 
-              {(isDownloadOpen || isEditModalOpen) && (
-                <div className="fixed -left-[4000px] top-0 pointer-events-none opacity-0">
-                  <div ref={frontRef} style={{ width: '480px' }}>
-                    <EmergencyCard data={initialData} forcedSide="front" />
-                  </div>
-                  <div ref={backRef} style={{ width: '480px' }} className="mt-4">
-                    <EmergencyCard data={initialData} forcedSide="back" />
-                  </div>
+              <div className="fixed -left-[4000px] top-0 pointer-events-none opacity-0">
+                <div ref={frontRef} style={{ width: '480px' }}>
+                  <EmergencyCard data={initialData} forcedSide="front" priority={true} />
                 </div>
-              )}
+                <div ref={backRef} style={{ width: '480px' }} className="mt-4">
+                  <EmergencyCard data={initialData} forcedSide="back" priority={true} />
+                </div>
+              </div>
             </div>
           </div>
 

@@ -86,7 +86,7 @@ const formatWeight = (w?: string) => {
 };
 
 /** Front face */
-function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: string }) {
+function FrontContent({ data, publicUrl, priority = false }: { data: EmergencyData; publicUrl: string; priority?: boolean }) {
   const [isImgLoading, setIsImgLoading] = useState(true);
 
   useEffect(() => {
@@ -124,6 +124,7 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
                   className={`w-full h-full object-cover transition-opacity duration-300 ${isImgLoading ? 'opacity-0' : 'opacity-100'}`}
                   width={76}
                   height={76}
+                  priority={priority}
                   onLoad={() => setIsImgLoading(false)}
                 />
               </div>
@@ -307,7 +308,7 @@ function BackContent({ data }: { data: EmergencyData }) {
 /* ══════════════════════════════════════════════
    Main component
  ══════════════════════════════════════════════ */
-export default function EmergencyCard({ data, forcedSide }: { data: EmergencyData; forcedSide?: 'front' | 'back' }) {
+export default function EmergencyCard({ data, forcedSide, priority = false }: { data: EmergencyData; forcedSide?: 'front' | 'back'; priority?: boolean }) {
   const [isFlipped, setIsFlipped]   = useState(false);
   const [isHovered, setIsHovered]   = useState(false);
   const currentFlipped              = forcedSide ? (forcedSide === 'back') : isFlipped;
@@ -375,7 +376,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
           <div className="relative h-full w-full rounded-[2rem] overflow-hidden border border-cyan-500/25 text-white" style={{ background: CARD_BG }}>
             <CardGlows />
             {forcedSide === 'front'
-              ? <FrontContent data={data} publicUrl={publicUrl} />
+              ? <FrontContent data={data} publicUrl={publicUrl} priority={priority} />
               : <BackContent data={data} />
             }
           </div>
@@ -417,7 +418,7 @@ export default function EmergencyCard({ data, forcedSide }: { data: EmergencyDat
           <div className="absolute inset-0 backface-hidden">
             <div className="relative h-full w-full rounded-[2rem] overflow-hidden border border-cyan-500/25 text-white" style={{ background: CARD_BG }}>
               <CardGlows />
-              <FrontContent data={data} publicUrl={publicUrl} />
+              <FrontContent data={data} publicUrl={publicUrl} priority={priority} />
             </div>
           </div>
 

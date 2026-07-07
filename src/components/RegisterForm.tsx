@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -13,7 +13,6 @@ import toast from "react-hot-toast";
 import { processFileForWeb } from "@/lib/fileProcessing";
 import { registerUser, checkEmailExists } from "@/lib/actions";
 import { motion, AnimatePresence } from "framer-motion";
-import CountryList from "country-list-with-dial-code-and-flag";
 
 interface Country {
   name: string;
@@ -23,16 +22,13 @@ interface Country {
   dialCode: string;
 }
 
-const countriesList: Country[] = CountryList.getAll().map((c: any) => {
-  const data = c.data || c;
-  return {
-    name: data.name,
-    flag: data.flag,
-    flagUrl: `https://flagcdn.com/16x12/${data.code.toLowerCase()}.png`,
-    code: data.code,
-    dialCode: data.dial_code
-  };
-}).sort((a, b) => a.name.localeCompare(b.name));
+const defaultCountry: Country = {
+  name: "India",
+  flag: "🇮🇳",
+  flagUrl: "https://flagcdn.com/16x12/in.png",
+  code: "IN",
+  dialCode: "+91"
+};
 const getPasswordStrength = (password: string) => {
   if (!password) return 0;
   let strength = 0;
@@ -47,11 +43,30 @@ export default function RegisterForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
-  const [countries] = useState<Country[]>(countriesList);
-  const [selectedCountry, setSelectedCountry] = useState<Country | null>(
-    countriesList.find(c => c.code === "IN") || countriesList[0]
-  );
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(defaultCountry);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  useEffect(() => {
+    if (isDropdownOpen && countries.length === 0) {
+      import("country-list-with-dial-code-and-flag").then((module) => {
+        const list = module.default.getAll().map((c: any) => {
+          const data = c.data || c;
+          return {
+            name: data.name,
+            flag: data.flag,
+            flagUrl: `https://flagcdn.com/16x12/${data.code.toLowerCase()}.png`,
+            code: data.code,
+            dialCode: data.dial_code
+          };
+        }).sort((a, b) => a.name.localeCompare(b.name));
+        setCountries(list);
+      }).catch(err => {
+        console.error("Failed to load country list", err);
+      });
+    }
+  }, [isDropdownOpen, countries.length]);
+
   const [countrySearch, setCountrySearch] = useState("");
   const [isGenderOpen, setIsGenderOpen] = useState(false);
   const [isBloodGroupOpen, setIsBloodGroupOpen] = useState(false);
@@ -831,7 +846,12 @@ export default function RegisterForm() {
                               />
                             </div>
                             <div className="overflow-y-auto max-h-40 flex flex-col gap-0.5">
-                              {filteredCountries.length > 0 ? (
+                              {countries.length === 0 ? (
+                                <div className="flex items-center justify-center py-6 text-xs text-slate-400 gap-2">
+                                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                                  <span>Loading countries...</span>
+                                </div>
+                              ) : filteredCountries.length > 0 ? (
                                 filteredCountries.map((c, index) => (
                                   <button
                                     key={`${c.code}-${index}`}
