@@ -82,7 +82,7 @@ export default function PublicEmergencyProfile({ data, isLoggedIn = true }: { da
                 style={glassDark}
               >
                 {data.photoUrl ? (
-                  <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" />
+                  <img src={data.photoUrl} alt={data.fullName} className="w-full h-full object-cover" loading="lazy" />
                 ) : (
                   <User className="w-12 h-12 lg:w-16 lg:h-16 text-white/15" />
                 )}
@@ -326,12 +326,12 @@ export default function PublicEmergencyProfile({ data, isLoggedIn = true }: { da
                                 </div>
                                 {isImage && (
                                   <div className="mt-2 rounded-lg overflow-hidden border border-white/7">
-                                    <img src={url} alt={file.name} className="w-full h-auto max-h-36 object-cover" />
+                                    <img src={url} alt={file.name} className="w-full h-auto max-h-36 object-cover" loading="lazy" />
                                   </div>
                                 )}
                                 {isPdf && (
                                   <div className="mt-2 rounded-lg overflow-hidden border border-white/7 h-36 relative flex items-center justify-center">
-                                    <iframe src={`${url}#toolbar=0&navpanes=0&scrollbar=0`} className="w-full h-full rounded-lg border-0 pointer-events-none select-none" style={{ minHeight: '130px' }} />
+                                    <iframe src={`${url}#toolbar=0&navpanes=0&scrollbar=0`} className="w-full h-full rounded-lg border-0 pointer-events-none select-none" style={{ minHeight: '130px' }} loading="lazy" />
                                     <div className="absolute bottom-2 left-2">
                                       <span className="text-[8px] font-black uppercase tracking-wider bg-rose-500/80 text-white px-1.5 py-0.5 rounded flex items-center gap-1 border border-rose-400/20">
                                         <FileText className="w-2 h-2" /> PDF
@@ -430,8 +430,8 @@ export default function PublicEmergencyProfile({ data, isLoggedIn = true }: { da
                   const url = activePreview.url;
                   const isImage = url.startsWith('data:image/') || url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
                   const isPdf = url.match(/\.pdf$/i) || url.startsWith('data:application/pdf');
-                  if (isImage) return <img src={url} alt={activePreview.name} className="max-w-full max-h-[65vh] object-contain rounded-xl shadow-2xl" />;
-                  if (isPdf) return <iframe src={url} className="w-full h-[65vh] rounded-xl bg-white border-0" title={activePreview.name} />;
+                  if (isImage) return <img src={url} alt={activePreview.name} className="max-w-full max-h-[65vh] object-contain rounded-xl shadow-2xl" loading="lazy" />;
+                  if (isPdf) return <iframe src={url} className="w-full h-[65vh] rounded-xl bg-white border-0" title={activePreview.name} loading="lazy" />;
                   return (
                     <div className="text-center py-16 text-white/30">
                       <FileText className="w-16 h-16 mx-auto mb-4 text-white/15" />

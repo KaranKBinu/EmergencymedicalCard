@@ -592,7 +592,7 @@ export default function RegisterForm() {
                     ) : formData.photoUrl ? (
                       <div className="flex flex-col items-center gap-3">
                         <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary/50 shadow-lg group-hover/uploader:scale-105 transition-transform duration-300">
-                          <img src={formData.photoUrl} alt="Preview" className="w-full h-full object-cover" />
+                          <img src={formData.photoUrl} alt="Preview" className="w-full h-full object-cover" loading="lazy" />
                         </div>
                         <button
                           type="button"
@@ -794,6 +794,7 @@ export default function RegisterForm() {
                               src={selectedCountry.flagUrl}
                               alt=""
                               className="w-4 h-3 object-cover rounded-sm shadow-sm shrink-0"
+                              loading="lazy"
                             />
                             <span>{selectedCountry.dialCode}</span>
                           </span>
@@ -847,6 +848,7 @@ export default function RegisterForm() {
                                       src={c.flagUrl}
                                       alt=""
                                       className="w-4 h-3 object-cover rounded-sm shadow-sm"
+                                      loading="lazy"
                                     />
                                     <span className="truncate max-w-[120px]">{c.name}</span>
                                     <span className="text-slate-400 font-semibold ml-auto">{c.dialCode}</span>

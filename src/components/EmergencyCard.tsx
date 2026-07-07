@@ -124,7 +124,6 @@ function FrontContent({ data, publicUrl }: { data: EmergencyData; publicUrl: str
                   className={`w-full h-full object-cover transition-opacity duration-300 ${isImgLoading ? 'opacity-0' : 'opacity-100'}`}
                   width={76}
                   height={76}
-                  priority={true}
                   onLoad={() => setIsImgLoading(false)}
                 />
               </div>

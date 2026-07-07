@@ -362,7 +362,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                 <div className="relative group">
                   <div className="w-28 h-28 rounded-[2.25rem] bg-slate-950/40 border border-dashed border-white/15 overflow-hidden flex items-center justify-center transition-all group-hover:border-cyan-500/50 shadow-inner">
                     {formData.photoUrl ? (
-                      <img src={formData.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+                      <img src={formData.photoUrl} alt="Profile" className="w-full h-full object-cover" loading="lazy" />
                     ) : (
                       <div className="text-center">
                         <Camera className="w-7 h-7 text-slate-600 mx-auto mb-1" />
@@ -786,13 +786,13 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                             {/* Mini Image Preview */}
                             {isImage && (
                               <div className="mt-2.5 rounded-xl overflow-hidden border border-white/5 bg-slate-950/80 p-0.5 shadow-inner">
-                                <img src={url} alt={file.name} className="w-full h-auto max-h-40 object-cover rounded-lg" />
+                                <img src={url} alt={file.name} className="w-full h-auto max-h-40 object-cover rounded-lg" loading="lazy" />
                               </div>
                             )}
                             {/* Mini PDF Preview */}
                             {isPdf && (
                               <div className="mt-2.5 rounded-xl overflow-hidden border border-white/5 bg-slate-950/85 p-0.5 shadow-inner h-40 relative flex items-center justify-center">
-                                <iframe src={`${url}#toolbar=0&navpanes=0&scrollbar=0`} className="w-full h-full rounded-lg bg-white border-0 pointer-events-none select-none overflow-hidden" style={{ minHeight: '150px' }} />
+                                <iframe src={`${url}#toolbar=0&navpanes=0&scrollbar=0`} className="w-full h-full rounded-lg bg-white border-0 pointer-events-none select-none overflow-hidden" style={{ minHeight: '150px' }} loading="lazy" />
                                 <div className="absolute inset-0 bg-slate-950/[0.01] hover:bg-slate-950/[0.04] transition-colors rounded-lg flex items-end p-2.5">
                                   <span className="text-[8px] font-black uppercase tracking-wider bg-rose-500 text-white px-2 py-0.5 rounded shadow-sm flex items-center gap-1 z-10">
                                     <FileText className="w-2.5 h-2.5" /> PDF Preview
@@ -952,6 +952,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                           src={url} 
                           alt={activePreview.name} 
                           className="max-w-full max-h-[60vh] object-contain rounded-xl"
+                          loading="lazy"
                         />
                       );
                     } else if (isPdf) {
@@ -960,6 +961,7 @@ export default function EditRecordModal({ isOpen, onClose, initialData }: EditRe
                           src={url} 
                           className="w-full h-[60vh] rounded-xl bg-white border-0" 
                           title={activePreview.name}
+                          loading="lazy"
                         />
                       );
                     } else {
