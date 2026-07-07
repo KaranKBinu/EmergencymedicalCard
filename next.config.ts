@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
     },
-    optimizePackageImports: ["lucide-react", "framer-motion", "qrcode.react"],
   },
   images: {
     remotePatterns: [

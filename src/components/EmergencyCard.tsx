@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, Droplets, User, Activity, Scale, Ruler, Info, Calendar, AlertTriangle, Mars, Venus, Transgender } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { useRef } from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-
-const QRCodeSVG = dynamic(() => import("qrcode.react").then((mod) => mod.QRCodeSVG), { ssr: false });
 
 interface EmergencyData {
   fullName: string;
