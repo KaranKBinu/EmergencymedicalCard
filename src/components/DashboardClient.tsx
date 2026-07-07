@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import EmergencyCard from "@/components/EmergencyCard";
+import dynamic from "next/dynamic";
+const EmergencyCard = dynamic(() => import("@/components/EmergencyCard"), { ssr: false });
 import { Download, Share2, Edit3, Shield, LogOut, Droplets, Calendar, Phone, Activity, ChevronDown, FileText, Image as ImageIcon, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import toast from "react-hot-toast";
 import { signOut } from "next-auth/react";
-import dynamic from "next/dynamic";
-
 const EditRecordModal = dynamic(
   () => import("@/components/EditRecordModal"),
   { ssr: false }
