@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { put, list } from "@vercel/blob";
 import fs from "fs/promises";
 import path from "path";
+import os from "os";
 
 export interface NoteAttachment {
   id: string;
@@ -21,7 +22,8 @@ export interface NoteData {
   updatedAt: string;
 }
 
-const LOCAL_STORAGE_DIR = path.join(process.cwd(), ".next", "emergency-notepad-store");
+// Use os.tmpdir() for serverless / Vercel compatibility
+const LOCAL_STORAGE_DIR = path.join(os.tmpdir(), "emergency-notepad-store");
 
 function sanitizeNoteId(id?: string | null): string {
   if (!id || typeof id !== "string") return "default";
@@ -77,22 +79,23 @@ export async function GET(req: Request) {
 
     if (process.env.BLOB_READ_WRITE_TOKEN) {
       try {
-        const res = await fetch(`https://blob.vercel-storage.com/emergency-notepad-${noteId}.json`, {
-          cache: "no-store",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          noteData = {
-            noteId,
-            content: data.content || "",
-            attachments: Array.isArray(data.attachments) ? data.attachments : [],
-            password: data.password || null,
-            isLocked: Boolean(data.isLocked && data.password),
-            updatedAt: data.updatedAt || new Date().toISOString(),
-          };
+        const { blobs } = await list({ prefix: `emergency-notepad-${noteId}.json` });
+        if (blobs.length > 0) {
+          const res = await fetch(blobs[0].url, { cache: "no-store" });
+          if (res.ok) {
+            const data = await res.json();
+            noteData = {
+              noteId,
+              content: data.content || "",
+              attachments: Array.isArray(data.attachments) ? data.attachments : [],
+              password: data.password || null,
+              isLocked: Boolean(data.isLocked && data.password),
+              updatedAt: data.updatedAt || new Date().toISOString(),
+            };
+          }
         }
-      } catch {
-        // Fallback to local
+      } catch (blobErr) {
+        console.warn("Vercel Blob list/fetch failed:", blobErr);
       }
     }
 
@@ -152,6 +155,7 @@ export async function POST(req: Request) {
         const blob = await put(`emergency-notepad-${noteId}.json`, JSON.stringify(noteData), {
           access: "public",
           addRandomSuffix: false,
+          allowOverwrite: true,
         });
         return NextResponse.json({
           noteId,
